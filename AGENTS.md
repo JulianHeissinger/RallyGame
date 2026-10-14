@@ -14,7 +14,12 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - Project check: `godot --headless --path . --import`. `--quit` hangs with "no main scene defined" until a main scene exists (task 8.2).
 - Tests: `godot --headless --path . -s tests/run_tests.gd`. After adding a new `class_name` script, run `--import` once first, or the global class cache does not know the class.
 - Editing the InputMap: generate it with a one-off script (outside the repo) that uses `ProjectSettings.set_setting` and `ProjectSettings.save()`, not by hand. Set key events to `device = -1` (the default is 16) to match editor output. `save()` drops settings equal to their defaults (e.g. `renderer/rendering_method="forward_plus"`); that is expected.
+- New scripts and test files get their `.uid` only on the next `--import`; run it again before committing.
+- Write `.tres` files that contain sub-resources (e.g. the torque `Curve` in `data/cars/prototype.tres`) with a one-off `ResourceSaver` script outside the repo, not by hand.
+- Physics checks: the test runner calls test methods synchronously and cannot await physics frames. Verify handling with a one-off headless script outside the repo that instantiates `scenes/test/handling_test.tscn`, awaits `physics_frame`, and prints measurements.
 
 ## Watch-outs
 
 - `IsoCameraRig` estimates target velocity from position change per frame. If the camera jitters once the 120 Hz car exists (task 3.2), use the car's `linear_velocity` instead.
+- Godot's project default body damping (0.1) acts as fake drag and slows rotation. `car.tscn` overrides it with `linear_damp_mode`/`angular_damp_mode` = Replace and damping 0; keep it that way for any new car body.
+- `project.godot` has an uncommitted `run/main_scene="res://scenes/test/handling_test.tscn"` set by the user for test driving. Leave it uncommitted; task 8.2 sets the real main scene.
