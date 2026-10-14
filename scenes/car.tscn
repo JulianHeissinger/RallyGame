@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/car/car.gd" id="1_car"]
+[ext_resource type="Resource" path="res://data/cars/prototype.tres" id="2_stats"]
+[ext_resource type="Script" path="res://scripts/car/wheel.gd" id="3_wheel"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(1.7, 0.5, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(1.7, 0.5, 4)
+
+[node name="Car" type="RigidBody3D"]
+script = ExtResource("1_car")
+car_stats = ExtResource("2_stats")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_body")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_body")
+
+[node name="WheelFL" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, -0.25, -1.25)
+script = ExtResource("3_wheel")
+
+[node name="WheelFR" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -0.25, -1.25)
+script = ExtResource("3_wheel")
+
+[node name="WheelRL" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, -0.25, 1.25)
+script = ExtResource("3_wheel")
+
+[node name="WheelRR" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -0.25, 1.25)
+script = ExtResource("3_wheel")
