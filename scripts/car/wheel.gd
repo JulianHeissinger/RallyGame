@@ -3,6 +3,9 @@ extends RayCast3D
 ## Raycast wheel with spring/damper suspension and a slip-based tire. The ray points down from
 ## the mount point; its length is suspension rest length plus wheel radius.
 
+## Slip stiffness is too high for one explicit spin step at 120 Hz; substeps keep it stable.
+const SPIN_SUBSTEPS := 8
+
 ## Front wheels turn with the steering input.
 @export var steerable := false
 
@@ -13,12 +16,16 @@ var normal_load := 0.0
 var spin := 0.0
 var slip_angle := 0.0
 var slip_ratio := 0.0
+## Set by the drivetrain each tick, in N·m. Drive is signed; brake is a magnitude.
+var drive_torque := 0.0
+var brake_torque := 0.0
 
 var _last_compression := 0.0
 var _contact := Vector3.ZERO
 var _contact_normal := Vector3.UP
-## Sideways tire carcass deflection in m, used only near standstill.
+## Tire carcass deflections in m, used only near standstill.
 var _lateral_deflection := 0.0
+var _longitudinal_deflection := 0.0
 
 
 func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
@@ -44,13 +51,16 @@ func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> voi
 
 ## Applies tire forces at the contact point. Call after `update_suspension` in the same tick.
 func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
+	var radius := stats.get_stat("wheel_radius")
+	var inertia := stats.get_stat("wheel_inertia")
 	if not is_grounded:
 		slip_angle = 0.0
 		slip_ratio = 0.0
 		_lateral_deflection = 0.0
+		_longitudinal_deflection = 0.0
+		spin = move_toward(spin + drive_torque / inertia * delta, 0.0, brake_torque / inertia * delta)
 		return
 
-	var radius := stats.get_stat("wheel_radius")
 	var low_speed := stats.get_stat("low_speed_threshold")
 	var forward := -global_basis.z
 	forward = (forward - _contact_normal * forward.dot(_contact_normal)).normalized()
@@ -60,49 +70,65 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var velocity := body.linear_velocity + body.angular_velocity.cross(offset)
 	var v_long := velocity.dot(forward)
 	var v_lat := velocity.dot(right)
+	var mass_share := normal_load / body.get_gravity().length()
 
-	slip_ratio = (spin * radius - v_long) / maxf(absf(v_long), low_speed)
 	slip_angle = atan2(v_lat, absf(v_long))
-
 	var max_force := stats.get_stat("tire_friction") * normal_load
-	var force_long := max_force * _magic_formula(slip_ratio,
-		stats.get_stat("tire_long_b"), stats.get_stat("tire_long_c"))
 	var force_lat := -max_force * _magic_formula(slip_angle,
 		stats.get_stat("tire_lat_b"), stats.get_stat("tire_lat_c"))
 
-	# Slip angle is ill-defined near standstill: blend toward a tire carcass spring, which holds
-	# static side loads (e.g. on a slope) without creeping. Critically damped per wheel load share.
+	# Spin and longitudinal force are integrated together in substeps. The friction circle
+	# scales each substep's combined force down to the available grip.
+	var long_b := stats.get_stat("tire_long_b")
+	var long_c := stats.get_stat("tire_long_c")
+	var h := delta / SPIN_SUBSTEPS
+	var force_long := 0.0
+	var circle_scale := 0.0
+	for i in SPIN_SUBSTEPS:
+		slip_ratio = (spin * radius - v_long) / maxf(absf(v_long), low_speed)
+		var force := max_force * _magic_formula(slip_ratio, long_b, long_c)
+		var demand := Vector2(force, force_lat).length()
+		var grip_scale := max_force / demand if demand > max_force else 1.0
+		force *= grip_scale
+		spin = move_toward(spin + (drive_torque - force * radius) / inertia * h, 0.0,
+			brake_torque / inertia * h)
+		force_long += force
+		circle_scale += grip_scale
+	force_long /= SPIN_SUBSTEPS
+	force_lat *= circle_scale / SPIN_SUBSTEPS
+
+	# Slip is ill-defined near standstill: blend toward tire carcass springs, which hold static
+	# loads (e.g. on a slope) without creeping. Critically damped per wheel load share.
 	var blend := clampf(Vector2(v_long, v_lat).length() / low_speed, 0.0, 1.0)
-	var stiffness := stats.get_stat("tire_lateral_stiffness")
-	var damping := 2.0 * sqrt(stiffness * normal_load / body.get_gravity().length())
-	var max_deflection := max_force / stiffness
-	_lateral_deflection = clampf(_lateral_deflection + v_lat * delta, -max_deflection, max_deflection)
-	var force_lat_low := clampf(-stiffness * _lateral_deflection - damping * v_lat, -max_force, max_force)
+
+	var lat_stiffness := stats.get_stat("tire_lateral_stiffness")
+	_lateral_deflection = clampf(_lateral_deflection + v_lat * delta,
+		-max_force / lat_stiffness, max_force / lat_stiffness)
+	var force_lat_low := clampf(-lat_stiffness * _lateral_deflection
+		- 2.0 * sqrt(lat_stiffness * mass_share) * v_lat, -max_force, max_force)
 	force_lat = lerpf(force_lat_low, force_lat, blend)
 	_lateral_deflection *= 1.0 - blend
-	# Slip ratio is too stiff to integrate near standstill: blend toward a wheel that sticks to
-	# the ground, where only torque applied to the wheel (none yet) makes longitudinal force.
-	var force_long_low := 0.0
+
+	# Near standstill the wheel sticks to the ground: drive torque pushes directly, and a braked
+	# wheel holds through the carcass spring up to what the brake can resist.
+	var force_long_low := drive_torque / radius
+	var spin_low := v_long / radius
+	if brake_torque > 0.0:
+		var long_stiffness := stats.get_stat("tire_longitudinal_stiffness")
+		var hold := minf(max_force, brake_torque / radius)
+		_longitudinal_deflection = clampf(_longitudinal_deflection + v_long * delta,
+			-hold / long_stiffness, hold / long_stiffness)
+		force_long_low += clampf(-long_stiffness * _longitudinal_deflection
+			- 2.0 * sqrt(long_stiffness * mass_share) * v_long, -hold, hold)
+		spin_low = 0.0
+	else:
+		_longitudinal_deflection = 0.0
+	force_long_low = clampf(force_long_low, -max_force, max_force)
 	force_long = lerpf(force_long_low, force_long, blend)
+	spin = lerpf(spin_low, spin, blend)
+	_longitudinal_deflection *= 1.0 - blend
 
-	# Friction circle: combined demand cannot exceed the available grip.
-	var demand := Vector2(force_long, force_lat).length()
-	if demand > max_force and demand > 0.0:
-		force_long *= max_force / demand
-		force_lat *= max_force / demand
-
-	_integrate_spin(-force_long * radius, v_long / radius, stats.get_stat("wheel_inertia"), delta)
-	spin = lerpf(v_long / radius, spin, blend)
 	body.apply_force(forward * force_long + right * force_lat, offset)
-
-
-## Explicit integration at 120 Hz overshoots the free-rolling speed when slip stiffness is high,
-## so with no drive or brake torque the spin may reach that speed but not cross it.
-func _integrate_spin(torque: float, rolling_spin: float, inertia: float, delta: float) -> void:
-	var next := spin + torque / inertia * delta
-	if signf(spin - rolling_spin) != signf(next - rolling_spin):
-		next = rolling_spin
-	spin = next
 
 
 ## Simplified Pacejka curve, normalized to a peak of 1.
