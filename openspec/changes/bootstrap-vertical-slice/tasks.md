@@ -14,7 +14,7 @@
 
 ## 3. Car handling
 
-- [ ] 3.1 Create `CarStats` resource and `data/cars/prototype.tres`, plus `StatBlock` (base, additive, multiplicative, damage multipliers); verify with `tests/test_stat_block.gd` for stacking order and recompute on change
+- [x] 3.1 Create `CarStats` resource and `data/cars/prototype.tres`, plus `StatBlock` (base, additive, multiplicative, damage multipliers); verify with `tests/test_stat_block.gd` for stacking order and recompute on change
 - [ ] 3.2 Build `car.tscn` with placeholder box body, four raycast wheels, per-wheel spring/damper suspension; verify in a flat test scene that the car settles at rest on flat and sloped ground without endless bouncing
 - [ ] 3.3 Implement per-wheel spin integration and slip-based tire forces (slip angle, slip ratio, load, friction ellipse, low-speed blending); verify gentle turns grip and fast full-lock turns slide in the test scene
 - [ ] 3.4 Implement engine and drivetrain: AWD torque split, torque curve, RPM from driven-wheel spin, automatic clutch at launch, engine braking, rev limiter with bounce, brakes, handbrake rear lock; verify in the test scene that wheelspin raises RPM, lift-off slows faster than neutral, holding a gear bounces off the limiter, and handbrake rotates the car
