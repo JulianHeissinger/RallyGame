@@ -8,7 +8,7 @@
 
 ## 2. Input and camera
 
-- [ ] 2.1 Implement `InputSource` (single-player source: keyboard + device 0, analog with deadzone, speed-dependent keyboard steering ramp); verify with `tests/test_input_source.gd` for ramp-up, return to center and slower ramp at speed
+- [x] 2.1 Implement `InputSource` (single-player source: keyboard + device 0, analog with deadzone, speed-dependent keyboard steering ramp); verify with `tests/test_input_source.gd` for ramp-up, return to center and slower ramp at speed
 - [ ] 2.2 Implement `IsoCameraRig` (fixed pitch/yaw, narrow FOV, damped follow, speed look-ahead, settable target); verify in a test scene that the camera does not rotate when a moving target turns
 
 ## 3. Car handling

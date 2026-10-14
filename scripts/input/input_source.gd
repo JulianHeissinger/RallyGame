@@ -1,0 +1,43 @@
+class_name InputSource
+extends RefCounted
+## Single-player input: keyboard plus joypad device 0. The car reads only these values.
+## Keyboard steering ramps toward its target; the ramp slows down as car speed rises.
+
+const DEVICE := 0
+const STICK_DEADZONE := 0.1
+
+## Steering rate toward lock, in full-range units per second, at standstill and at `steer_fast_speed`.
+var steer_rate_slow := 5.0
+var steer_rate_fast := 1.5
+## Steering rate back to center at standstill and at `steer_fast_speed`.
+var steer_return_rate_slow := 6.0
+var steer_return_rate_fast := 3.0
+## Speed in m/s at which the fast rates apply fully.
+var steer_fast_speed := 30.0
+
+var steer := 0.0
+var throttle := 0.0
+var brake := 0.0
+var handbrake := 0.0
+
+
+## Reads input for one physics tick. `speed` is the car's speed in m/s.
+func update(delta: float, speed: float) -> void:
+	var stick := Input.get_joy_axis(DEVICE, JOY_AXIS_LEFT_X)
+	if absf(stick) > STICK_DEADZONE:
+		steer = stick
+	else:
+		steer = step_steer(steer, Input.get_axis("steer_left", "steer_right"), delta, speed)
+	throttle = Input.get_action_strength("throttle")
+	brake = Input.get_action_strength("brake")
+	handbrake = Input.get_action_strength("handbrake")
+
+
+## Moves `current` toward `target` at a speed-dependent rate. Moving away from center uses the
+## steer rate, moving toward center uses the return rate.
+func step_steer(current: float, target: float, delta: float, speed: float) -> float:
+	var t := clampf(speed / steer_fast_speed, 0.0, 1.0)
+	var toward_center := absf(target) < absf(current) and signf(target) != -signf(current)
+	var rate := lerpf(steer_return_rate_slow, steer_return_rate_fast, t) if toward_center \
+		else lerpf(steer_rate_slow, steer_rate_fast, t)
+	return move_toward(current, target, rate * delta)
