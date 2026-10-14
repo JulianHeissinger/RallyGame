@@ -13,6 +13,8 @@ size = Vector3(1.7, 0.5, 4)
 [node name="Car" type="RigidBody3D"]
 script = ExtResource("1_car")
 car_stats = ExtResource("2_stats")
+linear_damp_mode = 1
+angular_damp_mode = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_body")
@@ -23,10 +25,12 @@ mesh = SubResource("BoxMesh_body")
 [node name="WheelFL" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, -0.25, -1.25)
 script = ExtResource("3_wheel")
+steerable = true
 
 [node name="WheelFR" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -0.25, -1.25)
 script = ExtResource("3_wheel")
+steerable = true
 
 [node name="WheelRL" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, -0.25, 1.25)
