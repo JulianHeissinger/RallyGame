@@ -10,16 +10,18 @@
 
 - [x] 2.1 Implement `InputSource` (single-player source: keyboard + device 0, analog with deadzone, speed-dependent keyboard steering ramp); verify with `tests/test_input_source.gd` for ramp-up, return to center and slower ramp at speed
 - [x] 2.2 Implement `IsoCameraRig` (fixed pitch/yaw, narrow FOV, damped follow, speed look-ahead, settable target); verify with `tests/test_iso_camera_rig.gd` that the camera does not rotate when a moving target turns and that the focus leads along velocity
+- [ ] 2.3 Add `shift_up` (Left Shift, RB) and `shift_down` (Left Ctrl, LB) InputMap actions and expose them as just-pressed flags in `InputSource`; verify both actions appear in `project.godot` and all tests pass
 
 ## 3. Car handling
 
 - [ ] 3.1 Create `CarStats` resource and `data/cars/prototype.tres`, plus `StatBlock` (base, additive, multiplicative, damage multipliers); verify with `tests/test_stat_block.gd` for stacking order and recompute on change
 - [ ] 3.2 Build `car.tscn` with placeholder box body, four raycast wheels, per-wheel spring/damper suspension; verify in a flat test scene that the car settles at rest on flat and sloped ground without endless bouncing
 - [ ] 3.3 Implement per-wheel spin integration and slip-based tire forces (slip angle, slip ratio, load, friction ellipse, low-speed blending); verify gentle turns grip and fast full-lock turns slide in the test scene
-- [ ] 3.4 Implement AWD drivetrain with torque curve, automatic gearbox, brakes, reverse at standstill, and handbrake rear lock; verify full-throttle run shifts up and caps at top speed, brake at standstill reverses, handbrake rotates the car
-- [ ] 3.5 Implement surface grip lookup from collider `surface` metadata; verify wheels on a `grass` collider produce less grip than on `gravel` via the debug overlay
-- [ ] 3.6 Add F1 debug overlay (per-wheel load, slip angle, slip ratio, surface, gear, RPM, speed); verify it toggles in the test scene
-- [ ] 3.7 Handling tuning pass in the test scene with controller and keyboard: lift-off rotation, Scandinavian flick and handbrake hairpin all work without yaw assist; record final values in `prototype.tres`
+- [ ] 3.4 Implement engine and drivetrain: AWD torque split, torque curve, RPM from driven-wheel spin, automatic clutch at launch, engine braking, rev limiter with bounce, brakes, handbrake rear lock; verify in the test scene that wheelspin raises RPM, lift-off slows faster than neutral, holding a gear bounces off the limiter, and handbrake rotates the car
+- [ ] 3.5 Implement gearbox (R, N, 1..n ratios, shift time with torque cut, `gear_shifted` signal) with automatic mode (RPM shift points, reverse by brake at standstill) and manual mode (shift up/down, N then R only at standstill, over-rev downshift refused), plus a `Settings` autoload for the mode (`user://settings.cfg`); verify with `tests/test_gearbox.gd` for both modes and in the test scene that a full-throttle automatic run shifts up and caps at top speed
+- [ ] 3.6 Implement surface grip lookup from collider `surface` metadata; verify wheels on a `grass` collider produce less grip than on `gravel` via the debug overlay
+- [ ] 3.7 Add F1 debug overlay (per-wheel load, slip angle, slip ratio, surface, gear, RPM, speed); verify it toggles in the test scene
+- [ ] 3.8 Handling tuning pass in the test scene with controller and keyboard: lift-off rotation, Scandinavian flick and handbrake hairpin all work without yaw assist, and manual shifting feels responsive; record final values in `prototype.tres`
 
 ## 4. Car damage
 
@@ -55,9 +57,9 @@
 ## 8. Game flow and UI
 
 - [ ] 8.1 Implement `RunState` autoload (seed, difficulty, prize money, owned items, reset); verify with a test that reset clears items and money
-- [ ] 8.2 Build main menu (Start Stage, seed field, Quit) with controller and keyboard navigation, set as main scene; verify empty seed starts a random stage and seed 42 reproduces the same stage
+- [ ] 8.2 Build main menu (Start Stage, seed field, gearbox setting, Quit) with controller and keyboard navigation, set as main scene; verify empty seed starts a random stage, seed 42 reproduces the same stage, and the gearbox setting persists after restart
 - [ ] 8.3 Implement stage lifecycle: generation before control, countdown with car frozen, timer, penalties added from rollover and respawn; verify timer starts at 0 after countdown and a penalty increases it
-- [ ] 8.4 Build minimal HUD (timer, speed, gear, part conditions, mounted items with cooldowns, upgrade meter); verify a broken tire shows as broken
+- [ ] 8.4 Build minimal HUD (timer, speed, gear, RPM with shift light, part conditions, mounted items with cooldowns, upgrade meter); verify a broken tire shows as broken
 - [ ] 8.5 Implement prize money formula and finish screen (time, penalties, money, retry same seed, new seed, main menu); verify with a test that a faster time awards more money and in-game that retry regenerates the same seed
 - [ ] 8.6 Implement game-over screen with immobilization cause (retry, main menu) and pause menu (resume, restart, quit); verify timer does not advance while paused and a lethal crash shows its cause
 

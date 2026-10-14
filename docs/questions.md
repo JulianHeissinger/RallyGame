@@ -143,3 +143,8 @@ Example synergies (draft):
 - Moon Springs: airtime pays prize money; with broken suspension every bump becomes a jump.
 - Spare Tire Launcher: fires tires at threats; auto-swaps a flat tire.
 - Evolution: maxed Turbo + broken Radiator = Steam Locomotive (damaging steam cloud behind you, no engine heat limit).
+
+## 16. Gearbox
+Should the car have a manual gearbox option, and how real should engine RPM be?
+
+**Answer:** Yes. Automatic or manual shifting, chosen in a menu setting that persists. Engine RPM follows the driven wheels, so wheelspin raises RPM; an automatic clutch prevents stalling. Gears R, N, 1..n; in manual, shifting down from 1st goes to N, then R (only at standstill). Shifts take a short time with no drive torque. Rev limiter bounces at redline. HUD shows RPM with a shift light.

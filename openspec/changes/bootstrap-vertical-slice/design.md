@@ -39,7 +39,9 @@ tests/    run_tests.gd + test_*.gd
 - Alternative kinematic arcade model: rejected. It conflicts with the semi-sim requirement.
 - Low-speed jitter: below a few m/s slip uses a blended velocity-damping model, a standard fix for raycast cars.
 - Wheel spin is integrated per wheel (angular velocity from drive torque, brake torque and tire force) so slip ratio, handbrake lock and wheelspin are real.
-- Drivetrain: AWD with fixed torque split, torque curve from data, automatic gearbox (shift by RPM thresholds). Manual gears are not needed for the prototype.
+- Drivetrain: AWD with fixed torque split and a torque curve from data. Engine RPM is derived from the mean angular velocity of the driven wheels × gear ratio × final drive, so wheelspin shows up as RPM flare. Below a clutch engage speed an automatic clutch slips: RPM is held at least at a launch RPM and torque still reaches the wheels, so the car never stalls. Engine braking is a negative torque scaled by RPM when throttle is 0. The rev limiter cuts drive torque at redline and restores it below redline minus a hysteresis.
+  - Alternative: simulated flywheel inertia with clutch torque transfer. Rejected for the prototype: harder to tune, and wheel-coupled RPM already shows wheelspin.
+- Gearbox: gears R, N, 1..n with ratios in `CarStats`. A shift starts a timer (`shift_time` stat) with zero drive torque, then engages the new gear and emits `gear_shifted(from, to)`. Automatic mode shifts by RPM thresholds and engages reverse when braking near standstill. Manual mode reads shift presses from the `InputSource`: down from 1st goes to N, then R (R only below a standstill speed), and downshifts that would exceed redline are refused. The mode comes from `Settings`.
 - No yaw assist of any kind (spec: realistic rotation speed).
 
 ### Car stats as Resources plus a modifier stack
@@ -54,9 +56,9 @@ tests/    run_tests.gd + test_*.gd
 - Signals: `part_damaged(part, amount)`, `part_broken(part)`, `immobilized(cause)`.
 
 ### Input
-InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `activate_item`, `pause`, `ui_*`. Both keyboard and joypad events are bound to each action.
+InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `shift_up`, `shift_down`, `activate_item`, `pause`, `ui_*`. Both keyboard and joypad events are bound to each action.
 
-An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats. The car reads only from its assigned source. The single-player source uses the `Input` singleton with keyboard and device 0. A per-device source for couch co-op can be added later without touching the car. Keyboard steering ramps at a rate that drops with speed.
+An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats and `shift_up/shift_down` as just-pressed flags. The car reads only from its assigned source. The single-player source uses the `Input` singleton with keyboard and device 0. A per-device source for couch co-op can be added later without touching the car. Keyboard steering ramps at a rate that drops with speed.
 
 ### Camera
 `IsoCameraRig` (Node3D + Camera3D) with a target. Perspective camera with a narrow FOV (~30°) placed far away at a fixed pitch (~45°) and yaw (~45°). This gives a near-isometric look while keeping depth cues on crests.
@@ -91,6 +93,7 @@ Each wheel reads the `surface` metadata from the collider its ray hits and looks
 - **Upgrade pick:** `UpgradeMeter` gains value from progress delta and `hazard_defeated`. When full it sets `Engine.time_scale = 0.2` and shows a 3-card UI. The card timer uses real time (`Time.get_ticks_msec`) so slow motion does not stretch it; on timeout it picks the first card. Offers are drawn from a run RNG seeded by stage seed.
 
 ### Game flow
+- `Settings` autoload holds player settings (prototype: gearbox mode) and saves them in a `ConfigFile` at `user://settings.cfg`.
 - `RunState` autoload holds the current seed, difficulty, prize money, and owned items. It is ready for multi-stage runs later. `GameEvents` is not needed; signals stay local to car, stage and items.
 - Scenes: `main_menu.tscn`, then `stage.tscn` (generator, car, camera, HUD, pause, finish and game-over overlays). Retry reloads `stage.tscn` with the same seed and a reset `RunState`.
 - **Prize money:** `base * clamp(par_time / final_time, 0.25, 2.0)`, where `par_time = road_length / reference_speed`.

@@ -7,7 +7,7 @@ Defines the screens and run lifecycle of the prototype: main menu, starting a st
 ## ADDED Requirements
 
 ### Requirement: Main menu
-The game SHALL start on a main menu with: Start Stage, a seed field (empty means random), and Quit. The menu SHALL be fully usable with controller and keyboard.
+The game SHALL start on a main menu with: Start Stage, a seed field (empty means random), a gearbox setting (automatic or manual), and Quit. The gearbox setting SHALL persist between game launches. The menu SHALL be fully usable with controller and keyboard.
 
 #### Scenario: Start with random seed
 - **WHEN** the player selects Start Stage with an empty seed field
@@ -16,6 +16,10 @@ The game SHALL start on a main menu with: Start Stage, a seed field (empty means
 #### Scenario: Start with entered seed
 - **WHEN** the player enters seed 42 and selects Start Stage
 - **THEN** the stage is generated with seed 42
+
+#### Scenario: Gearbox setting persists
+- **WHEN** the player sets the gearbox to manual and restarts the game
+- **THEN** the menu shows manual and stages start with the manual gearbox
 
 ### Requirement: Stage start countdown
 A stage SHALL begin with the car on the start line and a short countdown during which the car cannot move, followed by the timer starting.
@@ -39,11 +43,15 @@ Crossing the finish line SHALL award prize money that is higher for a faster fin
 - **THEN** the 120 s finish awards more prize money
 
 ### Requirement: In-stage HUD
-During a stage the HUD SHALL show the timer, speed, gear, the condition of each part, mounted active items with cooldowns, and the upgrade meter. The HUD SHALL stay minimal and SHALL NOT use arcade-style banners.
+During a stage the HUD SHALL show the timer, speed, gear, engine RPM with a shift light, the condition of each part, mounted active items with cooldowns, and the upgrade meter. The HUD SHALL stay minimal and SHALL NOT use arcade-style banners.
 
 #### Scenario: Part breaks
 - **WHEN** a tire breaks
 - **THEN** the HUD part display shows that tire as broken
+
+#### Scenario: Shift light
+- **WHEN** engine RPM approaches the redline
+- **THEN** the HUD shift light turns on
 
 ### Requirement: Finish screen
 Crossing the finish line SHALL show a finish screen with final time, penalties, prize money, and options to retry the same seed, play a new random seed, or return to the main menu.
