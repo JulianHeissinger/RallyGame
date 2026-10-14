@@ -3,7 +3,7 @@
 ## 1. Project setup
 
 - [x] 1.1 Create `project.godot` (Godot 4.7, Forward+, Jolt physics, 120 Hz physics tick), folder layout from design.md, and `.gitignore` for `.godot/`; verify `godot --headless --path . --import` exits 0 with no errors (`--quit` needs a main scene, which arrives in 8.2)
-- [ ] 1.2 Add headless test runner `tests/run_tests.gd` that discovers `tests/test_*.gd`, runs them, and exits non-zero on failure; verify with one passing and one deliberately failing sample test, then remove the failing one
+- [x] 1.2 Add headless test runner `tests/run_tests.gd` that discovers `tests/test_*.gd`, runs them, and exits non-zero on failure; verify with one passing and one deliberately failing sample test, then remove the failing one
 - [ ] 1.3 Define InputMap actions (steer, throttle, brake, handbrake, activate_item, pause, ui) with keyboard and joypad bindings; verify all actions appear in `project.godot`
 
 ## 2. Input and camera
