@@ -19,6 +19,8 @@ var steer := 0.0
 var throttle := 0.0
 var brake := 0.0
 var handbrake := 0.0
+var shift_up_pressed := false
+var shift_down_pressed := false
 
 
 ## Reads input for one physics tick. `speed` is the car's speed in m/s.
@@ -31,6 +33,8 @@ func update(delta: float, speed: float) -> void:
 	throttle = Input.get_action_strength("throttle")
 	brake = Input.get_action_strength("brake")
 	handbrake = Input.get_action_strength("handbrake")
+	shift_up_pressed = Input.is_action_just_pressed("shift_up")
+	shift_down_pressed = Input.is_action_just_pressed("shift_down")
 
 
 ## Moves `current` toward `target` at a speed-dependent rate. Moving away from center uses the

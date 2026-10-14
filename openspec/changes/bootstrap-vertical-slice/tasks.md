@@ -10,7 +10,7 @@
 
 - [x] 2.1 Implement `InputSource` (single-player source: keyboard + device 0, analog with deadzone, speed-dependent keyboard steering ramp); verify with `tests/test_input_source.gd` for ramp-up, return to center and slower ramp at speed
 - [x] 2.2 Implement `IsoCameraRig` (fixed pitch/yaw, narrow FOV, damped follow, speed look-ahead, settable target); verify with `tests/test_iso_camera_rig.gd` that the camera does not rotate when a moving target turns and that the focus leads along velocity
-- [ ] 2.3 Add `shift_up` (Left Shift, RB) and `shift_down` (Left Ctrl, LB) InputMap actions and expose them as just-pressed flags in `InputSource`; verify both actions appear in `project.godot` and all tests pass
+- [x] 2.3 Add `shift_up` (Left Shift, RB) and `shift_down` (Left Ctrl, LB) InputMap actions and expose them as just-pressed flags in `InputSource`; verify both actions appear in `project.godot` and all tests pass
 
 ## 3. Car handling
 
