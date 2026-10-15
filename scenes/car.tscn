@@ -7,8 +7,23 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
 size = Vector3(1.7, 0.5, 4)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.8, 0.15, 0.1, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
+material = SubResource("StandardMaterial3D_body")
 size = Vector3(1.7, 0.5, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wheel"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wheel"]
+material = SubResource("StandardMaterial3D_wheel")
+top_radius = 0.33
+bottom_radius = 0.33
+height = 0.25
+radial_segments = 8
+rings = 1
 
 [node name="Car" type="RigidBody3D"]
 script = ExtResource("1_car")
@@ -39,3 +54,31 @@ script = ExtResource("3_wheel")
 [node name="WheelRR" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -0.25, 1.25)
 script = ExtResource("3_wheel")
+
+[node name="Visual" type="Node3D" parent="WheelFL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WheelFL/Visual"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Visual" type="Node3D" parent="WheelFR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WheelFR/Visual"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Visual" type="Node3D" parent="WheelRL"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WheelRL/Visual"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")
+
+[node name="Visual" type="Node3D" parent="WheelRR"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="WheelRR/Visual"]
+transform = Transform3D(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_wheel")

@@ -29,3 +29,4 @@ func _physics_process(delta: float) -> void:
 			wheel.rotation.y = steer_angle
 		wheel.update_suspension(self, stats, delta)
 		wheel.update_tire(self, stats, delta)
+		wheel.update_visual(stats, delta)

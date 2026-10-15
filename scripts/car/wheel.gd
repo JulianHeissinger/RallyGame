@@ -26,6 +26,8 @@ var _contact_normal := Vector3.UP
 ## Tire carcass deflections in m, used only near standstill.
 var _lateral_deflection := 0.0
 var _longitudinal_deflection := 0.0
+## Optional wheel mesh, moved along the suspension and rolled by `spin`.
+@onready var _visual: Node3D = get_node_or_null("Visual")
 
 
 func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
@@ -129,6 +131,14 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	_longitudinal_deflection *= 1.0 - blend
 
 	body.apply_force(forward * force_long + right * force_lat, offset)
+
+
+## Places the wheel mesh at the suspension's current travel and rolls it.
+func update_visual(stats: StatBlock, delta: float) -> void:
+	if _visual == null:
+		return
+	_visual.position.y = -(stats.get_stat("suspension_rest_length") - _last_compression)
+	_visual.rotate_x(-spin * delta)
 
 
 ## Simplified Pacejka curve, normalized to a peak of 1.
