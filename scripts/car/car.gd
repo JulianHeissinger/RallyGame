@@ -14,6 +14,7 @@ var wheels: Array[Wheel] = []
 func _ready() -> void:
 	stats = StatBlock.new(car_stats.stats)
 	mass = stats.get_stat("mass")
+	drivetrain.gearbox.mode = Settings.gearbox_mode
 	for child in get_children():
 		if child is Wheel:
 			wheels.append(child)
@@ -21,7 +22,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	input.update(delta, linear_velocity.length())
-	drivetrain.update(input, wheels, stats, car_stats.torque_curve)
+	drivetrain.update(input, wheels, stats, car_stats.torque_curve, linear_velocity.length(), delta)
 	var steer_angle := -input.steer * deg_to_rad(stats.get_stat("max_steer_angle_deg"))
 	for wheel in wheels:
 		if wheel.steerable:

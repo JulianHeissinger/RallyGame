@@ -13,6 +13,10 @@ config_version=5
 config/name="rally-game"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
+[autoload]
+
+Settings="*res://scripts/core/settings.gd"
+
 [input]
 
 steer_left={

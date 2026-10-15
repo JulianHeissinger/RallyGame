@@ -17,6 +17,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - New scripts and test files get their `.uid` only on the next `--import`; run it again before committing.
 - Write `.tres` files that contain sub-resources (e.g. the torque `Curve` in `data/cars/prototype.tres`) with a one-off `ResourceSaver` script outside the repo, not by hand.
 - Physics checks: the test runner calls test methods synchronously and cannot await physics frames. Verify handling with a one-off headless script outside the repo that instantiates `scenes/test/handling_test.tscn`, awaits `physics_frame`, and prints measurements.
+- Autoloads (e.g. `Settings`) are not registered yet when a `-s` script compiles. A one-off script that touches the car must not use the `Car` type statically; `await process_frame` in `_init` before loading the scene.
 
 ## Watch-outs
 
