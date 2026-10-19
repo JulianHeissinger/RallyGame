@@ -3,7 +3,8 @@ extends RigidBody3D
 ## One flock sheep. Walks to `target` after `start_delay` once started, then stands. A hit by the
 ## car knocks it sideways and up and frees its rotation so it tumbles; ending up off the road after
 ## a hit emits `knocked_off` once. The scene's `impact_once` metadata makes only the first car hit
-## damage the car.
+## damage the car. Sheep live on collision layer 2, which wheel rays do not scan, and stop colliding
+## with the car after its first hit, so a flock never stops the car.
 
 signal knocked_off(sheep: Sheep)
 
@@ -71,6 +72,7 @@ func _on_body_entered(body: Node) -> void:
 	axis_lock_angular_y = false
 	axis_lock_angular_z = false
 	var car := body as Car
+	add_collision_exception_with(car)
 	var right := car.global_basis.x
 	var side := right if (global_position - car.global_position).dot(right) >= 0.0 else -right
 	var speed := car.linear_velocity.length()

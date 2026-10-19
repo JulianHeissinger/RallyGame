@@ -8,10 +8,12 @@ signal hazard_defeated(hazard: Node)
 
 const SHEEP_SCENE := preload("res://scenes/hazards/sheep.tscn")
 
-@export var count_range := Vector2i(20, 30)
-## Cluster size in m along the road and outward from the nearest sheep.
-@export var spread_along := 16.0
-@export var spread_side := 6.0
+@export var count_range := Vector2i(40, 100)
+## Cluster size in m along the road and outward from the nearest sheep. Sheep stand on distinct
+## cells of a `cell` m grid, so they never spawn inside each other.
+@export var spread_along := 30.0
+@export var spread_side := 10.0
+@export var cell := 1.5
 ## Gap in m between the road edge and the nearest sheep.
 @export var side_gap := 1.0
 ## Seconds before the car arrives at which the crossing starts.
@@ -37,11 +39,22 @@ func setup(_def: HazardDef, car: Car, path: RoadPath, rng: RandomNumberGenerator
 	_distance = path.progress_at(transform.origin)
 	var side := 1.0 if rng.randf() < 0.5 else -1.0
 	var to_local := transform.affine_inverse()
-	for i in rng.randi_range(count_range.x, count_range.y):
-		var along := _distance + rng.randf_range(-spread_along / 2.0, spread_along / 2.0)
+	var columns := floori(spread_along / cell)
+	var rows := floori(spread_side / cell)
+	var cells := range(columns * rows)
+	# Seeded Fisher-Yates shuffle; `Array.shuffle` uses the global RNG.
+	for i in range(cells.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var swap: int = cells[i]
+		cells[i] = cells[j]
+		cells[j] = swap
+	for i in mini(rng.randi_range(count_range.x, count_range.y), cells.size()):
+		var column: int = cells[i] % columns
+		var row: int = cells[i] / columns
+		var along := _distance - spread_along / 2.0 + (column + rng.randf_range(0.2, 0.8)) * cell
 		var road := path.transform_at(along)
 		var half := path.widths[clampi(path.distances.bsearch(along), 0, path.widths.size() - 1)] / 2.0
-		var out := half + Sheep.OFF_ROAD_MARGIN + side_gap + rng.randf() * spread_side
+		var out := half + Sheep.OFF_ROAD_MARGIN + side_gap + (row + rng.randf_range(0.2, 0.8)) * cell
 		var start := road.origin + road.basis.x * side * out + Vector3.UP * spawn_height
 		var sheep: Sheep = SHEEP_SCENE.instantiate()
 		sheep.path = path
