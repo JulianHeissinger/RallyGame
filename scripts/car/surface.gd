@@ -7,9 +7,9 @@ const DEFAULT := "gravel"
 const GRIP := {
 	"tarmac": 1.2,
 	"gravel": 1.0,
-	"grass": 0.6,
-	"snow": 0.5,
-	"ice": 0.3,
+	"grass": 0.8,
+	"snow": 0.6,
+	"ice": 0.4,
 }
 
 

@@ -110,11 +110,15 @@ A handbrake input SHALL lock the rear wheels while held, reducing rear grip so t
 - **THEN** the rear slides out and the car rotates faster than with steering alone
 
 ### Requirement: Realistic rotation speed
-The car's rotation when thrown into a slide SHALL be limited by its physical properties (mass, inertia, grip) with no artificial yaw boost or forced drift angle.
+The car's rotation when thrown into a slide SHALL come from its physical properties (mass, inertia, grip) and never snap to a forced drift angle. While the driver steers, a steering yaw assist MAY add a limited yaw torque toward a yaw rate set by the steering input, so the car holds a light, controllable drift and countersteer catches it. Without steering input the assist SHALL be off.
 
 #### Scenario: No arcade spin assist
 - **WHEN** the car slides with no driver input
 - **THEN** its rotation slows down only through tire forces and does not snap to a preset drift angle
+
+#### Scenario: Assist follows steering
+- **WHEN** the driver steers into a corner and then countersteers
+- **THEN** the assist first adds rotation toward the corner and then works against the slide
 
 ### Requirement: Tunable car parameters
 Car handling parameters (mass, power, grip, suspension, steering) SHALL be data that can be changed without code changes, so items and damage can modify them at runtime.

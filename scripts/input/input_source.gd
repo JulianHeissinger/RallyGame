@@ -7,11 +7,11 @@ const DEVICE := 0
 const STICK_DEADZONE := 0.1
 
 ## Steering rate toward lock, in full-range units per second, at standstill and at `steer_fast_speed`.
-var steer_rate_slow := 5.0
-var steer_rate_fast := 1.5
+var steer_rate_slow := 6.0
+var steer_rate_fast := 4.0
 ## Steering rate back to center at standstill and at `steer_fast_speed`.
 var steer_return_rate_slow := 6.0
-var steer_return_rate_fast := 3.0
+var steer_return_rate_fast := 5.5
 ## Speed in m/s at which the fast rates apply fully.
 var steer_fast_speed := 30.0
 

@@ -62,6 +62,32 @@ func _physics_process(delta: float) -> void:
 		wheel.update_suspension(self, stats, delta)
 		wheel.update_tire(self, stats, delta)
 		wheel.update_visual(stats, delta)
+	_apply_yaw_assist()
+
+
+## Steering yaw assist: while steering, pulls the yaw rate toward a target set by the input, so
+## the car holds a light drift and countersteer catches it. Off without steering input.
+func _apply_yaw_assist() -> void:
+	if input.steer == 0.0 or wheels.filter(func(w: Wheel) -> bool: return w.is_grounded).size() < 2:
+		return
+	var min_speed := stats.get_stat("yaw_assist_min_speed")
+	var fade := clampf((linear_velocity.length() - min_speed) / min_speed, 0.0, 1.0)
+	var up := global_basis.y
+	# The target turn rate is capped by a lateral acceleration a bit above tire grip, so the car
+	# drifts lightly at every speed instead of spinning at high speed.
+	var speed := maxf(linear_velocity.length(), 0.1)
+	var target_rate := minf(deg_to_rad(stats.get_stat("yaw_assist_rate")),
+		stats.get_stat("yaw_assist_lateral_g") * get_gravity().length() / speed)
+	var target := -input.steer * target_rate
+	var max_accel := stats.get_stat("yaw_assist_max_accel")
+	var accel := clampf(stats.get_stat("yaw_assist_gain") * (target - angular_velocity.dot(up)), -max_accel, max_accel)
+	# Rotation-adding torque tapers off toward `yaw_assist_max_slip_deg` of body slip, so the assist
+	# never pushes the car into a spin; torque against the rotation is never limited.
+	if accel * target > 0.0:
+		var body_slip := rad_to_deg(absf(atan2(linear_velocity.dot(global_basis.x), linear_velocity.dot(-global_basis.z))))
+		accel *= clampf(1.0 - body_slip / stats.get_stat("yaw_assist_max_slip_deg"), 0.0, 1.0)
+	var inertia := 1.0 / PhysicsServer3D.body_get_direct_state(get_rid()).inverse_inertia.y
+	apply_torque(up * accel * fade * inertia)
 
 
 ## Turns new contacts into impacts. Contacts arrive after the solver has already slowed the car,
