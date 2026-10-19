@@ -160,3 +160,16 @@ func test_raised_lethal_speed_survives() -> void:
 	assert_false(damage.is_immobilized, "raised threshold survives")
 	assert_true(damage.condition["chassis"] < 100.0, "parts still damaged")
 	damage.free()
+
+
+func test_center_end_impacts_hit_both_corners() -> void:
+	var damage := _damage()
+	# amount = (13 - 3) * 4 = 40, each corner takes 0.75 of it.
+	damage.apply_impact(_impact_stats(), Vector3(0.1, 0.0, -2.0), 13.0, false)
+	for part in ["tire_fl", "tire_fr", "brake_fl", "brake_fr", "suspension_fl", "suspension_fr"]:
+		assert_almost_eq(damage.condition[part], 70.0, 0.0001, part)
+	assert_almost_eq(damage.condition["engine"], 88.0, 0.0001, "engine share unchanged")
+	damage.apply_impact(_impact_stats(), Vector3(-0.1, 0.0, 2.0), 13.0, false)
+	assert_almost_eq(damage.condition["tire_rl"], 70.0, 0.0001, "rear-center hits rear-left")
+	assert_almost_eq(damage.condition["tire_rr"], 70.0, 0.0001, "rear-center hits rear-right")
+	damage.free()

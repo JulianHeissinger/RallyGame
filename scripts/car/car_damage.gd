@@ -18,6 +18,10 @@ const MOVING_SPEED := 1.0
 ## Contacts within this distance of the body's centre along z hit the center zone (the middle
 ## third of the 4 m body); further out they hit a corner.
 const CENTER_HALF_LENGTH := 0.67
+## Front or rear contacts within this distance of the centre line along x (the middle third of
+## the 1.7 m width) hit both corners of that end, each with `CENTER_END_SHARE` of the damage.
+const CENTER_HALF_WIDTH := 0.28
+const CENTER_END_SHARE := 0.75
 
 var condition: Dictionary = {}
 var is_immobilized := false
@@ -45,12 +49,18 @@ func apply_impact(stats: StatBlock, local_point: Vector3, impact_speed: float, i
 	if absf(local_point.z) < CENTER_HALF_LENGTH:
 		apply_damage("chassis", amount)
 	else:
-		var corner := ("f" if local_point.z < 0.0 else "r") + ("l" if local_point.x < 0.0 else "r")
+		var end := "f" if local_point.z < 0.0 else "r"
+		var corners: Array[String] = [end + ("l" if local_point.x < 0.0 else "r")]
+		var corner_amount := amount
+		if absf(local_point.x) < CENTER_HALF_WIDTH:
+			corners = [end + "l", end + "r"]
+			corner_amount *= CENTER_END_SHARE
+		for corner in corners:
+			for part in ["tire_", "brake_", "suspension_"]:
+				apply_damage(part + corner, corner_amount)
 		var share := amount * stats.get_stat("impact_chassis_share")
-		for part in ["tire_", "brake_", "suspension_"]:
-			apply_damage(part + corner, amount)
 		apply_damage("chassis", share)
-		if corner.begins_with("f"):
+		if end == "f":
 			apply_damage("engine", share)
 	if is_solid and impact_speed >= stats.get_stat("lethal_impact_speed"):
 		immobilize("lethal_impact")
