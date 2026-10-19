@@ -39,6 +39,7 @@
 - [ ] 5.4 Build heightmap terrain blended to the road with `HeightMapShape3D` collider, bounds walls and kill plane respawn with penalty; verify driving off-road works without seams or falling through, and falling out respawns on the road
 - [ ] 5.5 Scatter props (trees, rocks, fences) with road clearance and corner-outside density, `MultiMeshInstance3D` visuals and `solid` colliders; verify with a test that no prop overlaps the road and that props are identical for the same seed
 - [ ] 5.6 Add start and finish lines with finish detection signal; verify crossing the finish emits the signal once
+- [ ] 5.7 Add road surface sections: `StageParams` surface table (road surface, matching terrain surface, weight, section length range), sections drawn from a `"surfaces"` sub-stream, road mesh and collider split per section with `surface` metadata, terrain surface following the nearest road section; verify with `tests/test_road_layout.gd` that the same seed gives the same sections, and in `stage.tscn` that wheels report the section's surface on the road and beside it
 
 ## 6. Hazards
 

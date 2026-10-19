@@ -76,6 +76,7 @@ An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats and `
 5. **Terrain:** heightmap grid covering road bounds plus a margin. Heights come from noise, blended toward road height by distance to the road (spatial hash of road samples). The terrain sits slightly below the road under it to avoid z-fighting. Collision is `HeightMapShape3D` with `surface = "grass"`.
 6. **Props:** jittered-grid sampling, rejected inside the road width plus margin. Density is boosted on corner outsides using curvature. Visuals use `MultiMeshInstance3D` per prop type; trees and rocks get `StaticBody3D` colliders in group `solid`.
 7. **Bounds:** invisible walls at the terrain edge, plus a kill plane below the terrain that triggers respawn.
+8. **Surface sections:** the road is split into sections drawn from a weighted surface table in `StageParams` (road surface, matching terrain surface, weight, length range) using the `"surfaces"` sub-stream. Road mesh and collider are built per section with its `surface` metadata, replacing the single `gravel` collider of step 4. The terrain beside each section takes the section's terrain surface instead of plain `grass`.
 
 Each wheel reads the `surface` metadata from the collider its ray hits and looks up grip in a surface table.
 

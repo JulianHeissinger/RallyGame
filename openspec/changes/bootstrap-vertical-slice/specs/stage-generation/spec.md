@@ -38,6 +38,21 @@ The generator SHALL produce a mix of straights, fast corners, tight corners, hai
 - **WHEN** a 2 km stage is generated
 - **THEN** it contains at least one hairpin and at least one crest
 
+### Requirement: Surface sections
+The road SHALL be divided into sections, each with its own surface (e.g. gravel, tarmac, snow). Section surfaces SHALL be drawn from weighted chances set per stage style, so each country can favour its own surfaces. The terrain beside a section SHALL use that section's matching off-road surface.
+
+#### Scenario: Same sections for the same seed
+- **WHEN** a stage is generated twice with the same seed and difficulty
+- **THEN** both stages have the same sections with the same surfaces
+
+#### Scenario: Entering a new section
+- **WHEN** the car drives from a gravel section into a tarmac section
+- **THEN** wheels on the tarmac section use tarmac grip
+
+#### Scenario: Off-road beside a section
+- **WHEN** the car leaves the road beside a snow section
+- **THEN** the terrain it lands on has the snow section's off-road surface
+
 ### Requirement: Terrain around the road
 The road SHALL sit on generated terrain that extends to both sides, blends into the road edges without steps, and is drivable but grips less than the road.
 
