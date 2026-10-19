@@ -1,6 +1,6 @@
 # Roadmap
 
-Technical work deferred past the vertical slice (`openspec/changes/bootstrap-vertical-slice`). Each entry says what triggers it.
+Technical work deferred past the vertical slice (`openspec/changes/bootstrap-vertical-slice`), plus slice tasks moved to a later point. Each entry says what triggers it.
 
 ## Multiple cars
 
@@ -19,9 +19,13 @@ Known limits, fine until a car needs them:
 
 ## Handling tuning on a real track
 
-Task 3.8a fixed the structural handling issues in the flat test scene. Once a real track exists, do another tuning pass covering:
+Task 3.8a fixed the structural handling issues in the flat test scene. Task 3.8 (the tuning pass) is skipped until stage generation (section 5) gives a real track; it stays unchecked in `tasks.md` until then. That pass also covers:
 
 - **Handbrake modulation.** While cornering, the rear wheels lock at 30% handbrake input or more for any `handbrake_torque` of 700 N·m or higher, because cornering already uses most of the rear grip. 500 N·m leaves a small usable range on an analog trigger. Keyboard input is all-or-nothing. Options: lower `handbrake_torque`, or ramp the handbrake key like steering (changes the player-input spec).
 - **No aerodynamic drag.** Top speed is set only by the 5th-gear rev limiter (about 192 km/h).
 - **Yaw wobble.** At 70 km/h with 30% steering, the yaw rate oscillates (about 40/17/32/22 °/s over 2 s).
 - **Launch wheelspin on loose surfaces.** `torque_split_front` 0.35 stops front wheelspin on full grip. If gravel or grass (task 3.6) brings it back, add a viscous centre coupling: a `center_coupling` stat that moves torque from the faster axle to the slower one, capped per tick so the axles do not overshoot. This replaces the fixed split described in `design.md`, so update it too.
+
+## Immobilized car keeps driving
+
+`CarDamage.immobilize` only emits `immobilized(cause)`; the car still accepts input and drives. Task 8.6 (game-over screen) cuts the engine and stops the car when the signal fires, so game-over behaviour lives in one place.

@@ -5,6 +5,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 ## Workflow
 
 - Apply OpenSpec tasks one at a time: show a short plan for the next task, wait for approval, implement, run tests, tick the checkbox in `tasks.md`, then commit on branch `dev`. Do not chain into the next task without a new plan and approval.
+- Before planning a task, check `docs/roadmap.md` for tasks moved to a later point (3.8 waits for a real track) and work added to later tasks (8.6 cuts the engine on immobilize).
 - If a verification step in `tasks.md` cannot work as written, pause, offer options, and update the task text once the user picks one.
 - Folders created empty in task 1.1 hold a `.gitkeep`. When adding the first real file to such a folder, delete its `.gitkeep` in the same change.
 - Commit the `.uid` files Godot creates next to scripts.
