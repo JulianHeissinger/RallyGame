@@ -77,28 +77,35 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 
 	slip_angle = atan2(v_lat, absf(v_long))
 	var max_force := stats.get_stat("tire_friction") * normal_load
-	var force_lat := -max_force * _magic_formula(slip_angle,
-		stats.get_stat("tire_lat_b"), stats.get_stat("tire_lat_c"))
-
-	# Spin and longitudinal force are integrated together in substeps. The friction circle
-	# scales each substep's combined force down to the available grip.
+	var lat_b := stats.get_stat("tire_lat_b")
+	var lat_c := stats.get_stat("tire_lat_c")
 	var long_b := stats.get_stat("tire_long_b")
 	var long_c := stats.get_stat("tire_long_c")
+	var lat_peak := _peak_slip(lat_b, lat_c)
+	var long_peak := _peak_slip(long_b, long_c)
+	var lat_norm := slip_angle / lat_peak
+
+	# Spin and longitudinal force are integrated together in substeps. Combined slip: both slips
+	# are normalized to their curve's peak, each curve is evaluated on the combined length, and
+	# the force is split by direction. A locked wheel thus loses almost all lateral grip.
 	var h := delta / SPIN_SUBSTEPS
 	var force_long := 0.0
-	var circle_scale := 0.0
+	var force_lat := 0.0
 	for i in SPIN_SUBSTEPS:
 		slip_ratio = (spin * radius - v_long) / maxf(absf(v_long), low_speed)
-		var force := max_force * _magic_formula(slip_ratio, long_b, long_c)
-		var demand := Vector2(force, force_lat).length()
-		var grip_scale := max_force / demand if demand > max_force else 1.0
-		force *= grip_scale
+		var long_norm := slip_ratio / long_peak
+		var combined := Vector2(long_norm, lat_norm).length()
+		var force := 0.0
+		if combined > 0.0:
+			force = max_force * _magic_formula(combined * long_peak, long_b, long_c) \
+				* long_norm / combined
+			force_lat -= max_force * _magic_formula(combined * lat_peak, lat_b, lat_c) \
+				* lat_norm / combined
 		spin = move_toward(spin + (drive_torque - force * radius) / inertia * h, 0.0,
 			brake_torque / inertia * h)
 		force_long += force
-		circle_scale += grip_scale
 	force_long /= SPIN_SUBSTEPS
-	force_lat *= circle_scale / SPIN_SUBSTEPS
+	force_lat /= SPIN_SUBSTEPS
 
 	# Slip is ill-defined near standstill: blend toward tire carcass springs, which hold static
 	# loads (e.g. on a slope) without creeping. Critically damped per wheel load share.
@@ -145,3 +152,8 @@ func update_visual(stats: StatBlock, delta: float) -> void:
 ## Simplified Pacejka curve, normalized to a peak of 1.
 static func _magic_formula(slip: float, b: float, c: float) -> float:
 	return sin(c * atan(b * slip))
+
+
+## Slip at which `_magic_formula` peaks.
+static func _peak_slip(b: float, c: float) -> float:
+	return tan(PI / (2.0 * c)) / b
