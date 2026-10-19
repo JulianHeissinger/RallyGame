@@ -62,7 +62,7 @@ InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `shift_u
 An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats and `shift_up/shift_down` as just-pressed flags. The car reads only from its assigned source. The single-player source uses the `Input` singleton with keyboard and device 0. A per-device source for couch co-op can be added later without touching the car. Keyboard steering ramps at a rate that drops with speed.
 
 ### Camera
-`IsoCameraRig` (Node3D + Camera3D) with a target. Perspective camera with a narrow FOV (~30°) placed far away at a fixed pitch (~45°) and yaw (~45°). This gives a near-isometric look while keeping depth cues on crests.
+`IsoCameraRig` (Node3D + Camera3D) with a target. Perspective camera with a narrow FOV (~30°) placed far away at a fixed pitch (~35°). This gives a near-isometric look while keeping depth cues on crests. With a `road` (`RoadPath`) set, the yaw follows the road tangent a little ahead of the car's progress through a slow smoothing, so the car always drives away from the camera and its own spins do not turn the view. Without a road the yaw is fixed (~45°).
 - Alternative: orthographic. Rejected because it flattens height, which makes crests and jumps hard to read.
 - Smoothing: position follows with critically damped smoothing, plus a look-ahead offset of velocity × factor (clamped).
 

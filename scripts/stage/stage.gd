@@ -37,6 +37,7 @@ func _ready() -> void:
 	add_child(_build_kill_plane(terrain.get_node("Mesh").get_aabb()))
 	_car.road = path
 	_car.global_transform = path.transform_at(START_DISTANCE).translated(Vector3.UP)
+	_camera.road = path
 	_camera.target = _car
 	_hud.car = _car
 	_debug_overlay.car = _car
