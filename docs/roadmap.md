@@ -17,6 +17,12 @@ Known limits, fine until a car needs them:
 - **Axle role comes from `steerable`.** `Drivetrain` picks the front axle for torque split and brake bias by the wheel's `steerable` flag. Rear-wheel steering would need a separate axle flag.
 - **Gearbox mode is global.** `Settings.gearbox_mode` is one setting for all cars. Split-screen or per-car modes would need it per player.
 
+## Countries
+
+Road layout tuning is data-driven: `StageParams` holds the segment table (pick weights, length, radius and angle ranges), hairpin minimum, width range and pinch frequency. The slice uses only the defaults in code.
+
+To do when countries are planned: one `StageParams` `.tres` per country (e.g. Monte Carlo with a high hairpin weight, tight radii, a higher `min_hairpins` and narrow roads), chosen by the run's current country.
+
 ## Handling tuning on a real track
 
 Task 3.8a fixed the structural handling issues in the flat test scene. Task 3.8 (the tuning pass) is skipped until stage generation (section 5) gives a real track; it stays unchecked in `tasks.md` until then. That pass also covers:
