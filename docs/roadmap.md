@@ -50,6 +50,18 @@ Out of scope for the slice (see `proposal.md`). The design (`docs/syspec/art-aud
 
 To do as its own change: derive calls from the `RoadPath` ahead of the car, since the whole stage exists upfront. Corner direction and severity come from the curvature (e.g. 1–6 or hairpin). Crests come from `RoadPath.crests`, narrow sections from the road widths, and surface changes from the surface sections (task 5.7). Calls are timed by distance ahead at current speed. Severity thresholds should depend on the car's cornering speed, so they stay right after handling changes.
 
+## More hazards
+
+Hazards kept for after the slice (tasks 6.5–6.7 cover the rest of the proposed set):
+
+- **UFO abduction.** Lifts the car and drops it about 50 m back along the road.
+- **Paparazzi.** Camera flashes that blind the screen for a moment.
+- **Road train.** A long truck crossing the road; wait or find a gap.
+
+## Bad landing
+
+The car takes no damage from hard landings; only body contacts count as impacts. To do when jumps matter (ramps in task 6.6, crests): damage the suspension of each wheel by its compression speed on touchdown above a threshold stat, so ramps and crests reward clean landings.
+
 ## Immobilized car keeps driving
 
 `CarDamage.immobilize` only emits `immobilized(cause)`; the car still accepts input and drives. Task 8.6 (game-over screen) cuts the engine and stops the car when the signal fires, so game-over behaviour lives in one place.
