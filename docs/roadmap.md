@@ -38,6 +38,8 @@ First pass, values now in `prototype.tres` and code:
 
 Still open for 3.8:
 
+- **Sense of speed.** From the iso camera the player cannot tell when the car is too fast. As a result they underestimate the loss of grip and how much the car rotates. More speed feedback should let them judge corner entry speed.
+
 - **Handbrake modulation.** While cornering, the rear wheels lock at 30% handbrake input or more for any `handbrake_torque` of 700 N·m or higher, because cornering already uses most of the rear grip. 500 N·m leaves a small usable range on an analog trigger. Keyboard input is all-or-nothing. Options: lower `handbrake_torque`, or ramp the handbrake key like steering (changes the player-input spec).
 - **No aerodynamic drag.** Top speed is set only by the 5th-gear rev limiter (about 192 km/h).
 - **Launch wheelspin on loose surfaces.** `torque_split_front` 0.35 stops front wheelspin on full grip. If gravel or grass (task 3.6) brings it back, add a viscous centre coupling: a `center_coupling` stat that moves torque from the faster axle to the slower one, capped per tick so the axles do not overshoot. This replaces the fixed split described in `design.md`, so update it too.
