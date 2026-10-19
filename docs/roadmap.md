@@ -42,6 +42,12 @@ Still open for 3.8:
 - **No aerodynamic drag.** Top speed is set only by the 5th-gear rev limiter (about 192 km/h).
 - **Launch wheelspin on loose surfaces.** `torque_split_front` 0.35 stops front wheelspin on full grip. If gravel or grass (task 3.6) brings it back, add a viscous centre coupling: a `center_coupling` stat that moves torque from the faster axle to the slower one, capped per tick so the axles do not overshoot. This replaces the fixed split described in `design.md`, so update it too.
 
+## Pace notes
+
+Out of scope for the slice (see `proposal.md`). The design (`docs/syspec/art-audio.md`, `world.md`) wants co-driver pace notes: arrow icons on screen plus voiced calls ("left 4, don't cut!"), shown in the HUD.
+
+To do as its own change: derive calls from the `RoadPath` ahead of the car, since the whole stage exists upfront. Corner direction and severity come from the curvature (e.g. 1–6 or hairpin). Crests come from `RoadPath.crests`, narrow sections from the road widths, and surface changes from the surface sections (task 5.7). Calls are timed by distance ahead at current speed. Severity thresholds should depend on the car's cornering speed, so they stay right after handling changes.
+
 ## Immobilized car keeps driving
 
 `CarDamage.immobilize` only emits `immobilized(cause)`; the car still accepts input and drives. Task 8.6 (game-over screen) cuts the engine and stops the car when the signal fires, so game-over behaviour lives in one place.
