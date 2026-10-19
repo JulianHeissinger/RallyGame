@@ -34,6 +34,22 @@ static func build(path: RoadPath, stage_seed: int, params: StageParams) -> Stati
 	return terrain
 
 
+## Terrain height at world `x`, `z`, bilinear between grid points of the terrain's heightmap collider.
+static func height_at(terrain: StaticBody3D, x: float, z: float) -> float:
+	var collision: CollisionShape3D = terrain.get_node("Collision")
+	var shape := collision.shape as HeightMapShape3D
+	var cell := collision.scale.x
+	var gx := clampf((x - collision.position.x) / cell + (shape.map_width - 1) / 2.0, 0.0, shape.map_width - 1.001)
+	var gz := clampf((z - collision.position.z) / cell + (shape.map_depth - 1) / 2.0, 0.0, shape.map_depth - 1.001)
+	var i := floori(gx)
+	var j := floori(gz)
+	var data := shape.map_data
+	var w := shape.map_width
+	var top := lerpf(data[j * w + i], data[j * w + i + 1], gx - i)
+	var bottom := lerpf(data[(j + 1) * w + i], data[(j + 1) * w + i + 1], gx - i)
+	return lerpf(top, bottom, gz - j) * cell
+
+
 static func _heights(path: RoadPath, rng: RandomNumberGenerator, params: StageParams, corner: Vector2,
 		nx: int, nz: int) -> PackedFloat32Array:
 	var cell := params.terrain_cell
@@ -168,6 +184,7 @@ static func _collision(heights: PackedFloat32Array, corner: Vector2, nx: int, nz
 	shape.map_depth = nz
 	shape.map_data = scaled
 	var collision := CollisionShape3D.new()
+	collision.name = "Collision"
 	collision.shape = shape
 	collision.scale = Vector3.ONE * cell
 	collision.position = Vector3(corner.x + (nx - 1) * cell / 2.0, 0.0, corner.y + (nz - 1) * cell / 2.0)

@@ -63,6 +63,25 @@ extends Resource
 ## Seconds added when the car falls out of the world and is put back on the road.
 @export var respawn_penalty := 10.0
 
+@export_group("Props")
+## Jittered grid spacing in m; each cell holds at most one prop.
+@export var prop_cell := 6.0
+## Props are placed up to this far in m from the road edge.
+@export var prop_max_distance := 40.0
+## Free space in m between the bevel and a prop's footprint.
+@export var prop_road_clearance := 2.0
+## Chance that a grid cell holds a prop.
+@export var prop_density := 0.25
+## Extra keep chance on corner outsides, as a multiple of `prop_density`, at full strength.
+@export var corner_density_boost := 2.0
+## Corners this tight in m or tighter get the full boost; wider corners get less.
+@export var corner_full_boost_radius := 20.0
+## The boost fades out over this distance in m from the road edge.
+@export var corner_band := 20.0
+@export var tree_weight := 3.0
+@export var rock_weight := 2.0
+@export var fence_weight := 1.0
+
 @export_group("Validation")
 ## Minimum centre-to-centre distance between separate parts of the road.
 ## Keep it above `road_width_max` and below `2 * hairpin_radius.x`, or hairpins never fit.

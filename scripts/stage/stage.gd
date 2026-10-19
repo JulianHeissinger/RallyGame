@@ -1,5 +1,5 @@
 extends Node3D
-## Generated stage: builds road and terrain from a seed, puts the car on the start, and
+## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
 ## returns it to the road when it falls out of the world.
 
 ## Emitted when the car fell out of the world and was put back on the road; `penalty` is in seconds.
@@ -34,6 +34,7 @@ func _ready() -> void:
 	add_child(RoadBuilder.build(path, _params))
 	var terrain := TerrainBuilder.build(path, stage_seed, _params)
 	add_child(terrain)
+	add_child(PropScatter.build(PropScatter.scatter(path, stage_seed, _params), terrain))
 	add_child(_build_kill_plane(terrain.get_node("Mesh").get_aabb()))
 	_car.road = path
 	_car.global_transform = path.transform_at(START_DISTANCE).translated(Vector3.UP)
