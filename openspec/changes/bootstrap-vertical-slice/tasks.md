@@ -34,7 +34,7 @@
 ## 5. Stage generation
 
 - [x] 5.1 Implement seeded sub-stream helper and 2D road layout (segment table, clearance check, retries, derived-seed regeneration, target length, per-sample road width with rare narrow pinches, tuning in `StageParams`); verify with `tests/test_road_layout.gd` (same seed identical, different seeds differ, no self-intersection, hairpin present, length within tolerance)
-- [ ] 5.2 Add elevation with clamped gradient and crest features, `Curve3D` sampling with cumulative distance and progress query; verify crest present and progress at midpoint ≈ half length in `tests/test_road_layout.gd`
+- [x] 5.2 Add elevation with clamped gradient and crest features, `Curve3D` sampling with cumulative distance and progress query; verify crest present and progress at midpoint ≈ half length in `tests/test_road_layout.gd`
 - [ ] 5.3 Build road ribbon mesh and collider with `surface` metadata; verify the car drives the full road from start to finish in `stage.tscn`
 - [ ] 5.4 Build heightmap terrain blended to the road with `HeightMapShape3D` collider, bounds walls and kill plane respawn with penalty; verify driving off-road works without seams or falling through, and falling out respawns on the road
 - [ ] 5.5 Scatter props (trees, rocks, fences) with road clearance and corner-outside density, `MultiMeshInstance3D` visuals and `solid` colliders; verify with a test that no prop overlaps the road and that props are identical for the same seed

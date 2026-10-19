@@ -67,3 +67,50 @@ func _self_intersects(points: PackedVector2Array) -> bool:
 			if Geometry2D.segment_intersects_segment(points[i], points[i + 1], points[j], points[j + 1]) != null:
 				return true
 	return false
+
+
+func test_crest_present() -> void:
+	var params := StageParams.new()
+	for stage_seed in SEEDS:
+		var path := _path(stage_seed, params)
+		assert_true(path.crests.size() >= 1, "seed %d has a crest" % stage_seed)
+		for top in path.crests:
+			var rise := _gradient(path, top - 15.0, top - 5.0)
+			var fall := _gradient(path, top + 5.0, top + 15.0)
+			assert_true(rise - fall >= params.crest_gradient.x, "seed %d crest at %.0f m turns from rise to fall" % [stage_seed, top])
+
+
+func test_gradient_clamped() -> void:
+	var params := StageParams.new()
+	for stage_seed in SEEDS:
+		var samples := _path(stage_seed, params).samples
+		var steepest := 0.0
+		for i in range(1, samples.size()):
+			var run := Vector2(samples[i].x, samples[i].z).distance_to(Vector2(samples[i - 1].x, samples[i - 1].z))
+			steepest = maxf(steepest, absf(samples[i].y - samples[i - 1].y) / run)
+		assert_true(steepest <= params.max_gradient + 0.001, "seed %d steepest gradient %.3f" % [stage_seed, steepest])
+
+
+func test_same_seed_same_heights() -> void:
+	var params := StageParams.new()
+	assert_eq(_path(12345, params).samples, _path(12345, params).samples, "same seed gives the same 3D road")
+
+
+func test_progress_at_midpoint() -> void:
+	var params := StageParams.new()
+	var path := _path(12345, params)
+	var mid := path.samples.size() / 2
+	var side := (path.samples[mid + 1] - path.samples[mid]).cross(Vector3.UP).normalized() * 2.0
+	assert_almost_eq(path.progress_at(path.samples[mid]), path.length / 2.0, path.length * 0.01, "progress on the centreline")
+	assert_almost_eq(path.progress_at(path.samples[mid] + side), path.distances[mid], 0.5, "progress 2 m off the centreline")
+
+
+func _path(stage_seed: int, params: StageParams) -> RoadPath:
+	return RoadPath.build(RoadLayout.generate(stage_seed, params), stage_seed, params)
+
+
+## Average gradient between two distances along the road.
+func _gradient(path: RoadPath, from: float, to: float) -> float:
+	var a := path.curve.sample_baked(from)
+	var b := path.curve.sample_baked(to)
+	return (b.y - a.y) / Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))

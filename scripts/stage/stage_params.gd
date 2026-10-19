@@ -35,6 +35,20 @@ extends Resource
 ## Fraction of `target_length` after which missing hairpins are forced.
 @export var hairpin_force_after := 0.6
 
+@export_group("Elevation")
+## Low-frequency base height: amplitude in m, wavelength in m along the road.
+@export var elevation_amplitude := 6.0
+@export var elevation_wavelength := 400.0
+## Steepest allowed rise or fall per metre, so slopes stay readable from the iso camera.
+@export var max_gradient := 0.12
+@export var crests_per_km := 1.5
+@export var min_crests := 1
+## Crest flank gradient and total length in m. A crest is a sharp change from rising to falling.
+@export var crest_gradient := Vector2(0.08, 0.12)
+@export var crest_length := Vector2(40.0, 80.0)
+## Rounds the crest top over about this many metres.
+@export var crest_top_radius := 4.0
+
 @export_group("Validation")
 ## Minimum centre-to-centre distance between separate parts of the road.
 ## Keep it above `road_width_max` and below `2 * hairpin_radius.x`, or hairpins never fit.
