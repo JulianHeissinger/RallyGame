@@ -4,11 +4,16 @@ extends Node3D
 
 ## Emitted when the car fell out of the world and was put back on the road; `penalty` is in seconds.
 signal car_respawned(penalty: float)
+## Emitted once when the car crosses the finish line.
+signal car_finished
 
 ## Depth in m of the kill plane below the lowest terrain point.
 const KILL_DEPTH := 20.0
-## Car spawn distance along the road, so the whole car stands on the road.
+## Car spawn distance along the road, so the whole car stands on the road behind the start line.
 const START_DISTANCE := 5.0
+## The car counts as finished only within this distance in m before the finish line along the road,
+## so another road part passing near the finish trigger does not finish the stage.
+const FINISH_PROGRESS_TOLERANCE := 5.0
 
 ## 0 picks a random seed.
 @export var stage_seed := 0
@@ -16,8 +21,10 @@ const START_DISTANCE := 5.0
 @export var params: StageParams
 
 var path: RoadPath
+var finish_distance := 0.0
 
 var _params: StageParams
+var _finished := false
 
 @onready var _car: Car = $Car
 @onready var _camera: IsoCameraRig = $IsoCameraRig
@@ -32,6 +39,10 @@ func _ready() -> void:
 	_params = params if params else StageParams.new()
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
 	add_child(RoadBuilder.build(path, _params))
+	var lines := StageLines.build(path, _params)
+	add_child(lines)
+	finish_distance = StageLines.finish_distance(path)
+	lines.get_node("FinishArea").body_entered.connect(_on_finish_area_body_entered)
 	var terrain := TerrainBuilder.build(path, stage_seed, _params)
 	add_child(terrain)
 	add_child(PropScatter.build(PropScatter.scatter(path, stage_seed, _params), terrain))
@@ -64,3 +75,12 @@ func _on_kill_plane_body_entered(body: Node3D) -> void:
 		return
 	_car.place(path.transform_at(path.progress_at(_car.global_position)).translated(Vector3.UP))
 	car_respawned.emit(_params.respawn_penalty)
+
+
+func _on_finish_area_body_entered(body: Node3D) -> void:
+	if body != _car or _finished:
+		return
+	if path.progress_at(_car.global_position) < finish_distance - FINISH_PROGRESS_TOLERANCE:
+		return
+	_finished = true
+	car_finished.emit()
