@@ -1,6 +1,7 @@
 class_name RoadPath
 extends RefCounted
-## 3D road centreline: a `RoadLayout` lifted by noise and crests, with cumulative distance and progress.
+## 3D road centreline: a `RoadLayout` lifted by noise and crests, with cumulative distance, progress
+## and surface sections.
 
 const CREST_END_MARGIN := 100.0
 const CREST_SPACING := 150.0
@@ -14,6 +15,9 @@ var widths := PackedFloat32Array()
 var distances := PackedFloat32Array()
 ## Distance of each crest top.
 var crests := PackedFloat32Array()
+## First sample index of each surface section, ascending from 0, and the section's surface entry.
+var section_starts := PackedInt32Array()
+var section_defs: Array[SurfaceSectionDef] = []
 var length := 0.0
 var curve := Curve3D.new()
 
@@ -35,6 +39,7 @@ static func build(layout: RoadLayout, stage_seed: int, params: StageParams) -> R
 		path.curve.add_point(sample)
 	for index in crest_indices:
 		path.crests.append(path.distances[index])
+	_add_sections(path, SeedStreams.rng(stage_seed, "surfaces"), params)
 	return path
 
 
@@ -48,6 +53,33 @@ func transform_at(distance: float) -> Transform3D:
 ## Distance along the road of the closest road point to `position`.
 func progress_at(position: Vector3) -> float:
 	return curve.get_closest_offset(position)
+
+
+## Surface section that sample `index` belongs to.
+func section_at(index: int) -> SurfaceSectionDef:
+	return section_defs[section_starts.bsearch(index, false) - 1]
+
+
+## Sections back to back from the start, each with a weighted surface and a length from its range,
+## snapped to samples. A last section shorter than `min_section_length` merges into the one before.
+static func _add_sections(path: RoadPath, rng: RandomNumberGenerator, params: StageParams) -> void:
+	var weights := PackedFloat32Array()
+	for def in params.surfaces:
+		weights.append(def.weight)
+	var last := path.samples.size() - 1
+	var start := 0.0
+	while true:
+		var index := mini(path.distances.bsearch(start), last)
+		if index == last:
+			break
+		var def := params.surfaces[rng.rand_weighted(weights)]
+		path.section_starts.append(index)
+		path.section_defs.append(def)
+		start = path.distances[index] + rng.randf_range(def.length.x, def.length.y)
+	if path.section_starts.size() > 1 \
+			and path.length - path.distances[path.section_starts[-1]] < params.min_section_length:
+		path.section_starts.resize(path.section_starts.size() - 1)
+		path.section_defs.resize(path.section_defs.size() - 1)
 
 
 static func _base_heights(layout: RoadLayout, rng: RandomNumberGenerator, params: StageParams) -> PackedFloat32Array:

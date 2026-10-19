@@ -63,6 +63,12 @@ extends Resource
 ## Seconds added when the car falls out of the world and is put back on the road.
 @export var respawn_penalty := 10.0
 
+@export_group("Surfaces")
+## Weighted surface table the road sections are drawn from. Neighbouring sections may repeat a surface.
+@export var surfaces: Array[SurfaceSectionDef] = []
+## A last section shorter than this in m merges into the one before it.
+@export var min_section_length := 100.0
+
 @export_group("Props")
 ## Jittered grid spacing in m; each cell holds at most one prop.
 @export var prop_cell := 6.0
@@ -88,3 +94,12 @@ extends Resource
 @export var min_clearance := 16.0
 @export var max_segment_retries := 10
 @export var max_regenerations := 20
+
+
+## Default surface table for the prototype stage. A `.tres` that sets `surfaces` replaces it.
+func _init() -> void:
+	surfaces = [
+		SurfaceSectionDef.create("gravel", "grass", 3.0, Vector2(300.0, 700.0)),
+		SurfaceSectionDef.create("tarmac", "grass", 1.0, Vector2(300.0, 700.0)),
+		SurfaceSectionDef.create("snow", "snow", 1.0, Vector2(300.0, 700.0)),
+	]

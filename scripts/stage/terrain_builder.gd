@@ -1,8 +1,8 @@
 class_name TerrainBuilder
 ## Heightmap terrain around the road: its own noise far away, blended to just below the road near it.
-## Bounds walls at the terrain edge keep the car on the generated area.
+## Each grid cell takes the off-road surface of its nearest road section. Bounds walls at the terrain
+## edge keep the car on the generated area.
 
-const COLOR := Color(0.3, 0.5, 0.22)
 ## Wall height in m above the highest and depth below the lowest terrain point.
 const WALL_REACH := 50.0
 const WALL_THICKNESS := 2.0
@@ -14,7 +14,7 @@ const ROAD_HEIGHT_BLUR_PASSES := 2
 const ROAD_HEIGHT_EXACT_BAND := 4.0
 
 
-static func build(path: RoadPath, stage_seed: int, params: StageParams) -> StaticBody3D:
+static func build(path: RoadPath, stage_seed: int, params: StageParams) -> TerrainBody:
 	var cell := params.terrain_cell
 	var bounds := Rect2(Vector2(path.samples[0].x, path.samples[0].z), Vector2.ZERO)
 	for sample in path.samples:
@@ -23,12 +23,18 @@ static func build(path: RoadPath, stage_seed: int, params: StageParams) -> Stati
 	var nx := ceili(bounds.size.x / cell) + 1
 	var nz := ceili(bounds.size.y / cell) + 1
 	var corner := bounds.position
-	var heights := _heights(path, SeedStreams.rng(stage_seed, "terrain"), params, corner, nx, nz)
+	var nearest := PackedInt32Array()
+	var heights := _heights(path, SeedStreams.rng(stage_seed, "terrain"), params, corner, nx, nz, nearest)
 
-	var terrain := StaticBody3D.new()
+	var terrain := TerrainBody.new()
 	terrain.name = "Terrain"
-	terrain.set_meta("surface", "grass")
-	terrain.add_child(_mesh(heights, corner, nx, nz, cell))
+	terrain.corner = corner
+	terrain.cell = cell
+	terrain.nx = nx
+	terrain.nz = nz
+	for k in nearest:
+		terrain.cell_surfaces.append(path.section_at(k).terrain_surface)
+	terrain.add_child(_mesh(heights, terrain.cell_surfaces, corner, nx, nz, cell))
 	terrain.add_child(_collision(heights, corner, nx, nz, cell))
 	terrain.add_child(_walls(heights, corner, nx, nz, cell))
 	return terrain
@@ -50,15 +56,15 @@ static func height_at(terrain: StaticBody3D, x: float, z: float) -> float:
 	return lerpf(top, bottom, gz - j) * cell
 
 
+## Fills `nearest` with the road sample index closest to each grid point.
 static func _heights(path: RoadPath, rng: RandomNumberGenerator, params: StageParams, corner: Vector2,
-		nx: int, nz: int) -> PackedFloat32Array:
+		nx: int, nz: int, nearest: PackedInt32Array) -> PackedFloat32Array:
 	var cell := params.terrain_cell
-	# Signed distance from the nearest road edge (negative under the road) and that road's height.
+	# Signed distance from the nearest road edge (negative under the road) and that road sample.
 	var edge := PackedFloat32Array()
 	edge.resize(nx * nz)
 	edge.fill(INF)
-	var road_y := PackedFloat32Array()
-	road_y.resize(nx * nz)
+	nearest.resize(nx * nz)
 	# Exact distances in a small band around the road, then spread outward.
 	for k in path.samples.size():
 		var sample := path.samples[k]
@@ -71,8 +77,11 @@ static func _heights(path: RoadPath, rng: RandomNumberGenerator, params: StagePa
 				var index := j * nx + i
 				if d < edge[index]:
 					edge[index] = d
-					road_y[index] = sample.y
-	_spread(edge, road_y, nx, nz, cell)
+					nearest[index] = k
+	_spread(edge, nearest, nx, nz, cell)
+	var road_y := PackedFloat32Array()
+	for k in nearest:
+		road_y.append(path.samples[k].y)
 	var smooth_y := road_y.duplicate()
 	for blur_pass in ROAD_HEIGHT_BLUR_PASSES:
 		_box_blur(smooth_y, nx, nz, roundi(ROAD_HEIGHT_BLUR / cell))
@@ -94,8 +103,8 @@ static func _heights(path: RoadPath, rng: RandomNumberGenerator, params: StagePa
 	return heights
 
 
-## Two-pass chamfer distance transform: carries edge distance and road height to every grid point.
-static func _spread(edge: PackedFloat32Array, road_y: PackedFloat32Array, nx: int, nz: int, cell: float) -> void:
+## Two-pass chamfer distance transform: carries edge distance and nearest road sample to every grid point.
+static func _spread(edge: PackedFloat32Array, nearest: PackedInt32Array, nx: int, nz: int, cell: float) -> void:
 	var diagonal := cell * sqrt(2.0)
 	var forward := [Vector3i(-1, 0, 0), Vector3i(0, -1, 0), Vector3i(-1, -1, 1), Vector3i(1, -1, 1)]
 	var backward := [Vector3i(1, 0, 0), Vector3i(0, 1, 0), Vector3i(1, 1, 1), Vector3i(-1, 1, 1)]
@@ -115,7 +124,7 @@ static func _spread(edge: PackedFloat32Array, road_y: PackedFloat32Array, nx: in
 					var candidate := edge[neighbour] + (diagonal if offset.z == 1 else cell)
 					if candidate < edge[index]:
 						edge[index] = candidate
-						road_y[index] = road_y[neighbour]
+						nearest[index] = nearest[neighbour]
 
 
 ## Box blur with radius `r` cells along rows, then columns, clamped at the grid edges.
@@ -139,9 +148,11 @@ static func _box_blur(values: PackedFloat32Array, nx: int, nz: int, r: int) -> v
 				sum += line[mini(i + r + 1, count - 1)] - line[maxi(i - r, 0)]
 
 
-static func _mesh(heights: PackedFloat32Array, corner: Vector2, nx: int, nz: int, cell: float) -> MeshInstance3D:
+static func _mesh(heights: PackedFloat32Array, surfaces: PackedStringArray, corner: Vector2, nx: int, nz: int,
+		cell: float) -> MeshInstance3D:
 	var vertices := PackedVector3Array()
 	var normals := PackedVector3Array()
+	var colors := PackedColorArray()
 	for j in nz:
 		for i in nx:
 			var point := corner + Vector2(i, j) * cell
@@ -149,6 +160,7 @@ static func _mesh(heights: PackedFloat32Array, corner: Vector2, nx: int, nz: int
 			var dx := heights[j * nx + mini(i + 1, nx - 1)] - heights[j * nx + maxi(i - 1, 0)]
 			var dz := heights[mini(j + 1, nz - 1) * nx + i] - heights[maxi(j - 1, 0) * nx + i]
 			normals.append(Vector3(-dx, 2.0 * cell, -dz).normalized())
+			colors.append(Surface.COLOR[surfaces[j * nx + i]])
 	var indices := PackedInt32Array()
 	for j in nz - 1:
 		for i in nx - 1:
@@ -161,11 +173,12 @@ static func _mesh(heights: PackedFloat32Array, corner: Vector2, nx: int, nz: int
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
 	arrays[Mesh.ARRAY_NORMAL] = normals
+	arrays[Mesh.ARRAY_COLOR] = colors
 	arrays[Mesh.ARRAY_INDEX] = indices
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var material := StandardMaterial3D.new()
-	material.albedo_color = COLOR
+	material.vertex_color_use_as_albedo = true
 	mesh.surface_set_material(0, material)
 	var instance := MeshInstance3D.new()
 	instance.name = "Mesh"

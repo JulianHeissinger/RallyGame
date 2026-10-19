@@ -63,8 +63,8 @@ func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> voi
 
 	_contact = get_collision_point()
 	var collider := get_collider()
-	surface = Surface.name_of(collider)
-	surface_grip = Surface.grip_of(collider)
+	surface = Surface.name_of(collider, _contact)
+	surface_grip = Surface.grip_of(collider, _contact)
 	_contact_normal = get_collision_normal()
 	var compression := clampf(rest + radius - global_position.distance_to(_contact), 0.0, rest)
 	var compression_velocity := (compression - _last_compression) / delta

@@ -20,3 +20,14 @@ func test_missing_or_unknown_surface_uses_default() -> void:
 	assert_eq(Surface.name_of(unknown), Surface.DEFAULT, "unknown surface")
 	plain.free()
 	unknown.free()
+
+
+func test_surface_at_overrides_metadata() -> void:
+	var terrain := TerrainBody.new()
+	terrain.set_meta("surface", "gravel")
+	terrain.nx = 2
+	terrain.nz = 1
+	terrain.cell_surfaces = PackedStringArray(["grass", "snow"])
+	assert_eq(Surface.name_of(terrain, Vector3(0.1, 0.0, 0.0)), "grass", "cell 0")
+	assert_eq(Surface.name_of(terrain, Vector3(0.9, 0.0, 0.0)), "snow", "cell 1")
+	terrain.free()

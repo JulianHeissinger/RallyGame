@@ -105,6 +105,44 @@ func test_progress_at_midpoint() -> void:
 	assert_almost_eq(path.progress_at(path.samples[mid] + side), path.distances[mid], 0.5, "progress 2 m off the centreline")
 
 
+func test_same_seed_same_sections() -> void:
+	var params := StageParams.new()
+	var a := _path(12345, params)
+	var b := _path(12345, params)
+	assert_true(a.section_starts.size() >= 2, "a 2 km stage has several sections")
+	assert_eq(a.section_starts, b.section_starts, "same seed gives the same section starts")
+	assert_eq(_surfaces(a), _surfaces(b), "same seed gives the same section surfaces")
+	assert_true(_path(1, params).section_starts != _path(2, params).section_starts, "seeds 1 and 2 differ")
+
+
+func test_section_lengths() -> void:
+	var params := StageParams.new()
+	for stage_seed in SEEDS:
+		var path := _path(stage_seed, params)
+		var starts := path.section_starts
+		assert_eq(starts[0], 0, "seed %d first section starts at the start" % stage_seed)
+		for i in starts.size():
+			var end := path.length if i + 1 == starts.size() else path.distances[starts[i + 1]]
+			var length := end - path.distances[starts[i]]
+			var def := path.section_defs[i]
+			# Snapping to samples moves a boundary by up to one spacing; the last section may be
+			# shorter (but not below the floor) or have a short tail merged into it.
+			if i + 1 < starts.size():
+				assert_true(length >= def.length.x - params.sample_spacing and length <= def.length.y + params.sample_spacing,
+					"seed %d section %d length %.0f m in range" % [stage_seed, i, length])
+			else:
+				assert_true(length >= params.min_section_length and length <= def.length.y + params.min_section_length,
+					"seed %d last section length %.0f m" % [stage_seed, length])
+			assert_eq(path.section_at(starts[i]), def, "seed %d section_at start of section %d" % [stage_seed, i])
+
+
+func _surfaces(path: RoadPath) -> PackedStringArray:
+	var names := PackedStringArray()
+	for def in path.section_defs:
+		names.append(def.road_surface)
+	return names
+
+
 func _path(stage_seed: int, params: StageParams) -> RoadPath:
 	return RoadPath.build(RoadLayout.generate(stage_seed, params), stage_seed, params)
 
