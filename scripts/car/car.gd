@@ -25,7 +25,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	input.update(delta, linear_velocity.length())
 	drivetrain.update(input, wheels, stats, car_stats.torque_curve, linear_velocity.length(), delta)
-	var steer_angle := -input.steer * deg_to_rad(stats.get_stat("max_steer_angle_deg"))
+	# Max lock shrinks with speed so full input stays near the tires' peak slip angle.
+	var lock_t := clampf(linear_velocity.length() / stats.get_stat("steer_reduction_speed"), 0.0, 1.0)
+	var max_lock := lerpf(stats.get_stat("max_steer_angle_deg"), stats.get_stat("min_steer_angle_deg"), lock_t)
+	var steer_angle := -input.steer * deg_to_rad(max_lock)
 	for wheel in wheels:
 		if wheel.steerable:
 			wheel.rotation.y = steer_angle
