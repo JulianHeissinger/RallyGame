@@ -22,6 +22,8 @@ var road: RoadPath
 
 ## Colliders touched in the last physics step, by instance id. Only new contacts are impacts.
 var _touching: Dictionary = {}
+## Instance ids of `impact_once` bodies that already damaged the car.
+var _impacted_once: Dictionary = {}
 ## Body velocity from the previous step, before the solver resolved this step's new contacts.
 var _last_velocity := Vector3.ZERO
 var _last_angular_velocity := Vector3.ZERO
@@ -111,7 +113,14 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 		if not impacts.has(id) or speed > impacts[id][1]:
 			impacts[id] = [point, speed, collider]
 	for impact: Array in impacts.values():
-		damage.apply_impact(stats, to_local(impact[0]), impact[1], impact[2].is_in_group("solid"))
+		var collider: Object = impact[2]
+		# Bodies with `impact_once` metadata (e.g. sheep) damage the car only on their first impact.
+		if collider.get_meta("impact_once", false):
+			if _impacted_once.has(collider.get_instance_id()):
+				continue
+			_impacted_once[collider.get_instance_id()] = true
+		damage.apply_impact(stats, to_local(impact[0]), impact[1], collider.is_in_group("solid"),
+			collider.get_meta("impact_scale", 1.0))
 	_touching = touching
 	_last_velocity = state.linear_velocity
 	_last_angular_velocity = state.angular_velocity

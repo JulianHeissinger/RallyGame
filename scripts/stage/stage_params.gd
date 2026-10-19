@@ -114,6 +114,7 @@ func _init() -> void:
 	hazards = [
 		preload("res://data/hazards/rock.tres"),
 		preload("res://data/hazards/pothole.tres"),
+		preload("res://data/hazards/sheep_flock.tres"),
 	]
 	surfaces = [
 		SurfaceSectionDef.create("gravel", "grass", 1.0, Vector2(300.0, 700.0)),

@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/sheep.gd" id="1_vhbby"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ywpas"]
+size = Vector3(0.5, 0.8, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ik1qx"]
+albedo_color = Color(0.92, 0.9, 0.85, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hburb"]
+material = SubResource("StandardMaterial3D_ik1qx")
+size = Vector3(0.5, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pcprt"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cfobu"]
+material = SubResource("StandardMaterial3D_pcprt")
+size = Vector3(0.25, 0.3, 0.3)
+
+[node name="Sheep" type="RigidBody3D" unique_id=1950416955]
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+mass = 60.0
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_vhbby")
+metadata/impact_scale = 0.1
+metadata/impact_once = true
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=22874790]
+shape = SubResource("BoxShape3D_ywpas")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1965421218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("BoxMesh_hburb")
+
+[node name="Head" type="MeshInstance3D" parent="." unique_id=682061902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -0.6)
+mesh = SubResource("BoxMesh_cfobu")

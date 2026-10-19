@@ -113,6 +113,13 @@ func _impact_stats() -> StatBlock:
 	})
 
 
+func test_impact_scale_reduces_damage() -> void:
+	var damage := _damage()
+	damage.apply_impact(_impact_stats(), Vector3(0.8, 0.0, -1.9), 13.0, false, 0.1)
+	assert_almost_eq(damage.condition["tire_fr"], 96.0, 0.0001, "a tenth of the 40 damage")
+	damage.free()
+
+
 func test_front_right_impact_damages_that_corner() -> void:
 	var damage := _damage()
 	damage.apply_impact(_impact_stats(), Vector3(0.8, 0.0, -1.9), 13.0, false)

@@ -12,6 +12,11 @@ var car: Car
 var _inside := {}
 
 
+func setup(hazard_def: HazardDef, target: Car, _path: RoadPath, _rng: RandomNumberGenerator) -> void:
+	def = hazard_def
+	car = target
+
+
 func _physics_process(_delta: float) -> void:
 	if car == null:
 		return

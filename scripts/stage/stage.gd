@@ -7,6 +7,8 @@ extends Node3D
 signal car_respawned(penalty: float)
 ## Emitted once when the car crosses the finish line.
 signal car_finished
+## Emitted when the car defeats a hazard, e.g. knocks a sheep off the road.
+signal hazard_defeated(hazard: Node)
 
 ## Depth in m of the kill plane below the lowest terrain point.
 const KILL_DEPTH := 20.0
@@ -75,16 +77,20 @@ func _print_sections() -> void:
 	print("Sections: " + ", ".join(parts))
 
 
-## One scene per placement, on the road at its distance and lateral offset.
+## One scene per placement, on the road at its distance and lateral offset. Hazards with a `setup`
+## method get their def, the car, the road and their own seeded RNG; their `hazard_defeated` is
+## forwarded.
 func _build_hazards() -> Node3D:
 	var root := Node3D.new()
 	root.name = "Hazards"
-	for placement in hazards:
+	for i in hazards.size():
+		var placement := hazards[i]
 		var hazard := placement.def.scene.instantiate() as Node3D
 		hazard.transform = path.transform_at(placement.distance).translated_local(Vector3.RIGHT * placement.lateral)
-		if hazard is WheelHazard:
-			hazard.def = placement.def
-			hazard.car = _car
+		if hazard.has_method("setup"):
+			hazard.setup(placement.def, _car, path, SeedStreams.rng(stage_seed, "hazard_%d" % i))
+		if hazard.has_signal("hazard_defeated"):
+			hazard.hazard_defeated.connect(hazard_defeated.emit)
 		root.add_child(hazard)
 	return root
 
