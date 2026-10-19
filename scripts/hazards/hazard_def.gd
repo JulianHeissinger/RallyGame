@@ -13,6 +13,9 @@ extends Resource
 ## True: placed on the road with a lateral offset (rock, pothole). False: on the centreline,
 ## the scene handles its own extent (sheep flock crossing).
 @export var on_road := true
-## Part group to condition loss, e.g. {"tire": 30.0, "suspension": 15.0}. The hazard maps each
-## group to the parts it hits.
+## Part group to condition loss at `full_speed`, e.g. {"tire": 30.0, "suspension": 15.0}. The
+## hazard maps each group to the parts it hits. Empty for hazards that damage only through impacts.
 @export var damage: Dictionary = {}
+## Speed range in m/s over which `damage` scales from none to full.
+@export var min_speed := 8.0
+@export var full_speed := 25.0

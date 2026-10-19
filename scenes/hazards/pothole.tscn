@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/wheel_hazard.gd" id="1_cobkj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uemk5"]
+albedo_color = Color(0.12, 0.1, 0.08, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_iyt7g"]
+material = SubResource("StandardMaterial3D_uemk5")
+height = 0.02
+
+[node name="Pothole" type="Node3D" unique_id=325072028]
+script = ExtResource("1_cobkj")
+radius = 0.5
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=1210632961]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_iyt7g")

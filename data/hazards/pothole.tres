@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/pothole.tscn" id="1_4j0d7"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_a60od"]
+
+[resource]
+script = ExtResource("2_a60od")
+name = "pothole"
+scene = ExtResource("1_4j0d7")
+weight = 2.0
+damage = {
+"suspension": 25.0,
+"tire": 20.0
+}

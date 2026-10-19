@@ -24,7 +24,7 @@ const FINISH_PROGRESS_TOLERANCE := 5.0
 @export var difficulty := 1
 
 var path: RoadPath
-## Hazard placements; the hazard scenes are built from them from task 6.2 on.
+## Hazard placements, built into the "Hazards" node.
 var hazards: Array[HazardPlacer.Placement] = []
 var finish_distance := 0.0
 
@@ -53,6 +53,7 @@ func _ready() -> void:
 	var terrain := TerrainBuilder.build(path, stage_seed, _params)
 	add_child(terrain)
 	add_child(PropScatter.build(PropScatter.scatter(path, stage_seed, _params), terrain))
+	add_child(_build_hazards())
 	add_child(_build_kill_plane(terrain.get_node("Mesh").get_aabb()))
 	_car.road = path
 	_car.global_transform = path.transform_at(START_DISTANCE).translated(Vector3.UP)
@@ -72,6 +73,20 @@ func _print_sections() -> void:
 	for i in path.section_starts.size():
 		parts.append("%s at %.0f m" % [path.section_defs[i].road_surface, path.distances[path.section_starts[i]]])
 	print("Sections: " + ", ".join(parts))
+
+
+## One scene per placement, on the road at its distance and lateral offset.
+func _build_hazards() -> Node3D:
+	var root := Node3D.new()
+	root.name = "Hazards"
+	for placement in hazards:
+		var hazard := placement.def.scene.instantiate() as Node3D
+		hazard.transform = path.transform_at(placement.distance).translated_local(Vector3.RIGHT * placement.lateral)
+		if hazard is WheelHazard:
+			hazard.def = placement.def
+			hazard.car = _car
+		root.add_child(hazard)
+	return root
 
 
 ## Wide trigger below the terrain; anything falling into it is out of the world.

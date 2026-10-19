@@ -44,6 +44,7 @@ func test_spacing_and_range() -> void:
 
 func test_empty_pool_places_nothing() -> void:
 	var params := StageParams.new()
+	params.hazards = []
 	assert_eq(HazardPlacer.place(_path(1, params), 1, 3, params).size(), 0, "no pool, no hazards")
 
 

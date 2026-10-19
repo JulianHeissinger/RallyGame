@@ -71,6 +71,7 @@ extends Resource
 
 @export_group("Hazards")
 ## Hazard pool for this stage style; locked entries are skipped below their `min_difficulty`.
+## Filled with the prototype hazards in `_init`.
 @export var hazards: Array[HazardDef] = []
 ## Hazards per km of usable road at difficulty 1.
 @export var hazards_per_km := 4.0
@@ -108,8 +109,12 @@ extends Resource
 @export var max_regenerations := 20
 
 
-## Default surface table for the prototype stage. A `.tres` that sets `surfaces` replaces it.
+## Default surface table and hazard pool for the prototype stage. A `.tres` that sets them replaces them.
 func _init() -> void:
+	hazards = [
+		preload("res://data/hazards/rock.tres"),
+		preload("res://data/hazards/pothole.tres"),
+	]
 	surfaces = [
 		SurfaceSectionDef.create("gravel", "grass", 1.0, Vector2(300.0, 700.0)),
 		SurfaceSectionDef.create("tarmac", "grass", 1.0, Vector2(300.0, 700.0)),
