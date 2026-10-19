@@ -25,7 +25,7 @@ The prototype SHALL include at least: a rock on the road (solid, damages tires a
 
 #### Scenario: Pothole hit
 - **WHEN** a wheel drives through a pothole at speed
-- **THEN** that wheel's tire and the suspension lose condition
+- **THEN** that wheel's tire and suspension lose condition
 
 #### Scenario: Sheep crossing
 - **WHEN** the car approaches a sheep flock hazard

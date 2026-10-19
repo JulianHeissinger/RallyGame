@@ -48,12 +48,13 @@ tests/    run_tests.gd + test_*.gd
 `CarStats` resource (`data/cars/prototype.tres`) holds base values. A `StatBlock` computes effective stats as `base`, then additive item modifiers, then multiplicative item modifiers, then damage multipliers. It recomputes only when items or part conditions change. Wheels and drivetrain read effective stats. This one path serves items, damage and later car unlocks.
 
 ### Damage
-`CarDamage` node owns a dictionary of parts (`tire_fl` ... `brake_rr`, `engine`, `suspension`, `chassis`) with conditions from 0 to 100.
+`CarDamage` node owns a dictionary of parts (`tire_fl` ... `brake_rr`, `suspension_fl` ... `suspension_rr`, `engine`, `chassis`) with conditions from 0 to 100.
 - Impacts come from contact monitoring on the body. Impact speed is the relative velocity along the contact normal. The contact point in car-local space maps to a zone (front-left, front-right, rear-left, rear-right, center), and the zone decides which parts take damage.
 - Lethal impact: impact speed against a body in group `solid` above `lethal_impact_speed` (a stat) immobilizes the car immediately.
 - Degradation: once a part is below 100, it loses `rate * (1 + (100 - c) / k)` per second while the car moves.
 - Rollover: the body's up vector stays below a threshold for 2 s, then the car resets to the nearest road sample, upright, with a penalty.
 - Signals: `part_damaged(part, amount)`, `part_broken(part)`, `immobilized(cause)`.
+- Handling effects: car-wide effects (engine power) go through `StatBlock` damage multipliers. Per-wheel effects (tire grip and rolling drag, brake loss, suspension sag and stiffness) are factors on each `Wheel`, set by the car from the matching parts each tick, because `StatBlock` holds only car-wide stats.
 
 ### Input
 InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `shift_up`, `shift_down`, `activate_item`, `pause`, `ui_*`. Both keyboard and joypad events are bound to each action.

@@ -7,7 +7,7 @@ Defines how the car takes damage through individual breakable parts instead of a
 ## ADDED Requirements
 
 ### Requirement: Breakable parts with wear
-The car SHALL have these parts, each with a condition from 100% (intact) to 0% (broken): four tires, four brakes, engine, suspension, and chassis. The car SHALL NOT have a single health value.
+The car SHALL have these parts, each with a condition from 100% (intact) to 0% (broken): four tires, four brakes, four suspension corners, engine, and chassis. The car SHALL NOT have a single health value.
 
 #### Scenario: Fresh car
 - **WHEN** a stage starts with a new car

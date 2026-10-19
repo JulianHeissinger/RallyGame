@@ -22,6 +22,13 @@ var surface_grip: float = Surface.GRIP[Surface.DEFAULT]
 ## Set by the drivetrain each tick, in N·m. Drive is signed; brake is a magnitude.
 var drive_torque := 0.0
 var brake_torque := 0.0
+## Damage factors, set from part conditions by `apply_condition`. 1 (0 for drag) when intact.
+var grip_factor := 1.0
+var brake_factor := 1.0
+## Rolling resistance as a share of wheel load; a flat tire drags and pulls to its side.
+var drag := 0.0
+var rest_factor := 1.0
+var stiffness_factor := 1.0
 
 var _last_compression := 0.0
 var _contact := Vector3.ZERO
@@ -33,9 +40,19 @@ var _longitudinal_deflection := 0.0
 @onready var _visual: Node3D = get_node_or_null("Visual")
 
 
+## Maps part conditions (0..100) to damage factors: each blends linearly from intact to its
+## broken value in `stats`.
+func apply_condition(stats: StatBlock, tire: float, brake: float, suspension: float) -> void:
+	grip_factor = lerpf(stats.get_stat("flat_tire_grip"), 1.0, tire / 100.0)
+	drag = lerpf(stats.get_stat("flat_tire_drag"), 0.0, tire / 100.0)
+	brake_factor = brake / 100.0
+	rest_factor = lerpf(stats.get_stat("suspension_damaged_sag"), 1.0, suspension / 100.0)
+	stiffness_factor = lerpf(stats.get_stat("suspension_damaged_stiffness"), 1.0, suspension / 100.0)
+
+
 func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var radius := stats.get_stat("wheel_radius")
-	var rest := stats.get_stat("suspension_rest_length")
+	var rest := stats.get_stat("suspension_rest_length") * rest_factor
 	target_position = Vector3(0.0, -(rest + radius), 0.0)
 	force_raycast_update()
 	is_grounded = is_colliding()
@@ -52,8 +69,8 @@ func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> voi
 	var compression := clampf(rest + radius - global_position.distance_to(_contact), 0.0, rest)
 	var compression_velocity := (compression - _last_compression) / delta
 	_last_compression = compression
-	normal_load = maxf(stats.get_stat("spring_stiffness") * compression
-		+ stats.get_stat("damper") * compression_velocity, 0.0)
+	normal_load = maxf((stats.get_stat("spring_stiffness") * compression
+		+ stats.get_stat("damper") * compression_velocity) * stiffness_factor, 0.0)
 	body.apply_force(global_basis.y * normal_load, _contact - body.global_position)
 
 
@@ -61,12 +78,13 @@ func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> voi
 func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var radius := stats.get_stat("wheel_radius")
 	var inertia := stats.get_stat("wheel_inertia")
+	var brake := brake_torque * brake_factor
 	if not is_grounded:
 		slip_angle = 0.0
 		slip_ratio = 0.0
 		_lateral_deflection = 0.0
 		_longitudinal_deflection = 0.0
-		spin = move_toward(spin + drive_torque / inertia * delta, 0.0, brake_torque / inertia * delta)
+		spin = move_toward(spin + drive_torque / inertia * delta, 0.0, brake / inertia * delta)
 		return
 
 	var low_speed := stats.get_stat("low_speed_threshold")
@@ -82,7 +100,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var mass_share := normal_load / body.get_gravity().length()
 
 	slip_angle = atan2(v_lat, absf(v_long))
-	var max_force := stats.get_stat("tire_friction") * surface_grip * normal_load
+	var max_force := stats.get_stat("tire_friction") * surface_grip * grip_factor * normal_load
 	var lat_b := stats.get_stat("tire_lat_b")
 	var lat_c := stats.get_stat("tire_lat_c")
 	var long_b := stats.get_stat("tire_long_b")
@@ -108,7 +126,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 			force_lat -= max_force * _magic_formula(combined * lat_peak, lat_b, lat_c) \
 				* lat_norm / combined
 		spin = move_toward(spin + (drive_torque - force * radius) / inertia * h, 0.0,
-			brake_torque / inertia * h)
+			brake / inertia * h)
 		force_long += force
 	force_long /= SPIN_SUBSTEPS
 	force_lat /= SPIN_SUBSTEPS
@@ -129,9 +147,9 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	# wheel holds through the carcass spring up to what the brake can resist.
 	var force_long_low := drive_torque / radius
 	var spin_low := v_long / radius
-	if brake_torque > 0.0:
+	if brake > 0.0:
 		var long_stiffness := stats.get_stat("tire_longitudinal_stiffness")
-		var hold := minf(max_force, brake_torque / radius)
+		var hold := minf(max_force, brake / radius)
 		_longitudinal_deflection = clampf(_longitudinal_deflection + v_long * delta,
 			-hold / long_stiffness, hold / long_stiffness)
 		force_long_low += clampf(-long_stiffness * _longitudinal_deflection
@@ -143,6 +161,8 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	force_long = lerpf(force_long_low, force_long, blend)
 	spin = lerpf(spin_low, spin, blend)
 	_longitudinal_deflection *= 1.0 - blend
+	# Rolling resistance, faded out toward standstill so it cannot push a parked car.
+	force_long -= drag * normal_load * clampf(v_long / low_speed, -1.0, 1.0)
 
 	body.apply_force(forward * force_long + right * force_lat, offset)
 
@@ -151,7 +171,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 func update_visual(stats: StatBlock, delta: float) -> void:
 	if _visual == null:
 		return
-	_visual.position.y = -(stats.get_stat("suspension_rest_length") - _last_compression)
+	_visual.position.y = -(stats.get_stat("suspension_rest_length") * rest_factor - _last_compression)
 	_visual.rotate_x(-spin * delta)
 
 

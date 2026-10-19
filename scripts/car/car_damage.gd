@@ -10,7 +10,8 @@ signal immobilized(cause: String)
 const PARTS: Array[String] = [
 	"tire_fl", "tire_fr", "tire_rl", "tire_rr",
 	"brake_fl", "brake_fr", "brake_rl", "brake_rr",
-	"engine", "suspension", "chassis",
+	"suspension_fl", "suspension_fr", "suspension_rl", "suspension_rr",
+	"engine", "chassis",
 ]
 ## Below this speed in m/s the car counts as standing and parts do not wear.
 const MOVING_SPEED := 1.0

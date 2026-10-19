@@ -8,7 +8,7 @@ The repo is empty apart from the design notes in `docs/` (`docs/questions.md`, `
 
 - Create a Godot 4 project (GDScript, static typing) at the repo root with a clear folder layout.
 - Add a semi-sim raycast car: slip-based tire model, weight transfer, handbrake, gearbox with RPM, rev limiter and automatic or manual shifting, playable with controller and keyboard.
-- Add part-based damage: per-part wear (tires x4, brakes x4, engine, suspension, chassis), effects on handling, and immobilization (lethal impact speed or critical parts destroyed).
+- Add part-based damage: per-part wear (tires x4, brakes x4, suspension x4, engine, chassis), effects on handling, and immobilization (lethal impact speed or critical parts destroyed).
 - Add an isometric follow camera (art of rally style), built as a swappable rig.
 - Add a seeded procedural stage: road spline with curves, hairpins and crests, terrain around it, scattered props, start and finish.
 - Add a basic hazard system: data-driven hazards placed along the stage by seed and difficulty (e.g. rock, pothole, sheep flock, random malfunction).

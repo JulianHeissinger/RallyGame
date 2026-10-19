@@ -79,3 +79,26 @@ func test_immobilized_fires_once() -> void:
 	assert_eq(_immobilized, ["engine"], "immobilized fires once")
 	assert_true(damage.is_immobilized, "flag set")
 	damage.free()
+
+
+func test_wheel_factors_follow_condition() -> void:
+	var stats := StatBlock.new({
+		"flat_tire_grip": 0.4,
+		"flat_tire_drag": 0.1,
+		"suspension_damaged_sag": 0.6,
+		"suspension_damaged_stiffness": 2.0,
+	})
+	var wheel := Wheel.new()
+	wheel.apply_condition(stats, 100.0, 100.0, 100.0)
+	assert_almost_eq(wheel.grip_factor, 1.0, 0.0001, "intact grip")
+	assert_almost_eq(wheel.drag, 0.0, 0.0001, "intact drag")
+	assert_almost_eq(wheel.brake_factor, 1.0, 0.0001, "intact brake")
+	assert_almost_eq(wheel.rest_factor, 1.0, 0.0001, "intact rest length")
+	assert_almost_eq(wheel.stiffness_factor, 1.0, 0.0001, "intact stiffness")
+	wheel.apply_condition(stats, 0.0, 0.0, 50.0)
+	assert_almost_eq(wheel.grip_factor, 0.4, 0.0001, "flat tire grip")
+	assert_almost_eq(wheel.drag, 0.1, 0.0001, "flat tire drag")
+	assert_almost_eq(wheel.brake_factor, 0.0, 0.0001, "broken brake")
+	assert_almost_eq(wheel.rest_factor, 0.8, 0.0001, "half-damaged sag")
+	assert_almost_eq(wheel.stiffness_factor, 1.5, 0.0001, "half-damaged stiffness")
+	wheel.free()
