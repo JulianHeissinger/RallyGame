@@ -3,6 +3,14 @@ extends RigidBody3D
 ## Player car: rigid body on four raycast wheels. Reads tunables through a `StatBlock` and
 ## driver input only through its `InputSource`.
 
+## Emitted after spectators put the car back on its wheels; `penalty` is in seconds.
+signal rolled_over(penalty: float)
+
+## The car counts as rolled over while its up axis is below this against world up (~73° tilt).
+const ROLLOVER_UP_DOT := 0.3
+## Height in m the car is lifted on a rollover reset, so the wheels drop onto the ground.
+const ROLLOVER_LIFT := 1.0
+
 @export var car_stats: CarStats
 
 var stats: StatBlock
@@ -15,6 +23,7 @@ var _touching: Dictionary = {}
 ## Body velocity from the previous step, before the solver resolved this step's new contacts.
 var _last_velocity := Vector3.ZERO
 var _last_angular_velocity := Vector3.ZERO
+var _rollover_timer := 0.0
 
 @onready var damage: CarDamage = $Damage
 
@@ -34,6 +43,7 @@ func _physics_process(delta: float) -> void:
 	input.update(delta, linear_velocity.length())
 	damage.update_wear(stats, delta, linear_velocity.length())
 	_apply_damage()
+	_update_rollover(delta)
 	drivetrain.update(input, wheels, stats, car_stats.torque_curve, linear_velocity.length(), delta)
 	# Max lock shrinks with speed so full input stays near the tires' peak slip angle.
 	var lock_t := clampf(linear_velocity.length() / stats.get_stat("steer_reduction_speed"), 0.0, 1.0)
@@ -89,3 +99,27 @@ func _apply_damage() -> void:
 		var corner := wheel.name.trim_prefix("Wheel").to_lower()
 		wheel.apply_condition(stats, damage.condition["tire_" + corner],
 			damage.condition["brake_" + corner], damage.condition["suspension_" + corner])
+
+
+## Spectators push the car back upright after it rests on its side or roof for `rollover_time`.
+## It is reset in place, keeping its heading.
+func _update_rollover(delta: float) -> void:
+	if global_basis.y.dot(Vector3.UP) >= ROLLOVER_UP_DOT:
+		_rollover_timer = 0.0
+		return
+	_rollover_timer += delta
+	if _rollover_timer < stats.get_stat("rollover_time"):
+		return
+	_rollover_timer = 0.0
+	var forward := -global_basis.z
+	forward.y = 0.0
+	if forward.length_squared() < 0.0001:
+		forward = global_basis.y.slide(Vector3.UP)
+	global_transform = Transform3D(Basis.looking_at(forward.normalized()), global_position + Vector3.UP * ROLLOVER_LIFT)
+	linear_velocity = Vector3.ZERO
+	angular_velocity = Vector3.ZERO
+	_last_velocity = Vector3.ZERO
+	_last_angular_velocity = Vector3.ZERO
+	for wheel in wheels:
+		wheel.spin = 0.0
+	rolled_over.emit(stats.get_stat("rollover_penalty"))

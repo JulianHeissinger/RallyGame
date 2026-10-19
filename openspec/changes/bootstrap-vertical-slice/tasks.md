@@ -29,7 +29,7 @@
 - [x] 4.1 Implement `CarDamage` with parts, conditions, accelerating degradation once damaged, and signals `part_damaged`, `part_broken`, `immobilized`; verify with `tests/test_car_damage.gd` (intact part stays 100, damaged part reaches 0, signals fire)
 - [x] 4.2 Connect part conditions to handling: engine power via `StatBlock` damage multipliers, and per-wheel factors on `Wheel` for tire grip and pull, brake loss, and suspension sag/stiffness (suspension split into four corner parts); verify a broken front-left tire makes the car drift left and a broken brake gives no force on that wheel
 - [x] 4.3 Implement impact detection (contact normal speed, local zone, zone-to-parts damage) and lethal impact against `solid` bodies using the `lethal_impact_speed` stat; verify in the test scene: low-speed bump does little, fast tree hit immobilizes, raised stat survives the same hit
-- [ ] 4.4 Implement immobilization rules (chassis 0, engine 0, 3+ broken tires) and rollover recovery (2 s upside down, reset upright with penalty signal); verify rules in `tests/test_car_damage.gd` and rollover by flipping the car in the test scene
+- [x] 4.4 Implement immobilization rules (chassis 0, engine 0, 3+ broken tires) and rollover recovery (2 s upside down, reset upright with penalty signal); verify rules in `tests/test_car_damage.gd` and rollover by flipping the car in the test scene
 
 ## 5. Stage generation
 

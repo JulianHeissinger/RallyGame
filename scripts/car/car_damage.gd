@@ -81,7 +81,8 @@ func update_wear(stats: StatBlock, delta: float, speed: float) -> void:
 		_check_broken(part)
 
 
-## Ends the run for this car. Emits `immobilized` once.
+## Ends the run for this car. Emits `immobilized` once. Lethal impacts call it directly; part
+## loss goes through `_check_immobilized`.
 func immobilize(cause: String) -> void:
 	if is_immobilized:
 		return
@@ -96,3 +97,15 @@ func _set_condition(part: String, value: float) -> void:
 func _check_broken(part: String) -> void:
 	if condition[part] <= 0.0:
 		part_broken.emit(part)
+		_check_immobilized()
+
+
+## Immobilized at chassis 0, engine 0, or three or more broken tires.
+func _check_immobilized() -> void:
+	if condition["chassis"] <= 0.0:
+		immobilize("chassis_destroyed")
+	elif condition["engine"] <= 0.0:
+		immobilize("engine_destroyed")
+	elif ["tire_fl", "tire_fr", "tire_rl", "tire_rr"].filter(
+			func(tire: String) -> bool: return condition[tire] <= 0.0).size() >= 3:
+		immobilize("tires_destroyed")

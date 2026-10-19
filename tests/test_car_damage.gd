@@ -173,3 +173,34 @@ func test_center_end_impacts_hit_both_corners() -> void:
 	assert_almost_eq(damage.condition["tire_rl"], 70.0, 0.0001, "rear-center hits rear-left")
 	assert_almost_eq(damage.condition["tire_rr"], 70.0, 0.0001, "rear-center hits rear-right")
 	damage.free()
+
+
+func test_destroyed_chassis_or_engine_immobilizes() -> void:
+	var damage := _damage()
+	damage.apply_damage("chassis", 100.0)
+	assert_eq(_immobilized, ["chassis_destroyed"], "chassis at 0")
+	damage.free()
+	damage = _damage()
+	damage.apply_damage("engine", 100.0)
+	assert_eq(_immobilized, ["engine_destroyed"], "engine at 0")
+	damage.free()
+
+
+func test_two_flat_tires_still_drive_three_do_not() -> void:
+	var damage := _damage()
+	damage.apply_damage("tire_fl", 100.0)
+	damage.apply_damage("tire_rr", 100.0)
+	assert_false(damage.is_immobilized, "two broken tires")
+	damage.apply_damage("tire_fr", 100.0)
+	assert_eq(_immobilized, ["tires_destroyed"], "three broken tires")
+	damage.apply_damage("tire_rl", 100.0)
+	assert_eq(_immobilized, ["tires_destroyed"], "fires once")
+	damage.free()
+
+
+func test_wear_can_immobilize() -> void:
+	var damage := _damage()
+	damage.apply_damage("engine", 50.0)
+	_drive(damage, _stats(), 150.0, DRIVING_SPEED)
+	assert_eq(_immobilized, ["engine_destroyed"], "engine worn to 0")
+	damage.free()

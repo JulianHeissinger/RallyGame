@@ -26,4 +26,5 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 
 - `IsoCameraRig` estimates target velocity from position change per frame. If the camera jitters once the 120 Hz car exists (task 3.2), use the car's `linear_velocity` instead.
 - Godot's project default body damping (0.1) acts as fake drag and slows rotation. `car.tscn` overrides it with `linear_damp_mode`/`angular_damp_mode` = Replace and damping 0; keep it that way for any new car body.
+- `Car` resets a rollover in place (lifted 1 m, upright, same heading). Once the stage has a road (tasks 5.4/8.3), reset to the nearest road sample instead, as `design.md` describes.
 - `project.godot` has an uncommitted `run/main_scene="res://scenes/test/handling_test.tscn"` set by the user for test driving. Leave it uncommitted; task 8.2 sets the real main scene.
