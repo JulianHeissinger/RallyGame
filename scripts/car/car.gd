@@ -28,6 +28,11 @@ func _physics_process(delta: float) -> void:
 	# Max lock shrinks with speed so full input stays near the tires' peak slip angle.
 	var lock_t := clampf(linear_velocity.length() / stats.get_stat("steer_reduction_speed"), 0.0, 1.0)
 	var max_lock := lerpf(stats.get_stat("max_steer_angle_deg"), stats.get_stat("min_steer_angle_deg"), lock_t)
+	# Steering toward the slide adds the body slip angle, so countersteer can follow the slide.
+	var v_right := linear_velocity.dot(global_basis.x)
+	if input.steer * v_right > 0.0:
+		var body_slip := rad_to_deg(atan2(absf(v_right), absf(linear_velocity.dot(-global_basis.z))))
+		max_lock = minf(max_lock + body_slip, stats.get_stat("max_steer_angle_deg"))
 	var steer_angle := -input.steer * deg_to_rad(max_lock)
 	for wheel in wheels:
 		if wheel.steerable:
