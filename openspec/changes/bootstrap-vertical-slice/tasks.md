@@ -44,7 +44,7 @@
 
 ## 6. Hazards
 
-- [ ] 6.1 Create `HazardDef` resource and seeded placement with difficulty gating and per-km scaling; verify with `tests/test_hazards.gd` (locked hazard never placed below min difficulty, more hazards at higher difficulty, same seed same placement)
+- [x] 6.1 Create `HazardDef` resource and seeded placement with difficulty gating and per-km scaling; verify with `tests/test_hazards.gd` (locked hazard never placed below min difficulty, more hazards at higher difficulty, same seed same placement)
 - [ ] 6.2 Implement rock and pothole hazards with their damage profiles; verify in stage that a pothole at speed damages that wheel's tire and suspension
 - [ ] 6.3 Implement sheep flock (trigger area, crossing sheep, front-zone damage, `hazard_defeated` when knocked off road); verify in stage that sheep cross on approach and knocking one away emits the event
 - [ ] 6.4 Implement distance-scheduled malfunctions from the events sub-stream with HUD notification; verify in `tests/test_hazards.gd` that the same seed yields the same malfunction distances and parts

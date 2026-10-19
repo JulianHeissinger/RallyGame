@@ -20,8 +20,12 @@ const FINISH_PROGRESS_TOLERANCE := 5.0
 @export var stage_seed := 0
 ## Empty uses the `StageParams` defaults.
 @export var params: StageParams
+## Gates and scales hazards. `RunState` sets it once it exists (task 8.1).
+@export var difficulty := 1
 
 var path: RoadPath
+## Hazard placements; the hazard scenes are built from them from task 6.2 on.
+var hazards: Array[HazardPlacer.Placement] = []
 var finish_distance := 0.0
 
 var _params: StageParams
@@ -40,6 +44,7 @@ func _ready() -> void:
 	_params = params if params else StageParams.new()
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
 	_print_sections()
+	hazards = HazardPlacer.place(path, stage_seed, difficulty, _params)
 	add_child(RoadBuilder.build(path, _params))
 	var lines := StageLines.build(path, _params)
 	add_child(lines)

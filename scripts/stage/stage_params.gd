@@ -69,6 +69,18 @@ extends Resource
 ## A last section shorter than this in m merges into the one before it.
 @export var min_section_length := 100.0
 
+@export_group("Hazards")
+## Hazard pool for this stage style; locked entries are skipped below their `min_difficulty`.
+@export var hazards: Array[HazardDef] = []
+## Hazards per km of usable road at difficulty 1.
+@export var hazards_per_km := 4.0
+## Extra hazards per difficulty step above 1, as a share of the difficulty 1 count.
+@export var hazard_difficulty_scale := 0.5
+## Minimum distance in m along the road between two hazards.
+@export var hazard_min_spacing := 40.0
+## On-road hazards keep this far in m from the road edge.
+@export var hazard_edge_margin := 1.0
+
 @export_group("Props")
 ## Jittered grid spacing in m; each cell holds at most one prop.
 @export var prop_cell := 6.0

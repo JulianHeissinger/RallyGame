@@ -81,7 +81,7 @@ An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats and `
 Each wheel reads the `surface` metadata from the collider its ray hits and looks up grip in a surface table.
 
 ### Hazards
-`HazardDef` resource holds name, scene, `min_difficulty`, `weight`, `count_per_km` scaled by difficulty, and damage profile. Placement during generation uses the hazards sub-stream and picks road distances with minimum spacing.
+`HazardDef` resource holds name, scene, `min_difficulty`, `weight`, `on_road`, and damage profile. Hazard density lives in `StageParams` (the hazard pool, `hazards_per_km`, `hazard_difficulty_scale`, `hazard_min_spacing`): one density per stage style, scaled by difficulty, with the type mix set by the unlocked defs' weights. Placement during generation uses the hazards sub-stream and puts one hazard in each equal slot of the road between start and finish, so spacing never drops below the minimum.
 - **Rock:** solid body on or near the road.
 - **Pothole:** an `Area3D` decal; a wheel ray inside it applies tire and suspension damage scaled by speed.
 - **Sheep flock:** a trigger area ahead starts the sheep walking across the road. Each sheep is a light `RigidBody3D`; impacts above a speed damage the front zone and emit `hazard_defeated`.
