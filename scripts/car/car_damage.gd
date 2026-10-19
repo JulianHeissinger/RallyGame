@@ -15,6 +15,9 @@ const PARTS: Array[String] = [
 ]
 ## Below this speed in m/s the car counts as standing and parts do not wear.
 const MOVING_SPEED := 1.0
+## Contacts within this distance of the body's centre along z hit the center zone (the middle
+## third of the 4 m body); further out they hit a corner.
+const CENTER_HALF_LENGTH := 0.67
 
 var condition: Dictionary = {}
 var is_immobilized := false
@@ -33,6 +36,24 @@ func apply_damage(part: String, amount: float) -> void:
 	_set_condition(part, condition[part] - applied)
 	part_damaged.emit(part, applied)
 	_check_broken(part)
+
+
+## Collision at `local_point` (car space, front is -z) with `impact_speed` along the contact
+## normal. A hit on a `solid` body at or above `lethal_impact_speed` immobilizes the car.
+func apply_impact(stats: StatBlock, local_point: Vector3, impact_speed: float, is_solid: bool) -> void:
+	var amount := maxf(impact_speed - stats.get_stat("impact_min_speed"), 0.0) * stats.get_stat("impact_damage")
+	if absf(local_point.z) < CENTER_HALF_LENGTH:
+		apply_damage("chassis", amount)
+	else:
+		var corner := ("f" if local_point.z < 0.0 else "r") + ("l" if local_point.x < 0.0 else "r")
+		var share := amount * stats.get_stat("impact_chassis_share")
+		for part in ["tire_", "brake_", "suspension_"]:
+			apply_damage(part + corner, amount)
+		apply_damage("chassis", share)
+		if corner.begins_with("f"):
+			apply_damage("engine", share)
+	if is_solid and impact_speed >= stats.get_stat("lethal_impact_speed"):
+		immobilize("lethal_impact")
 
 
 ## Wear of damaged parts: `wear_rate * (1 + (100 - c) / wear_acceleration)` per second.

@@ -29,6 +29,8 @@ rings = 1
 [node name="Car" type="RigidBody3D"]
 script = ExtResource("1_car")
 car_stats = ExtResource("2_stats")
+contact_monitor = true
+max_contacts_reported = 8
 linear_damp_mode = 1
 angular_damp_mode = 1
 

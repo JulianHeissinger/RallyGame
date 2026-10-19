@@ -102,3 +102,61 @@ func test_wheel_factors_follow_condition() -> void:
 	assert_almost_eq(wheel.rest_factor, 0.8, 0.0001, "half-damaged sag")
 	assert_almost_eq(wheel.stiffness_factor, 1.5, 0.0001, "half-damaged stiffness")
 	wheel.free()
+
+
+func _impact_stats() -> StatBlock:
+	return StatBlock.new({
+		"impact_min_speed": 3.0,
+		"impact_damage": 4.0,
+		"impact_chassis_share": 0.3,
+		"lethal_impact_speed": 18.0,
+	})
+
+
+func test_front_right_impact_damages_that_corner() -> void:
+	var damage := _damage()
+	damage.apply_impact(_impact_stats(), Vector3(0.8, 0.0, -1.9), 13.0, false)
+	for part in ["tire_fr", "brake_fr", "suspension_fr"]:
+		assert_almost_eq(damage.condition[part], 60.0, 0.0001, part)
+	assert_almost_eq(damage.condition["chassis"], 88.0, 0.0001, "chassis share")
+	assert_almost_eq(damage.condition["engine"], 88.0, 0.0001, "engine share on front hit")
+	for part in ["tire_fl", "tire_rr", "brake_rl", "suspension_rl"]:
+		assert_eq(damage.condition[part], 100.0, part)
+	damage.free()
+
+
+func test_center_and_rear_impacts() -> void:
+	var damage := _damage()
+	damage.apply_impact(_impact_stats(), Vector3(-0.85, 0.0, 0.2), 8.0, false)
+	assert_almost_eq(damage.condition["chassis"], 80.0, 0.0001, "center hit damages chassis")
+	damage.apply_impact(_impact_stats(), Vector3(-0.8, 0.0, 1.9), 8.0, false)
+	assert_almost_eq(damage.condition["tire_rl"], 80.0, 0.0001, "rear-left tire")
+	assert_eq(damage.condition["engine"], 100.0, "rear hit spares engine")
+	damage.free()
+
+
+func test_light_bump_does_no_damage() -> void:
+	var damage := _damage()
+	damage.apply_impact(_impact_stats(), Vector3(0.0, 0.0, -2.0), 2.5, true)
+	assert_eq(_damaged, [], "below impact_min_speed")
+	damage.free()
+
+
+func test_lethal_impact_only_against_solid() -> void:
+	var damage := _damage()
+	damage.apply_impact(_impact_stats(), Vector3(0.0, 0.0, -2.0), 20.0, false)
+	assert_false(damage.is_immobilized, "non-solid survives")
+	damage.apply_impact(_impact_stats(), Vector3(0.0, 0.0, -2.0), 20.0, true)
+	assert_eq(_immobilized, ["lethal_impact"], "solid above lethal speed")
+	damage.free()
+
+
+func test_raised_lethal_speed_survives() -> void:
+	var damage := _damage()
+	var stats := _impact_stats()
+	stats.additive["lethal_impact_speed"] = 10.0
+	stats.mark_dirty()
+	damage.apply_impact(stats, Vector3(0.0, 0.0, -2.0), 20.0, true)
+	assert_false(damage.is_immobilized, "raised threshold survives")
+	assert_true(damage.condition["chassis"] < 100.0, "parts still damaged")
+	damage.free()

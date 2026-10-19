@@ -10,6 +10,12 @@ var input := InputSource.new()
 var drivetrain := Drivetrain.new()
 var wheels: Array[Wheel] = []
 
+## Colliders touched in the last physics step, by instance id. Only new contacts are impacts.
+var _touching: Dictionary = {}
+## Body velocity from the previous step, before the solver resolved this step's new contacts.
+var _last_velocity := Vector3.ZERO
+var _last_angular_velocity := Vector3.ZERO
+
 @onready var damage: CarDamage = $Damage
 
 
@@ -44,6 +50,33 @@ func _physics_process(delta: float) -> void:
 		wheel.update_suspension(self, stats, delta)
 		wheel.update_tire(self, stats, delta)
 		wheel.update_visual(stats, delta)
+
+
+## Turns new contacts into impacts. Contacts arrive after the solver has already slowed the car,
+## so the impact speed uses the velocity saved from the previous step.
+func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
+	var touching := {}
+	var impacts := {}
+	var com := global_transform * center_of_mass
+	for i in state.get_contact_count():
+		var collider := state.get_contact_collider_object(i)
+		if collider == null:
+			continue
+		var id := collider.get_instance_id()
+		touching[id] = true
+		if _touching.has(id):
+			continue
+		var point := state.get_contact_local_position(i)
+		var velocity := _last_velocity + _last_angular_velocity.cross(point - com)
+		var relative := velocity - state.get_contact_collider_velocity_at_position(i)
+		var speed := absf(relative.dot(state.get_contact_local_normal(i)))
+		if not impacts.has(id) or speed > impacts[id][1]:
+			impacts[id] = [point, speed, collider]
+	for impact: Array in impacts.values():
+		damage.apply_impact(stats, to_local(impact[0]), impact[1], impact[2].is_in_group("solid"))
+	_touching = touching
+	_last_velocity = state.linear_velocity
+	_last_angular_velocity = state.angular_velocity
 
 
 ## Feeds part conditions into handling: engine power through the stat block, the rest per wheel.
