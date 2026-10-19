@@ -14,6 +14,8 @@ var wheels: Array[Wheel] = []
 func _ready() -> void:
 	stats = StatBlock.new(car_stats.stats)
 	mass = stats.get_stat("mass")
+	center_of_mass_mode = CENTER_OF_MASS_MODE_CUSTOM
+	center_of_mass = Vector3(0.0, stats.get_stat("center_of_mass_y"), 0.0)
 	drivetrain.gearbox.mode = Settings.gearbox_mode
 	for child in get_children():
 		if child is Wheel:

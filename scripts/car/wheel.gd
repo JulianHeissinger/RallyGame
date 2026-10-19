@@ -67,9 +67,10 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var forward := -global_basis.z
 	forward = (forward - _contact_normal * forward.dot(_contact_normal)).normalized()
 	var right := forward.cross(_contact_normal)
-	# Body origin is the centre of mass (auto mode, centred box shape).
+	# `linear_velocity` is the centre-of-mass velocity; forces are applied relative to the origin.
 	var offset := _contact - body.global_position
-	var velocity := body.linear_velocity + body.angular_velocity.cross(offset)
+	var com_offset := _contact - body.global_transform * body.center_of_mass
+	var velocity := body.linear_velocity + body.angular_velocity.cross(com_offset)
 	var v_long := velocity.dot(forward)
 	var v_lat := velocity.dot(right)
 	var mass_share := normal_load / body.get_gravity().length()

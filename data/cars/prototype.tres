@@ -11,6 +11,7 @@ script = ExtResource("1_8ijxn")
 stats = {
 "brake_bias_front": 0.6,
 "brake_torque": 1800.0,
+"center_of_mass_y": -0.35,
 "damper": 3500.0,
 "engine_brake_torque": 60.0,
 "final_drive": 4.1,
