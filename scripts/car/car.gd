@@ -17,6 +17,8 @@ var stats: StatBlock
 var input := InputSource.new()
 var drivetrain := Drivetrain.new()
 var wheels: Array[Wheel] = []
+## Road of the current stage, set by the stage. Null resets rollovers in place.
+var road: RoadPath
 
 ## Colliders touched in the last physics step, by instance id. Only new contacts are impacts.
 var _touching: Dictionary = {}
@@ -102,7 +104,7 @@ func _apply_damage() -> void:
 
 
 ## Spectators push the car back upright after it rests on its side or roof for `rollover_time`.
-## It is reset in place, keeping its heading.
+## On a stage it is reset onto the nearest road point; without a road, in place, keeping its heading.
 func _update_rollover(delta: float) -> void:
 	if global_basis.y.dot(Vector3.UP) >= ROLLOVER_UP_DOT:
 		_rollover_timer = 0.0
@@ -111,15 +113,23 @@ func _update_rollover(delta: float) -> void:
 	if _rollover_timer < stats.get_stat("rollover_time"):
 		return
 	_rollover_timer = 0.0
-	var forward := -global_basis.z
-	forward.y = 0.0
-	if forward.length_squared() < 0.0001:
-		forward = global_basis.y.slide(Vector3.UP)
-	global_transform = Transform3D(Basis.looking_at(forward.normalized()), global_position + Vector3.UP * ROLLOVER_LIFT)
+	if road:
+		place(road.transform_at(road.progress_at(global_position)).translated(Vector3.UP * ROLLOVER_LIFT))
+	else:
+		var forward := -global_basis.z
+		forward.y = 0.0
+		if forward.length_squared() < 0.0001:
+			forward = global_basis.y.slide(Vector3.UP)
+		place(Transform3D(Basis.looking_at(forward.normalized()), global_position + Vector3.UP * ROLLOVER_LIFT))
+	rolled_over.emit(stats.get_stat("rollover_penalty"))
+
+
+## Moves the car to `target` at rest, with the wheels stopped.
+func place(target: Transform3D) -> void:
+	global_transform = target
 	linear_velocity = Vector3.ZERO
 	angular_velocity = Vector3.ZERO
 	_last_velocity = Vector3.ZERO
 	_last_angular_velocity = Vector3.ZERO
 	for wheel in wheels:
 		wheel.spin = 0.0
-	rolled_over.emit(stats.get_stat("rollover_penalty"))

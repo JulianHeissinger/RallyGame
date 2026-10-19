@@ -49,6 +49,20 @@ extends Resource
 ## Rounds the crest top over about this many metres.
 @export var crest_top_radius := 4.0
 
+@export_group("Terrain")
+## Terrain extends this far in m beyond the road bounds.
+@export var terrain_margin := 100.0
+@export var terrain_cell := 2.0
+@export var terrain_amplitude := 4.0
+@export var terrain_wavelength := 200.0
+## Terrain sits this far in m below the road, and the road edge bevels down to it.
+@export var road_sink := 0.2
+@export var road_bevel := 1.0
+## Distance in m beyond the bevel over which the terrain blends from road height to its own.
+@export var terrain_blend := 40.0
+## Seconds added when the car falls out of the world and is put back on the road.
+@export var respawn_penalty := 10.0
+
 @export_group("Validation")
 ## Minimum centre-to-centre distance between separate parts of the road.
 ## Keep it above `road_width_max` and below `2 * hairpin_radius.x`, or hairpins never fit.

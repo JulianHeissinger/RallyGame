@@ -38,6 +38,13 @@ static func build(layout: RoadLayout, stage_seed: int, params: StageParams) -> R
 	return path
 
 
+## Centreline point at `distance`, facing along the road.
+func transform_at(distance: float) -> Transform3D:
+	var d := clampf(distance, 0.0, length - 1.0)
+	var origin := curve.sample_baked(d)
+	return Transform3D(Basis.looking_at(curve.sample_baked(d + 1.0) - origin), origin)
+
+
 ## Distance along the road of the closest road point to `position`.
 func progress_at(position: Vector3) -> float:
 	return curve.get_closest_offset(position)

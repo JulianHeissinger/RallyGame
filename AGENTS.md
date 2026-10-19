@@ -21,11 +21,12 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - Run such scripts with `godot --headless --fixed-fps 120 --path . -s <script>`: each frame then advances exactly one 120 Hz physics tick and runs as fast as possible (~25x real time) instead of in real time.
 - In such scripts, drive the car with `Input.action_press(action, strength)` (the car's `InputSource` reads the `Input` singleton). Give a start speed by setting `linear_velocity` and each wheel's `spin` (speed / `wheel_radius`). Tune stats in memory by editing the loaded `prototype.tres` resource's `stats` before instantiating the scene; nothing is saved.
 - Test scene layout: a ramp sits at x=30, a tree (group `solid`, r=0.4) at x=80 z=0, a grass strip (`surface = "grass"`) covers x=-40..-20 over the full length, the rest is gravel, and the ground ends at ±1000. Move the car to x=-60 for turning runs and start long full-throttle runs at z=900 (the car drives toward -z).
+- Stage scene: `scenes/stage.tscn` builds the road from `stage_seed` (0 = random, printed on start) and spawns the car 5 m along the road. Heightmap terrain (`TerrainBuilder`) meets the road's bevelled edge at road height − `road_sink`; falling below it hits a kill plane that puts the car back on the road and emits `car_respawned(penalty)`. One-off scripts read the built road from the stage's `path` (`RoadPath`) and can move the car with `Car.place(transform)`.
 - Autoloads (e.g. `Settings`) are not registered yet when a `-s` script compiles. A one-off script that touches the car must not use the `Car` type statically; `await process_frame` in `_init` before loading the scene.
 
 ## Watch-outs
 
 - `IsoCameraRig` estimates target velocity from position change per frame. If the camera jitters once the 120 Hz car exists (task 3.2), use the car's `linear_velocity` instead.
 - Godot's project default body damping (0.1) acts as fake drag and slows rotation. `car.tscn` overrides it with `linear_damp_mode`/`angular_damp_mode` = Replace and damping 0; keep it that way for any new car body.
-- `Car` resets a rollover in place (lifted 1 m, upright, same heading). Once the stage has a road (tasks 5.4/8.3), reset to the nearest road sample instead, as `design.md` describes.
+- `Car` resets a rollover onto the nearest road point when its `road` is set (the stage sets it), otherwise in place (lifted 1 m, upright, same heading). Rollover and kill-plane respawn emit penalties that nothing adds to a timer until task 8.3.
 - `project.godot` has an uncommitted `run/main_scene="res://scenes/test/handling_test.tscn"` set by the user for test driving. Leave it uncommitted; task 8.2 sets the real main scene.
