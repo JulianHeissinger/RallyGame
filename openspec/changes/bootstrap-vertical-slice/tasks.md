@@ -26,7 +26,7 @@
 
 ## 4. Car damage
 
-- [ ] 4.1 Implement `CarDamage` with parts, conditions, accelerating degradation once damaged, and signals `part_damaged`, `part_broken`, `immobilized`; verify with `tests/test_car_damage.gd` (intact part stays 100, damaged part reaches 0, signals fire)
+- [x] 4.1 Implement `CarDamage` with parts, conditions, accelerating degradation once damaged, and signals `part_damaged`, `part_broken`, `immobilized`; verify with `tests/test_car_damage.gd` (intact part stays 100, damaged part reaches 0, signals fire)
 - [ ] 4.2 Connect part conditions to handling via `StatBlock` damage multipliers (tire grip and pull, per-wheel brake loss, engine power, suspension sag/stiffness); verify a broken front-left tire makes the car drift left and a broken brake gives no force on that wheel
 - [ ] 4.3 Implement impact detection (contact normal speed, local zone, zone-to-parts damage) and lethal impact against `solid` bodies using the `lethal_impact_speed` stat; verify in the test scene: low-speed bump does little, fast tree hit immobilizes, raised stat survives the same hit
 - [ ] 4.4 Implement immobilization rules (chassis 0, engine 0, 3+ broken tires) and rollover recovery (2 s upside down, reset upright with penalty signal); verify rules in `tests/test_car_damage.gd` and rollover by flipping the car in the test scene

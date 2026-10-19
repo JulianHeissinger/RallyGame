@@ -47,6 +47,8 @@ stats = {
 "tire_long_c": 1.6,
 "tire_longitudinal_stiffness": 60000.0,
 "torque_split_front": 0.35,
+"wear_acceleration": 10.0,
+"wear_rate": 0.1,
 "wheel_inertia": 1.2,
 "wheel_radius": 0.33
 }

@@ -10,6 +10,8 @@ var input := InputSource.new()
 var drivetrain := Drivetrain.new()
 var wheels: Array[Wheel] = []
 
+@onready var damage: CarDamage = $Damage
+
 
 func _ready() -> void:
 	stats = StatBlock.new(car_stats.stats)
@@ -24,6 +26,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	input.update(delta, linear_velocity.length())
+	damage.update_wear(stats, delta, linear_velocity.length())
 	drivetrain.update(input, wheels, stats, car_stats.torque_curve, linear_velocity.length(), delta)
 	# Max lock shrinks with speed so full input stays near the tires' peak slip angle.
 	var lock_t := clampf(linear_velocity.length() / stats.get_stat("steer_reduction_speed"), 0.0, 1.0)
