@@ -1,6 +1,7 @@
 extends Node3D
 ## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
-## returns it to the road when it falls out of the world.
+## returns it to the road when it falls out of the world. `reroll_stage` reloads the scene, which
+## rolls a new seed when the scene's `stage_seed` is 0.
 
 ## Emitted when the car fell out of the world and was put back on the road; `penalty` is in seconds.
 signal car_respawned(penalty: float)
@@ -38,6 +39,7 @@ func _ready() -> void:
 	print("Stage seed: %d" % stage_seed)
 	_params = params if params else StageParams.new()
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
+	_print_sections()
 	add_child(RoadBuilder.build(path, _params))
 	var lines := StageLines.build(path, _params)
 	add_child(lines)
@@ -53,6 +55,18 @@ func _ready() -> void:
 	_camera.target = _car
 	_hud.car = _car
 	_debug_overlay.car = _car
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("reroll_stage"):
+		get_tree().reload_current_scene()
+
+
+func _print_sections() -> void:
+	var parts := PackedStringArray()
+	for i in path.section_starts.size():
+		parts.append("%s at %.0f m" % [path.section_defs[i].road_surface, path.distances[path.section_starts[i]]])
+	print("Sections: " + ", ".join(parts))
 
 
 ## Wide trigger below the terrain; anything falling into it is out of the world.
