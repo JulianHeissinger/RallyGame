@@ -99,7 +99,7 @@ extends Resource
 ## Default surface table for the prototype stage. A `.tres` that sets `surfaces` replaces it.
 func _init() -> void:
 	surfaces = [
-		SurfaceSectionDef.create("gravel", "grass", 3.0, Vector2(300.0, 700.0)),
+		SurfaceSectionDef.create("gravel", "grass", 1.0, Vector2(300.0, 700.0)),
 		SurfaceSectionDef.create("tarmac", "grass", 1.0, Vector2(300.0, 700.0)),
 		SurfaceSectionDef.create("snow", "snow", 1.0, Vector2(300.0, 700.0)),
 	]
