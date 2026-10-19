@@ -19,7 +19,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - Physics checks: the test runner calls test methods synchronously and cannot await physics frames. Verify handling with a one-off headless script outside the repo that instantiates `scenes/test/handling_test.tscn`, awaits `physics_frame`, and prints measurements.
 - Run such scripts with `godot --headless --fixed-fps 120 --path . -s <script>`: each frame then advances exactly one 120 Hz physics tick and runs as fast as possible (~25x real time) instead of in real time.
 - In such scripts, drive the car with `Input.action_press(action, strength)` (the car's `InputSource` reads the `Input` singleton). Give a start speed by setting `linear_velocity` and each wheel's `spin` (speed / `wheel_radius`). Tune stats in memory by editing the loaded `prototype.tres` resource's `stats` before instantiating the scene; nothing is saved.
-- Test scene layout: a ramp sits at x=30 and the ground ends at ±1000. Move the car to x=-60 for turning runs and start long full-throttle runs at z=900 (the car drives toward -z).
+- Test scene layout: a ramp sits at x=30, a grass strip (`surface = "grass"`) covers x=-40..-20 over the full length, the rest is gravel, and the ground ends at ±1000. Move the car to x=-60 for turning runs and start long full-throttle runs at z=900 (the car drives toward -z).
 - Autoloads (e.g. `Settings`) are not registered yet when a `-s` script compiles. A one-off script that touches the car must not use the `Car` type statically; `await process_frame` in `_init` before loading the scene.
 
 ## Watch-outs

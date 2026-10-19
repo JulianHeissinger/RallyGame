@@ -16,6 +16,9 @@ var normal_load := 0.0
 var spin := 0.0
 var slip_angle := 0.0
 var slip_ratio := 0.0
+## Surface under the wheel and its grip factor, from the last grounded ray hit.
+var surface := Surface.DEFAULT
+var surface_grip: float = Surface.GRIP[Surface.DEFAULT]
 ## Set by the drivetrain each tick, in N·m. Drive is signed; brake is a magnitude.
 var drive_torque := 0.0
 var brake_torque := 0.0
@@ -42,6 +45,9 @@ func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> voi
 		return
 
 	_contact = get_collision_point()
+	var collider := get_collider()
+	surface = Surface.name_of(collider)
+	surface_grip = Surface.grip_of(collider)
 	_contact_normal = get_collision_normal()
 	var compression := clampf(rest + radius - global_position.distance_to(_contact), 0.0, rest)
 	var compression_velocity := (compression - _last_compression) / delta
@@ -76,7 +82,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var mass_share := normal_load / body.get_gravity().length()
 
 	slip_angle = atan2(v_lat, absf(v_long))
-	var max_force := stats.get_stat("tire_friction") * normal_load
+	var max_force := stats.get_stat("tire_friction") * surface_grip * normal_load
 	var lat_b := stats.get_stat("tire_lat_b")
 	var lat_c := stats.get_stat("tire_lat_c")
 	var long_b := stats.get_stat("tire_long_b")

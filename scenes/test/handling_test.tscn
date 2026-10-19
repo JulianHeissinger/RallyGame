@@ -26,6 +26,16 @@ albedo_color = Color(0.4, 0.38, 0.33, 1)
 material = SubResource("StandardMaterial3D_ramp")
 size = Vector3(20, 1, 60)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_grass"]
+size = Vector3(20, 0.04, 2000)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.3, 0.5, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grass"]
+material = SubResource("StandardMaterial3D_grass")
+size = Vector3(20, 0.04, 2000)
+
 [node name="HandlingTest" type="Node3D"]
 script = ExtResource("1_test")
 
@@ -35,12 +45,23 @@ shadow_enabled = true
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+metadata/surface = "gravel"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("BoxShape3D_ground")
 
 [node name="Mesh" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("BoxMesh_ground")
+
+[node name="Grass" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0, 0)
+metadata/surface = "grass"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Grass"]
+shape = SubResource("BoxShape3D_grass")
+
+[node name="Mesh" type="MeshInstance3D" parent="Grass"]
+mesh = SubResource("BoxMesh_grass")
 
 [node name="Ramp" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.9848, 0.1736, 0, -0.1736, 0.9848, 30, 4, 0)
