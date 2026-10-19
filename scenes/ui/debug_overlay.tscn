@@ -9,7 +9,7 @@ font_names = PackedStringArray("Monospace")
 script = ExtResource("1_overlay")
 
 [node name="Label" type="Label" parent="."]
-offset_left = 16.0
-offset_top = 16.0
+offset_left = 32.0
+offset_top = 32.0
 theme_override_fonts/font = SubResource("SystemFont_mono")
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 32
