@@ -121,7 +121,21 @@ func _build_hazards() -> Node3D:
 		if hazard.has_signal("hazard_defeated"):
 			hazard.hazard_defeated.connect(hazard_defeated.emit)
 		root.add_child(hazard)
+		var sign_node := _build_sign(placement)
+		sign_node.name = "Sign%d" % i
+		root.add_child(sign_node)
 	return root
+
+
+## Warning sign naming the hazard, beside the road on the right, `SIGN_DISTANCE` before it.
+func _build_sign(placement: HazardPlacer.Placement) -> Node3D:
+	var distance := maxf(placement.distance - HazardVisuals.SIGN_DISTANCE, 0.0)
+	var index := clampi(path.distances.bsearch(distance), 0, path.widths.size() - 1)
+	var offset := path.widths[index] / 2.0 + _params.road_bevel + HazardVisuals.SIGN_OFFSET
+	var sign_node := HazardVisuals.warning_sign(placement.def.sign_text)
+	var road := path.transform_at(distance)
+	sign_node.transform = Transform3D(road.basis, road.origin + road.basis.x * offset + Vector3.DOWN * _params.road_sink)
+	return sign_node
 
 
 ## Wide trigger below the terrain; anything falling into it is out of the world.

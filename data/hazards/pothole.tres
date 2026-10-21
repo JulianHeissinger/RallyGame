@@ -8,6 +8,7 @@ script = ExtResource("2_a60od")
 name = "pothole"
 scene = ExtResource("1_4j0d7")
 weight = 2.0
+sign_text = "POTHOLE"
 surfaces = PackedStringArray()
 damage = {
 "suspension": 25.0,
