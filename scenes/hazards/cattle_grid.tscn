@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/wheel_hazard.gd" id="1_bro03"]
+[ext_resource type="Script" path="res://scripts/hazards/road_bumps.gd" id="2_5w52l"]
+
+[node name="CattleGrid" type="Node3D" unique_id=1519245729]
+script = ExtResource("1_bro03")
+radius = 0.5
+size = Vector2(0, 3)
+continuous = false
+
+[node name="Bumps" type="StaticBody3D" parent="." unique_id=219955298]
+script = ExtResource("2_5w52l")
+length = 3.0
+height = 0.03
+spacing = 0.3
+depth = 0.06
+color = Color(0.5, 0.5, 0.52, 1)

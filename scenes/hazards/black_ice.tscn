@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_en5pc"]
+
+[node name="BlackIce" type="Node3D" unique_id=1447685930]
+script = ExtResource("1_en5pc")
+radius = 3.0
+grip = 0.25
+color = Color(0.7, 0.8, 0.9, 0.25)

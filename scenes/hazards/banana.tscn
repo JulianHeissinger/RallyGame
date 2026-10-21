@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_lpxwg"]
+
+[node name="Banana" type="Node3D" unique_id=2036324930]
+script = ExtResource("1_lpxwg")
+radius = 0.4
+grip = 0.3
+color = Color(0.95, 0.85, 0.2, 1)
+yaw_kick = 60.0

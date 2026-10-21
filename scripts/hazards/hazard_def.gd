@@ -10,6 +10,8 @@ extends Resource
 @export var min_difficulty := 1
 ## Pick weight among the unlocked hazards of the pool.
 @export var weight := 1.0
+## Road surfaces this hazard may be placed on, e.g. ["snow"]. Empty allows every surface.
+@export var surfaces: PackedStringArray = []
 ## True: placed on the road with a lateral offset (rock, pothole). False: on the centreline,
 ## the scene handles its own extent (sheep flock crossing).
 @export var on_road := true

@@ -1,6 +1,7 @@
 class_name DebugOverlay
 extends CanvasLayer
-## F1 handling overlay: per-wheel load, slip angle, slip ratio and surface of the target car, plus
+## F1 handling overlay: per-wheel load, slip angle, slip ratio, grip and drag (surface and patches)
+## and surface of the target car, plus
 ## each part's condition and the damage factors it applies.
 
 var car: Car
@@ -20,11 +21,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if car == null or not visible:
 		return
-	var lines := PackedStringArray(["wheel   load N  slip°   ratio  grip  surface"])
+	var lines := PackedStringArray(["wheel   load N  slip°   ratio  grip  drag  surface"])
 	for wheel in car.wheels:
 		var surface := wheel.surface if wheel.is_grounded else "-"
-		lines.append("%-6s %7.0f %6.1f %7.2f  %4.2f  %s" % [wheel.name.trim_prefix("Wheel"),
-			wheel.normal_load, rad_to_deg(wheel.slip_angle), wheel.slip_ratio, wheel.surface_grip, surface])
+		lines.append("%-6s %7.0f %6.1f %7.2f  %4.2f  %4.2f  %s" % [wheel.name.trim_prefix("Wheel"),
+			wheel.normal_load, rad_to_deg(wheel.slip_angle), wheel.slip_ratio, wheel.surface_grip * wheel.patch_grip,
+			wheel.patch_drag, surface])
 	lines.append("")
 	lines.append("corner  tire  grip  drag  brake  force  susp   sag  stiff")
 	var condition := car.damage.condition

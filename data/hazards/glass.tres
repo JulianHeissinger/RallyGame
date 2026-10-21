@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/glass.tscn" id="1_215uo"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_lrm3k"]
+
+[resource]
+script = ExtResource("2_lrm3k")
+name = "glass"
+scene = ExtResource("1_215uo")
+surfaces = PackedStringArray()
+damage = {
+"tire": 10.0
+}

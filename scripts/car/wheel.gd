@@ -29,6 +29,10 @@ var brake_factor := 1.0
 var drag := 0.0
 var rest_factor := 1.0
 var stiffness_factor := 1.0
+## Surface patch effects under this wheel (oil, mud, ...), set by the car each tick: grip
+## multiplier and extra rolling resistance as a share of wheel load.
+var patch_grip := 1.0
+var patch_drag := 0.0
 
 var _last_compression := 0.0
 var _contact := Vector3.ZERO
@@ -48,6 +52,11 @@ func apply_condition(stats: StatBlock, tire: float, brake: float, suspension: fl
 	brake_factor = brake / 100.0
 	rest_factor = lerpf(stats.get_stat("suspension_damaged_sag"), 1.0, suspension / 100.0)
 	stiffness_factor = lerpf(stats.get_stat("suspension_damaged_stiffness"), 1.0, suspension / 100.0)
+
+
+## Ground contact point of the last grounded ray hit, in world space.
+func contact_point() -> Vector3:
+	return _contact
 
 
 func update_suspension(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
@@ -100,7 +109,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	var mass_share := normal_load / body.get_gravity().length()
 
 	slip_angle = atan2(v_lat, absf(v_long))
-	var max_force := stats.get_stat("tire_friction") * surface_grip * grip_factor * normal_load
+	var max_force := stats.get_stat("tire_friction") * surface_grip * grip_factor * patch_grip * normal_load
 	var lat_b := stats.get_stat("tire_lat_b")
 	var lat_c := stats.get_stat("tire_lat_c")
 	var long_b := stats.get_stat("tire_long_b")
@@ -162,7 +171,7 @@ func update_tire(body: RigidBody3D, stats: StatBlock, delta: float) -> void:
 	spin = lerpf(spin_low, spin, blend)
 	_longitudinal_deflection *= 1.0 - blend
 	# Rolling resistance, faded out toward standstill so it cannot push a parked car.
-	force_long -= drag * normal_load * clampf(v_long / low_speed, -1.0, 1.0)
+	force_long -= (drag + patch_drag) * normal_load * clampf(v_long / low_speed, -1.0, 1.0)
 
 	body.apply_force(forward * force_long + right * force_lat, offset)
 

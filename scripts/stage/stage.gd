@@ -1,7 +1,8 @@
 extends Node3D
 ## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
 ## returns it to the road when it falls out of the world. `reroll_stage` reloads the scene, which
-## rolls a new seed when the scene's `stage_seed` is 0.
+## rolls a new seed when the scene's `stage_seed` is 0; `cycle_difficulty` (dev key) steps the
+## difficulty 1-2-3 and reloads the same way.
 
 ## Emitted when the car fell out of the world and was put back on the road; `penalty` is in seconds.
 signal car_respawned(penalty: float)
@@ -19,6 +20,7 @@ const START_DISTANCE := 5.0
 ## The car counts as finished only within this distance in m before the finish line along the road,
 ## so another road part passing near the finish trigger does not finish the stage.
 const FINISH_PROGRESS_TOLERANCE := 5.0
+const MAX_DEV_DIFFICULTY := 3
 
 ## 0 picks a random seed.
 @export var stage_seed := 0
@@ -26,6 +28,9 @@ const FINISH_PROGRESS_TOLERANCE := 5.0
 @export var params: StageParams
 ## Gates and scales hazards. `RunState` sets it once it exists (task 8.1).
 @export var difficulty := 1
+
+## Difficulty chosen with the dev key; survives scene reloads. 0 keeps the exported `difficulty`.
+static var _dev_difficulty := 0
 
 var path: RoadPath
 ## Hazard placements, built into the "Hazards" node.
@@ -47,7 +52,9 @@ var _next_malfunction := 0
 func _ready() -> void:
 	if stage_seed == 0:
 		stage_seed = randi_range(1, 999999)
-	print("Stage seed: %d" % stage_seed)
+	if _dev_difficulty > 0:
+		difficulty = _dev_difficulty
+	print("Stage seed: %d, difficulty %d" % [stage_seed, difficulty])
 	_params = params if params else StageParams.new()
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
 	_print_sections()
@@ -86,6 +93,9 @@ func _physics_process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reroll_stage"):
+		get_tree().reload_current_scene()
+	elif event.is_action_pressed("cycle_difficulty"):
+		_dev_difficulty = difficulty % MAX_DEV_DIFFICULTY + 1
 		get_tree().reload_current_scene()
 
 

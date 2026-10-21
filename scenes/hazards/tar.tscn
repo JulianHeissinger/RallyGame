@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_ovp4w"]
+
+[node name="Tar" type="Node3D" unique_id=56276441]
+script = ExtResource("1_ovp4w")
+size = Vector2(0, 10)
+grip = 1.3
+drag = 0.2
+color = Color(0.08, 0.08, 0.09, 1)

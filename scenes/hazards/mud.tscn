@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_ppdn5"]
+
+[node name="Mud" type="Node3D" unique_id=1039335471]
+script = ExtResource("1_ppdn5")
+radius = 3.0
+grip = 0.8
+drag = 0.25
+color = Color(0.35, 0.25, 0.15, 1)

@@ -87,6 +87,48 @@ func _describe_malfunctions(malfunctions: Array[MalfunctionSchedule.Malfunction]
 	return malfunctions.map(func(m: MalfunctionSchedule.Malfunction) -> Array: return [m.distance, m.part, m.amount])
 
 
+func test_surface_gated_hazards_only_on_allowed_sections() -> void:
+	var params := StageParams.new()
+	var snow_only := _def("snow_only", 1, true)
+	snow_only.surfaces = PackedStringArray(["snow"])
+	params.hazards = [snow_only, _def("anywhere", 1, true)]
+	var seen_snow_only := false
+	for stage_seed in [1, 2, 3, 12345]:
+		var path := _path(stage_seed, params)
+		for p in HazardPlacer.place(path, stage_seed, 1, params):
+			if p.def == snow_only:
+				seen_snow_only = true
+				var index := clampi(path.distances.bsearch(p.distance), 0, path.widths.size() - 1)
+				assert_eq(path.section_at(index).road_surface, "snow", "seed %d snow-only hazard on snow" % stage_seed)
+	assert_true(seen_snow_only, "snow-only hazard placed somewhere")
+
+
+func test_surface_gated_hazard_without_allowed_section_never_placed() -> void:
+	var params := StageParams.new()
+	var lava_only := _def("lava_only", 1, true)
+	lava_only.surfaces = PackedStringArray(["lava"])
+	params.hazards = [lava_only]
+	assert_eq(HazardPlacer.place(_path(1, params), 1, 1, params).size(), 0, "no lava sections, no hazards")
+
+
+func test_patch_contains_circle_and_rectangle() -> void:
+	var root := (Engine.get_main_loop() as SceneTree).root
+	var circle := SurfacePatch.new()
+	circle.radius = 2.0
+	var rect := SurfacePatch.new()
+	rect.size = Vector2(4.0, 10.0)
+	rect.rotation.y = PI / 2.0
+	root.add_child(circle)
+	root.add_child(rect)
+	assert_true(circle.contains(Vector3(1.9, 0.0, 0.0)), "inside circle")
+	assert_false(circle.contains(Vector3(1.5, 0.0, 1.5)), "outside circle")
+	# Rotated 90°: the 10 m length now runs along world x.
+	assert_true(rect.contains(Vector3(4.5, 0.0, 1.5)), "inside rotated rectangle")
+	assert_false(rect.contains(Vector3(1.0, 0.0, 2.5)), "outside rotated rectangle")
+	circle.free()
+	rect.free()
+
+
 func _params() -> StageParams:
 	var params := StageParams.new()
 	params.hazards = [_def("rock", 1, true), _def("sheep", 1, false), _def("locked", 3, true)]

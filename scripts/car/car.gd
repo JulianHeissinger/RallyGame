@@ -19,6 +19,9 @@ var drivetrain := Drivetrain.new()
 var wheels: Array[Wheel] = []
 ## Road of the current stage, set by the stage. Null resets rollovers in place.
 var road: RoadPath
+## Surface patches (oil, mud, ...) that change grip and drag of the wheels on them; patches
+## register themselves here.
+var patches: Array[SurfacePatch] = []
 
 ## Colliders touched in the last physics step, by instance id. Only new contacts are impacts.
 var _touching: Dictionary = {}
@@ -62,9 +65,22 @@ func _physics_process(delta: float) -> void:
 		if wheel.steerable:
 			wheel.rotation.y = steer_angle
 		wheel.update_suspension(self, stats, delta)
+		_apply_patches(wheel)
 		wheel.update_tire(self, stats, delta)
 		wheel.update_visual(stats, delta)
 	_apply_yaw_assist()
+
+
+## Combines the patches under a grounded wheel: grip factors multiply, drags add up.
+func _apply_patches(wheel: Wheel) -> void:
+	wheel.patch_grip = 1.0
+	wheel.patch_drag = 0.0
+	if not wheel.is_grounded:
+		return
+	for patch in patches:
+		if patch.contains(wheel.contact_point()):
+			wheel.patch_grip *= patch.grip
+			wheel.patch_drag += patch.drag
 
 
 ## Steering yaw assist: while steering, pulls the yaw rate toward a target set by the input, so

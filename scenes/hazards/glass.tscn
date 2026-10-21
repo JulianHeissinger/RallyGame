@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/wheel_hazard.gd" id="1_sr46p"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dwvay"]
+transparency = 1
+albedo_color = Color(0.75, 0.9, 0.95, 0.6)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6cgag"]
+material = SubResource("StandardMaterial3D_dwvay")
+top_radius = 2.0
+bottom_radius = 2.0
+height = 0.01
+
+[node name="Glass" type="Node3D" unique_id=1108445671]
+script = ExtResource("1_sr46p")
+radius = 2.0
+size = Vector2(0, 0)
+continuous = false
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=585746096]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+mesh = SubResource("CylinderMesh_6cgag")

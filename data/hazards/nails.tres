@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/nails.tscn" id="1_6qq7p"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_i2f3o"]
+
+[resource]
+script = ExtResource("2_i2f3o")
+name = "nails"
+scene = ExtResource("1_6qq7p")
+min_difficulty = 2
+surfaces = PackedStringArray()
+on_road = false
+damage = {
+"tire": 35.0
+}
