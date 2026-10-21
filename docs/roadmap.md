@@ -52,15 +52,14 @@ To do as its own change: derive calls from the `RoadPath` ahead of the car, sinc
 
 ## More hazards
 
-Hazards kept for after the slice (tasks 6.5–6.7 cover the rest of the proposed set):
+Hazards kept for after the slice (tasks 6.5–6.10 cover the rest of the proposed set):
 
 - **UFO abduction.** Lifts the car and drops it about 50 m back along the road.
-- **Paparazzi.** Camera flashes that blind the screen for a moment.
 - **Road train.** A long truck crossing the road; wait or find a gap.
 
 ## Bad landing
 
-The car takes no damage from hard landings; only body contacts count as impacts. To do when jumps matter (ramps in task 6.6, crests): damage the suspension of each wheel by its compression speed on touchdown above a threshold stat, so ramps and crests reward clean landings.
+The car takes no damage from hard landings; only body contacts count as impacts. To do when jumps matter (ramps in task 6.6, geysers in 6.9, crests): damage the suspension of each wheel by its compression speed on touchdown above a threshold stat, so ramps and crests reward clean landings.
 
 ## Immobilized car keeps driving
 
