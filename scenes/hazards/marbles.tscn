@@ -2,9 +2,27 @@
 
 [ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_rrynh"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rrynh"]
+albedo_color = Color(0.78, 0.75, 0.7, 1)
+metallic = 0.4
+roughness = 0.05
+
+[sub_resource type="SphereMesh" id="SphereMesh_qcfmm"]
+material = SubResource("StandardMaterial3D_rrynh")
+radius = 0.07
+height = 0.14
+
+[sub_resource type="MultiMesh" id="MultiMesh_ybo4o"]
+transform_format = 1
+instance_count = 150
+mesh = SubResource("SphereMesh_qcfmm")
+
 [node name="Marbles" type="Node3D" unique_id=146753223]
 script = ExtResource("1_rrynh")
 size = Vector2(3, 12)
 grip = 0.6
 color = Color(0.62, 0.58, 0.52, 1)
 outside_of_turn = true
+
+[node name="Marbles" type="MultiMeshInstance3D" parent="." unique_id=961153037]
+multimesh = SubResource("MultiMesh_ybo4o")

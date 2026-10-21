@@ -11,6 +11,10 @@ extends Node3D
 @export var grip := 1.0
 @export var drag := 0.0
 @export var color := Color(0.1, 0.1, 0.1)
+## Wet look (oil, water, ice, tar).
+@export var glossy := false
+## Posts at both ends of a road-spanning patch; alpha 0 builds none.
+@export var edge_post_color := Color(0, 0, 0, 0)
 ## Yaw rate in deg/s added once when a wheel enters; the direction comes from the placement RNG.
 @export var yaw_kick := 0.0
 ## Engine damage when the car enters faster than `engine_damage_speed` (m/s).
@@ -30,6 +34,8 @@ var car: Car
 
 var _kick_sign := 1.0
 var _inside := {}
+## Road surface under the patch; picks the outline colour. Empty outside a stage.
+var _surface := ""
 
 
 func setup(_def: HazardDef, target: Car, path: RoadPath, rng: RandomNumberGenerator) -> void:
@@ -39,6 +45,7 @@ func setup(_def: HazardDef, target: Car, path: RoadPath, rng: RandomNumberGenera
 	var distance := path.progress_at(transform.origin)
 	var index := clampi(path.distances.bsearch(distance), 0, path.widths.size() - 1)
 	var half := path.widths[index] / 2.0
+	_surface = path.section_at(index).road_surface
 	if size != Vector2.ZERO and size.x <= 0.0:
 		size.x = path.widths[index]
 	for child in get_children():
@@ -63,15 +70,15 @@ func _ready() -> void:
 		disc.bottom_radius = radius
 		disc.height = 0.01
 		mesh = disc
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	if color.a < 1.0:
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mesh.material = material
+	mesh.material = HazardVisuals.material(color, glossy)
 	var visual := MeshInstance3D.new()
 	visual.mesh = mesh
 	visual.position = Vector3.UP * LIFT
 	add_child(visual)
+	if not _surface.is_empty():
+		add_child(HazardVisuals.outline(radius, size, HazardVisuals.contrast(_surface), LIFT / 2.0))
+	if edge_post_color.a > 0.0 and size != Vector2.ZERO:
+		add_child(HazardVisuals.edge_posts(size.x / 2.0, edge_post_color))
 
 
 func _exit_tree() -> void:

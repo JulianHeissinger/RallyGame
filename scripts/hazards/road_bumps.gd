@@ -13,6 +13,9 @@ extends StaticBody3D
 ## A cylinder across the road (log) instead of a box bar.
 @export var round := false
 @export var color := Color(0.4, 0.4, 0.4)
+## Visual spikes on top of each bar every `spike_spacing` m across the road; 0 builds none.
+@export var spike_spacing := 0.0
+@export var spike_height := 0.08
 
 
 func _ready() -> void:
@@ -48,3 +51,19 @@ func _ready() -> void:
 		visual.transform = collision.transform
 		add_child(collision)
 		add_child(visual)
+		if spike_spacing > 0.0:
+			_add_spikes(z, material)
+
+
+## A row of small cones on top of the bar at `z`.
+func _add_spikes(z: float, material: StandardMaterial3D) -> void:
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.0
+	cone.bottom_radius = 0.03
+	cone.height = spike_height
+	cone.material = material
+	for i in floori(width / spike_spacing):
+		var spike := MeshInstance3D.new()
+		spike.mesh = cone
+		spike.position = Vector3(-width / 2.0 + (i + 0.5) * spike_spacing, height + spike_height / 2.0, z)
+		add_child(spike)

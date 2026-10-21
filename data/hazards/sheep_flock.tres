@@ -7,4 +7,6 @@
 script = ExtResource("2_vchrb")
 name = "sheep_flock"
 scene = ExtResource("1_k6axa")
+sign_text = "SHEEP"
+surfaces = PackedStringArray()
 on_road = false

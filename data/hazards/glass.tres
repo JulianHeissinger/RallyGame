@@ -7,6 +7,7 @@
 script = ExtResource("2_lrm3k")
 name = "glass"
 scene = ExtResource("1_215uo")
+sign_text = "GLASS"
 surfaces = PackedStringArray()
 damage = {
 "tire": 10.0

@@ -2,9 +2,29 @@
 
 [ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_lpxwg"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lpxwg"]
+albedo_color = Color(1, 0.88, 0.1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_h6s2x"]
+material = SubResource("StandardMaterial3D_lpxwg")
+radius = 0.12
+height = 0.5
+
 [node name="Banana" type="Node3D" unique_id=2036324930]
 script = ExtResource("1_lpxwg")
 radius = 0.4
 grip = 0.3
-color = Color(0.95, 0.85, 0.2, 1)
+color = Color(0.85, 0.75, 0.2, 1)
 yaw_kick = 60.0
+
+[node name="Banana0" type="MeshInstance3D" parent="." unique_id=684576123]
+transform = Transform3D(-3.836035e-08, -0.87758255, -0.47942555, 1, -4.371139e-08, 0, -2.0956357e-08, -0.47942555, 0.87758255, -0.35, 0.12, 0.12)
+mesh = SubResource("CapsuleMesh_h6s2x")
+
+[node name="Banana1" type="MeshInstance3D" parent="." unique_id=976082533]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.12, 0)
+mesh = SubResource("CapsuleMesh_h6s2x")
+
+[node name="Banana2" type="MeshInstance3D" parent="." unique_id=1585784306]
+transform = Transform3D(-3.836035e-08, -0.87758255, 0.47942555, 1, -4.371139e-08, 0, 2.0956357e-08, 0.47942555, 0.87758255, 0.35, 0.12, 0.12)
+mesh = SubResource("CapsuleMesh_h6s2x")

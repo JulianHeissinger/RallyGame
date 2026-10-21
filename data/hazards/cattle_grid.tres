@@ -7,6 +7,7 @@
 script = ExtResource("2_orhgv")
 name = "cattle_grid"
 scene = ExtResource("1_cxmlu")
+sign_text = "CATTLE GRID"
 surfaces = PackedStringArray()
 on_road = false
 damage = {

@@ -6,4 +6,5 @@
 script = ExtResource("1_n1mom")
 grip = 0.7
 drag = 0.08
-color = Color(0.3, 0.35, 0.45, 0.8)
+color = Color(0.25, 0.4, 0.6, 0.85)
+glossy = true

@@ -5,12 +5,12 @@
 
 [node name="Nails" type="Node3D" unique_id=346460357]
 script = ExtResource("1_edxri")
-radius = 0.5
 size = Vector2(0, 0.5)
-continuous = false
+edge_post_color = Color(0.85, 0.1, 0.1, 1)
 
 [node name="Bumps" type="StaticBody3D" parent="." unique_id=554834351]
 script = ExtResource("2_7kyis")
 height = 0.01
 depth = 0.5
 color = Color(0.2, 0.2, 0.22, 1)
+spike_spacing = 0.2

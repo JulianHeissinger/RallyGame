@@ -7,4 +7,5 @@
 script = ExtResource("2_wtemk")
 name = "puddle"
 scene = ExtResource("1_larfj")
+sign_text = "PUDDLE"
 surfaces = PackedStringArray()

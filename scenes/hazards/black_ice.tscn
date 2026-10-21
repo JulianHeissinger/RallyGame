@@ -6,4 +6,5 @@
 script = ExtResource("1_en5pc")
 radius = 3.0
 grip = 0.25
-color = Color(0.7, 0.8, 0.9, 0.25)
+color = Color(0.75, 0.85, 1, 0.35)
+glossy = true

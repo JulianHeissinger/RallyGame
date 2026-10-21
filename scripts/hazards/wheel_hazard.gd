@@ -10,6 +10,8 @@ extends Node3D
 @export var radius := 0.5
 @export var size := Vector2.ZERO
 @export var continuous := false
+## Posts at both ends of a road-spanning hazard; alpha 0 builds none.
+@export var edge_post_color := Color(0, 0, 0, 0)
 
 ## Extra width in m beyond the road edges for hazards that span the road.
 const SPAN_MARGIN := 1.0
@@ -30,6 +32,11 @@ func setup(hazard_def: HazardDef, target: Car, path: RoadPath, _rng: RandomNumbe
 		if child is RoadBumps:
 			child.width = size.x if size != Vector2.ZERO else 2.0 * radius
 			child.set_meta("surface", path.section_at(index).road_surface)
+
+
+func _ready() -> void:
+	if edge_post_color.a > 0.0 and size != Vector2.ZERO:
+		add_child(HazardVisuals.edge_posts(size.x / 2.0, edge_post_color))
 
 
 func _physics_process(delta: float) -> void:

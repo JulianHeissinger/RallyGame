@@ -12,12 +12,182 @@ top_radius = 2.0
 bottom_radius = 2.0
 height = 0.01
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sr46p"]
+albedo_color = Color(0.7, 0.95, 1, 1)
+metallic = 0.4
+roughness = 0.05
+emission_enabled = true
+emission = Color(0.7, 0.95, 1, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_dwvay"]
+material = SubResource("StandardMaterial3D_sr46p")
+size = Vector3(0.18, 0.01, 0.08)
+
 [node name="Glass" type="Node3D" unique_id=1108445671]
 script = ExtResource("1_sr46p")
 radius = 2.0
-size = Vector2(0, 0)
-continuous = false
 
 [node name="Mesh" type="MeshInstance3D" parent="." unique_id=585746096]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
 mesh = SubResource("CylinderMesh_6cgag")
+
+[node name="Shard0" type="MeshInstance3D" parent="." unique_id=1805362930]
+transform = Transform3D(0.81050205, 0, -0.5857358, 0, 1, 0, 0.5857358, 0, 0.81050205, -1.3755634, 0.03, 0.6314525)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard1" type="MeshInstance3D" parent="." unique_id=2098444093]
+transform = Transform3D(0.035701804, 0, -0.99936247, 0, 1, 0, 0.99936247, 0, 0.035701804, -0.77066636, 0.03, -1.4138985)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard2" type="MeshInstance3D" parent="." unique_id=202937973]
+transform = Transform3D(0.65138346, 0, -0.75874865, 0, 1, 0, 0.75874865, 0, 0.65138346, 0.76178557, 0.03, 0.23715612)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard3" type="MeshInstance3D" parent="." unique_id=923573028]
+transform = Transform3D(-0.6768582, 0, 0.7361134, 0, 1, 0, -0.7361134, 0, -0.6768582, -0.26807427, 0.03, 0.24538268)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard4" type="MeshInstance3D" parent="." unique_id=1383172906]
+transform = Transform3D(-0.9856448, 0, -0.16883214, 0, 1, 0, 0.16883214, 0, -0.9856448, -1.2669747, 0.03, 0.520979)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard5" type="MeshInstance3D" parent="." unique_id=812007343]
+transform = Transform3D(0.9651929, 0, -0.26153895, 0, 1, 0, 0.26153895, 0, 0.9651929, 0.62644947, 0.03, -1.1140486)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard6" type="MeshInstance3D" parent="." unique_id=2000405767]
+transform = Transform3D(-0.80939275, 0, 0.58726776, 0, 1, 0, -0.58726776, 0, -0.80939275, -0.9809731, 0.03, -0.89138067)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard7" type="MeshInstance3D" parent="." unique_id=2126131807]
+transform = Transform3D(-0.4507131, 0, 0.89266884, 0, 1, 0, -0.89266884, 0, -0.4507131, -1.0961243, 0.03, 0.99510443)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard8" type="MeshInstance3D" parent="." unique_id=1904491113]
+transform = Transform3D(0.98769975, 0, 0.15636232, 0, 1, 0, -0.15636232, 0, 0.98769975, 1.5323467, 0.03, -0.53266174)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard9" type="MeshInstance3D" parent="." unique_id=1725399846]
+transform = Transform3D(0.8015489, 0, 0.59792924, 0, 1, 0, -0.59792924, 0, 0.8015489, -1.2941964, 0.03, -1.146054)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard10" type="MeshInstance3D" parent="." unique_id=968755653]
+transform = Transform3D(0.8558276, 0, 0.5172611, 0, 1, 0, -0.5172611, 0, 0.8558276, -0.61647063, 0.03, 1.2358136)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard11" type="MeshInstance3D" parent="." unique_id=1555392327]
+transform = Transform3D(-0.57216597, 0, 0.82013786, 0, 1, 0, -0.82013786, 0, -0.57216597, 1.2371885, 0.03, 0.12458503)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard12" type="MeshInstance3D" parent="." unique_id=1886741620]
+transform = Transform3D(-0.35209835, 0, 0.93596303, 0, 1, 0, -0.93596303, 0, -0.35209835, 0.13820596, 0.03, -0.3546695)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard13" type="MeshInstance3D" parent="." unique_id=841404216]
+transform = Transform3D(-0.9817827, 0, 0.19000737, 0, 1, 0, -0.19000737, 0, -0.9817827, -0.3462124, 0.03, 0.75899214)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard14" type="MeshInstance3D" parent="." unique_id=1486505546]
+transform = Transform3D(0.17262958, 0, 0.98498684, 0, 1, 0, -0.98498684, 0, 0.17262958, 0.6465855, 0.03, -0.14283952)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard15" type="MeshInstance3D" parent="." unique_id=346660642]
+transform = Transform3D(-0.47032014, 0, 0.8824959, 0, 1, 0, -0.8824959, 0, -0.47032014, 0.95483905, 0.03, 1.4802177)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard16" type="MeshInstance3D" parent="." unique_id=1702917719]
+transform = Transform3D(0.94513303, 0, 0.3266857, 0, 1, 0, -0.3266857, 0, 0.94513303, 0.8286179, 0.03, 0.5798535)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard17" type="MeshInstance3D" parent="." unique_id=670761826]
+transform = Transform3D(0.9999801, 0, -0.0063064317, 0, 1, 0, 0.0063064317, 0, 0.9999801, 0.4563403, 0.03, -0.4444027)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard18" type="MeshInstance3D" parent="." unique_id=27571560]
+transform = Transform3D(0.79476345, 0, -0.6069193, 0, 1, 0, 0.6069193, 0, 0.79476345, 1.1040157, 0.03, 1.0507332)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard19" type="MeshInstance3D" parent="." unique_id=922407991]
+transform = Transform3D(-0.21252339, 0, -0.977156, 0, 1, 0, 0.977156, 0, -0.21252339, -0.14355487, 0.03, -0.45916605)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard20" type="MeshInstance3D" parent="." unique_id=208154924]
+transform = Transform3D(-0.6689947, 0, 0.7432671, 0, 1, 0, -0.7432671, 0, -0.6689947, -0.89120793, 0.03, 0.65436465)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard21" type="MeshInstance3D" parent="." unique_id=404735076]
+transform = Transform3D(0.33646676, 0, 0.94169533, 0, 1, 0, -0.94169533, 0, 0.33646676, 0.43181983, 0.03, -1.5747333)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard22" type="MeshInstance3D" parent="." unique_id=1002141934]
+transform = Transform3D(-0.5172671, 0, 0.855824, 0, 1, 0, -0.855824, 0, -0.5172671, 0.55019444, 0.03, 1.1419749)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard23" type="MeshInstance3D" parent="." unique_id=398022233]
+transform = Transform3D(0.88645536, 0, -0.46281412, 0, 1, 0, 0.46281412, 0, 0.88645536, -0.1234045, 0.03, -1.5535138)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard24" type="MeshInstance3D" parent="." unique_id=62627779]
+transform = Transform3D(0.24795742, 0, -0.9687709, 0, 1, 0, 0.9687709, 0, 0.24795742, -1.142416, 0.03, 0.5538936)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard25" type="MeshInstance3D" parent="." unique_id=359522075]
+transform = Transform3D(0.24876718, 0, 0.9685633, 0, 1, 0, -0.9685633, 0, 0.24876718, 0.41574743, 0.03, 0.14223936)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard26" type="MeshInstance3D" parent="." unique_id=706329108]
+transform = Transform3D(0.9247423, 0, -0.38059384, 0, 1, 0, 0.38059384, 0, 0.9247423, 0.8814153, 0.03, 0.6458618)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard27" type="MeshInstance3D" parent="." unique_id=69124590]
+transform = Transform3D(0.9524091, 0, -0.3048227, 0, 1, 0, 0.3048227, 0, 0.9524091, -1.3064893, 0.03, -0.9357525)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard28" type="MeshInstance3D" parent="." unique_id=1619279811]
+transform = Transform3D(-0.90106726, 0, 0.4336793, 0, 1, 0, -0.4336793, 0, -0.90106726, 1.3768736, 0.03, -1.0368189)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard29" type="MeshInstance3D" parent="." unique_id=613969741]
+transform = Transform3D(0.0072493036, 0, -0.9999737, 0, 1, 0, 0.9999737, 0, 0.0072493036, -0.3959532, 0.03, 1.1351353)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard30" type="MeshInstance3D" parent="." unique_id=456458109]
+transform = Transform3D(-0.5786139, 0, 0.8156016, 0, 1, 0, -0.8156016, 0, -0.5786139, 1.4981192, 0.03, -0.8759726)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard31" type="MeshInstance3D" parent="." unique_id=1661464493]
+transform = Transform3D(0.5512705, 0, 0.8343266, 0, 1, 0, -0.8343266, 0, 0.5512705, -0.8877486, 0.03, 0.5588224)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard32" type="MeshInstance3D" parent="." unique_id=601724550]
+transform = Transform3D(-0.8904676, 0, -0.45504665, 0, 1, 0, 0.45504665, 0, -0.8904676, 1.4929025, 0.03, 0.35049203)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard33" type="MeshInstance3D" parent="." unique_id=260956701]
+transform = Transform3D(-0.81052727, 0, 0.58570087, 0, 1, 0, -0.58570087, 0, -0.81052727, -1.3962835, 0.03, 0.087493055)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard34" type="MeshInstance3D" parent="." unique_id=1915348066]
+transform = Transform3D(0.9020321, 0, 0.43166903, 0, 1, 0, -0.43166903, 0, 0.9020321, 0.09783641, 0.03, -0.3731384)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard35" type="MeshInstance3D" parent="." unique_id=463712087]
+transform = Transform3D(0.84858656, 0, 0.5290566, 0, 1, 0, -0.5290566, 0, 0.84858656, -0.96963316, 0.03, -0.9801152)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard36" type="MeshInstance3D" parent="." unique_id=737707167]
+transform = Transform3D(0.32025677, 0, 0.9473308, 0, 1, 0, -0.9473308, 0, 0.32025677, -1.022148, 0.03, 0.885925)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard37" type="MeshInstance3D" parent="." unique_id=51952577]
+transform = Transform3D(0.38630188, 0, -0.9223724, 0, 1, 0, 0.9223724, 0, 0.38630188, 0.46408597, 0.03, 0.71584946)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard38" type="MeshInstance3D" parent="." unique_id=714916549]
+transform = Transform3D(0.470477, 0, 0.88241225, 0, 1, 0, -0.88241225, 0, 0.470477, -1.0970691, 0.03, 0.8783643)
+mesh = SubResource("BoxMesh_dwvay")
+
+[node name="Shard39" type="MeshInstance3D" parent="." unique_id=204802812]
+transform = Transform3D(-0.6166519, 0, -0.787236, 0, 1, 0, 0.787236, 0, -0.6166519, 0.10557563, 0.03, -1.2197337)
+mesh = SubResource("BoxMesh_dwvay")
