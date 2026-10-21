@@ -82,6 +82,14 @@ extends Resource
 ## On-road hazards keep this far in m from the road edge.
 @export var hazard_edge_margin := 1.0
 
+@export_group("Malfunctions")
+## Malfunctions per km of usable road at difficulty 1, scaled by `hazard_difficulty_scale`; at least one.
+@export var malfunctions_per_km := 0.75
+## Condition loss range of one malfunction (x = min, y = max).
+@export var malfunction_damage := Vector2(20.0, 40.0)
+## Minimum distance in m along the road between two malfunctions.
+@export var malfunction_min_spacing := 200.0
+
 @export_group("Props")
 ## Jittered grid spacing in m; each cell holds at most one prop.
 @export var prop_cell := 6.0

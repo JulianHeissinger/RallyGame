@@ -48,6 +48,45 @@ func test_empty_pool_places_nothing() -> void:
 	assert_eq(HazardPlacer.place(_path(1, params), 1, 3, params).size(), 0, "no pool, no hazards")
 
 
+func test_same_seed_same_malfunctions() -> void:
+	var params := StageParams.new()
+	var path := _path(12345, params)
+	var a := _describe_malfunctions(MalfunctionSchedule.generate(path, 12345, 1, params))
+	assert_true(a.size() >= 1, "at least one malfunction")
+	assert_eq(a, _describe_malfunctions(MalfunctionSchedule.generate(path, 12345, 1, params)),
+		"same seed gives the same malfunction distances, parts and amounts")
+
+
+func test_malfunction_spacing_parts_and_scaling() -> void:
+	var params := StageParams.new()
+	for stage_seed in [1, 2, 12345]:
+		var path := _path(stage_seed, params)
+		var from := StageLines.START_LINE_DISTANCE + HazardPlacer.START_CLEAR
+		var to := StageLines.finish_distance(path) - HazardPlacer.FINISH_CLEAR
+		var malfunctions := MalfunctionSchedule.generate(path, stage_seed, 3, params)
+		for i in malfunctions.size():
+			var m := malfunctions[i]
+			assert_true(m.distance >= from and m.distance <= to, "seed %d malfunction %d in range" % [stage_seed, i])
+			assert_true(m.part != "chassis" and CarDamage.PARTS.has(m.part), "seed %d malfunction %d part %s" % [stage_seed, i, m.part])
+			assert_true(m.amount >= params.malfunction_damage.x and m.amount <= params.malfunction_damage.y,
+				"seed %d malfunction %d amount" % [stage_seed, i])
+			if i > 0:
+				assert_true(m.distance - malfunctions[i - 1].distance >= params.malfunction_min_spacing - 0.001,
+					"seed %d malfunctions %d and %d spaced" % [stage_seed, i - 1, i])
+		assert_true(malfunctions.size() >= MalfunctionSchedule.generate(path, stage_seed, 1, params).size(),
+			"seed %d difficulty 3 has at least as many malfunctions" % stage_seed)
+
+
+func test_hud_part_names() -> void:
+	assert_eq(Hud.part_name("tire_fl"), "front-left tire", "corner part")
+	assert_eq(Hud.part_name("suspension_rr"), "rear-right suspension", "corner part")
+	assert_eq(Hud.part_name("engine"), "engine", "single part")
+
+
+func _describe_malfunctions(malfunctions: Array[MalfunctionSchedule.Malfunction]) -> Array:
+	return malfunctions.map(func(m: MalfunctionSchedule.Malfunction) -> Array: return [m.distance, m.part, m.amount])
+
+
 func _params() -> StageParams:
 	var params := StageParams.new()
 	params.hazards = [_def("rock", 1, true), _def("sheep", 1, false), _def("locked", 3, true)]

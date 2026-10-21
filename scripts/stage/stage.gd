@@ -9,6 +9,8 @@ signal car_respawned(penalty: float)
 signal car_finished
 ## Emitted when the car defeats a hazard, e.g. knocks a sheep off the road.
 signal hazard_defeated(hazard: Node)
+## Emitted when a scheduled malfunction damages a part of the car.
+signal malfunction(part: String, amount: float)
 
 ## Depth in m of the kill plane below the lowest terrain point.
 const KILL_DEPTH := 20.0
@@ -28,10 +30,13 @@ const FINISH_PROGRESS_TOLERANCE := 5.0
 var path: RoadPath
 ## Hazard placements, built into the "Hazards" node.
 var hazards: Array[HazardPlacer.Placement] = []
+## Malfunctions by road distance; `_next_malfunction` is the next one to fire.
+var malfunctions: Array[MalfunctionSchedule.Malfunction] = []
 var finish_distance := 0.0
 
 var _params: StageParams
 var _finished := false
+var _next_malfunction := 0
 
 @onready var _car: Car = $Car
 @onready var _camera: IsoCameraRig = $IsoCameraRig
@@ -47,6 +52,7 @@ func _ready() -> void:
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
 	_print_sections()
 	hazards = HazardPlacer.place(path, stage_seed, difficulty, _params)
+	malfunctions = MalfunctionSchedule.generate(path, stage_seed, difficulty, _params)
 	add_child(RoadBuilder.build(path, _params))
 	var lines := StageLines.build(path, _params)
 	add_child(lines)
@@ -62,7 +68,20 @@ func _ready() -> void:
 	_camera.road = path
 	_camera.target = _car
 	_hud.car = _car
+	malfunction.connect(_hud.show_malfunction)
 	_debug_overlay.car = _car
+
+
+## Fires each scheduled malfunction once, when the car's road progress passes its distance.
+func _physics_process(_delta: float) -> void:
+	if _next_malfunction >= malfunctions.size():
+		return
+	var next := malfunctions[_next_malfunction]
+	if path.progress_at(_car.global_position) < next.distance:
+		return
+	_next_malfunction += 1
+	_car.damage.apply_damage(next.part, next.amount)
+	malfunction.emit(next.part, next.amount)
 
 
 func _unhandled_input(event: InputEvent) -> void:
