@@ -3,7 +3,7 @@ extends Resource
 ## Layout tuning for one stage style. Defaults are the prototype stage; countries get their own `.tres` later.
 
 @export_group("Length")
-@export var target_length := 2000.0
+@export var target_length := 4000.0
 @export var sample_spacing := 2.0
 
 @export_group("Width")

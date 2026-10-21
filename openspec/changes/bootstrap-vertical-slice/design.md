@@ -120,7 +120,7 @@ Handling feel is checked by manual playtest with an F1 debug overlay (per-wheel 
 - [Custom tire model feels wrong or unstable] → 120 Hz physics, low-speed blending, every constant in `CarStats`, debug overlay, and a dedicated tuning task before the other systems pile on.
 - [Road/terrain seams or wheels catching on edges] → terrain lowered under the road, road edges slightly beveled, wheel rays (not shapes) so edges do not snag.
 - [Road generator dead ends] → bounded retries plus regeneration with a derived seed. Determinism holds because the derived seed comes from the original.
-- [Concave road collider performance] → about 2 km of road is small. Split it into chunks if profiling shows a cost.
+- [Concave road collider performance] → about 4 km of road is small. Split it into chunks if profiling shows a cost.
 - [Slow motion affects physics stability] → Jolt scales the step with time_scale. If issues appear, physics can be paused during the pick instead (falls back to the VS-style pause).
 - [Scope is large for one change] → tasks are ordered so each section is playable on its own (car on flat ground first).
 

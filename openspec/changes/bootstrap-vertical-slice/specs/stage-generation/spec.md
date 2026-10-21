@@ -25,7 +25,7 @@ The whole stage SHALL be generated before the player gains control, and the full
 - **THEN** the full road from start to finish already exists
 
 ### Requirement: Point-to-point road
-The road SHALL be a continuous, drivable path from a start line to a finish line, with a target length set by a parameter (default about 2 km for the prototype) and a road width that fits one car comfortably with room to slide.
+The road SHALL be a continuous, drivable path from a start line to a finish line, with a target length set by a parameter (default about 4 km for the prototype) and a road width that fits one car comfortably with room to slide.
 
 #### Scenario: Road is drivable end to end
 - **WHEN** a stage is generated
@@ -35,7 +35,7 @@ The road SHALL be a continuous, drivable path from a start line to a finish line
 The generator SHALL produce a mix of straights, fast corners, tight corners, hairpins and crests, with gradients that stay readable from the isometric camera.
 
 #### Scenario: Feature variety
-- **WHEN** a 2 km stage is generated
+- **WHEN** a 4 km stage is generated
 - **THEN** it contains at least one hairpin and at least one crest
 
 ### Requirement: Surface sections
@@ -82,5 +82,5 @@ The stage SHALL stop the car from leaving the generated area and SHALL return th
 The stage SHALL report the car's distance along the road, so other systems can use distance driven and position on the stage.
 
 #### Scenario: Halfway
-- **WHEN** the car is at the middle of a 2 km road
-- **THEN** reported progress is about 1 km
+- **WHEN** the car is at the middle of a 4 km road
+- **THEN** reported progress is about 2 km

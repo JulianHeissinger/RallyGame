@@ -109,7 +109,7 @@ func test_same_seed_same_sections() -> void:
 	var params := StageParams.new()
 	var a := _path(12345, params)
 	var b := _path(12345, params)
-	assert_true(a.section_starts.size() >= 2, "a 2 km stage has several sections")
+	assert_true(a.section_starts.size() >= 2, "a 4 km stage has several sections")
 	assert_eq(a.section_starts, b.section_starts, "same seed gives the same section starts")
 	assert_eq(_surfaces(a), _surfaces(b), "same seed gives the same section surfaces")
 	assert_true(_path(1, params).section_starts != _path(2, params).section_starts, "seeds 1 and 2 differ")
