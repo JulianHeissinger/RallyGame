@@ -61,6 +61,10 @@ Hazards kept for after the slice (tasks 6.5–6.10 cover the rest of the propose
 
 The car takes no damage from hard landings; only body contacts count as impacts. To do when jumps matter (ramps in task 6.6, geysers in 6.9, crests): damage the suspension of each wheel by its compression speed on touchdown above a threshold stat, so ramps and crests reward clean landings.
 
+## Stage build time
+
+A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards), so R and stage start pause. To do if it bothers: profile the terrain distance pass (`TerrainBuilder._heights`) and the prop colliders (one `CollisionShape3D` per prop) first.
+
 ## Immobilized car keeps driving
 
 `CarDamage.immobilize` only emits `immobilized(cause)`; the car still accepts input and drives. Task 8.6 (game-over screen) cuts the engine and stops the car when the signal fires, so game-over behaviour lives in one place.
