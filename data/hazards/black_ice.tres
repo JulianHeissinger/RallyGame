@@ -8,5 +8,4 @@ script = ExtResource("2_ahnvn")
 name = "black_ice"
 scene = ExtResource("1_hhedc")
 min_difficulty = 2
-sign_text = "BLACK ICE"
 surfaces = PackedStringArray("snow", "tarmac")

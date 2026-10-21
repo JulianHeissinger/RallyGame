@@ -7,5 +7,4 @@
 script = ExtResource("2_5upr4")
 name = "oil"
 scene = ExtResource("1_aydsf")
-sign_text = "OIL"
 surfaces = PackedStringArray()

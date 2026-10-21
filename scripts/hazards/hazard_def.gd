@@ -10,8 +10,6 @@ extends Resource
 @export var min_difficulty := 1
 ## Pick weight among the unlocked hazards of the pool.
 @export var weight := 1.0
-## Text on the roadside warning sign before the hazard, e.g. "OIL".
-@export var sign_text := ""
 ## Road surfaces this hazard may be placed on, e.g. ["snow"]. Empty allows every surface.
 @export var surfaces: PackedStringArray = []
 ## True: placed on the road with a lateral offset (rock, pothole). False: on the centreline,
