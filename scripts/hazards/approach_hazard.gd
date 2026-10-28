@@ -31,10 +31,23 @@ func _setup(_def: HazardDef, _rng: RandomNumberGenerator) -> void:
 func _physics_process(_delta: float) -> void:
 	if triggered or car == null:
 		return
-	var remaining := distance - path.progress_at(car.global_position)
-	if remaining <= lead_time * maxf(car.linear_velocity.length(), min_trigger_speed):
+	if time_to_arrival() <= lead_time:
 		triggered = true
 		_trigger()
+
+
+## Seconds until the car reaches the hazard along the road at its current speed.
+func time_to_arrival() -> float:
+	var remaining := distance - path.progress_at(car.global_position)
+	return remaining / maxf(car.linear_velocity.length(), min_trigger_speed)
+
+
+## Point beside the road at `along`, `gap` m beyond the road edge on `side` (+1 right, -1 left);
+## a negative `gap` lies on the road.
+func verge_point(along: float, side: float, gap: float) -> Vector3:
+	var road := path.transform_at(along)
+	var half := path.widths[clampi(path.distances.bsearch(along), 0, path.widths.size() - 1)] / 2.0
+	return road.origin + road.basis.x * side * (half + gap)
 
 
 func _trigger() -> void:

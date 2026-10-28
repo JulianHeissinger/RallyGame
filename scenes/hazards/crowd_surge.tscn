@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/crowd_surge.gd" id="1_script"]
+
+[node name="CrowdSurge" type="Node3D"]
+script = ExtResource("1_script")
+lead_time = 4.0
