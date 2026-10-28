@@ -67,7 +67,11 @@ func _ready() -> void:
 	lines.get_node("FinishArea").body_entered.connect(_on_finish_area_body_entered)
 	var terrain := TerrainBuilder.build(path, stage_seed, _params)
 	add_child(terrain)
-	add_child(PropScatter.build(PropScatter.scatter(path, stage_seed, _params), terrain))
+	var props := PropScatter.scatter(path, stage_seed, _params)
+	add_child(PropScatter.build(props, terrain))
+	var crowd := SpectatorCrowd.build(SpectatorPlacer.place(path, stage_seed, _params, props), terrain, _car, path)
+	add_child(crowd)
+	_car.rolled_over.connect(func(_penalty: float) -> void: crowd.push_car())
 	add_child(_build_hazards())
 	add_child(_build_kill_plane(terrain.get_node("Mesh").get_aabb()))
 	_car.road = path

@@ -109,6 +109,22 @@ extends Resource
 @export var rock_weight := 2.0
 @export var fence_weight := 1.0
 
+@export_group("Spectators")
+## Clusters on the outside of sharp corners per km, on top of the start, finish and crest clusters.
+@export var spectator_clusters_per_km := 3.0
+## Corners this tight in m or tighter get clusters.
+@export var spectator_corner_radius := 40.0
+@export var spectator_cluster_size := Vector2i(5, 20)
+## Cluster length in m along the road.
+@export var spectator_cluster_spread := 15.0
+## Minimum distance in m along the road between two clusters.
+@export var spectator_cluster_min_spacing := 100.0
+## Distance range in m along the road between two spread spectators.
+@export var spectator_spacing := Vector2(20.0, 40.0)
+## Minimum distance in m from the road edge; spots lie up to `spectator_depth` m further out.
+@export var spectator_gap := 5.0
+@export var spectator_depth := 6.0
+
 @export_group("Validation")
 ## Minimum centre-to-centre distance between separate parts of the road.
 ## Keep it above `road_width_max` and below `2 * hairpin_radius.x`, or hairpins never fit.

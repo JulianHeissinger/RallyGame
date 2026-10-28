@@ -63,7 +63,7 @@ The car takes no damage from hard landings; only body contacts count as impacts.
 
 ## Stage build time
 
-A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards), so R and stage start pause. To do if it bothers: profile the terrain distance pass (`TerrainBuilder._heights`) and the prop colliders (one `CollisionShape3D` per prop) first.
+A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards, spectators), so R and stage start pause. To do if it bothers: profile the terrain distance pass (`TerrainBuilder._heights`) and the prop colliders (one `CollisionShape3D` per prop) first.
 
 ## Immobilized car keeps driving
 
@@ -79,4 +79,4 @@ Task 6.7 was verified only with headless runs, not driven in `scenes/stage.tscn`
 
 ## Roadside spectators
 
-Task 5.9 (general roadside spectators) was added during section 6. Do it after 6.9 and before 6.10.
+Task 5.9 was added during section 6 and done after 6.9. A 4 km stage has about 250 spectators as `Person` rigid bodies; with them the stage build takes about 2.6 s. Only people within 40 m of the car along the road are checked each tick. Rollover pushers stand beside the car for 1 s and walk off; the reset itself is still instant. To do when it matters: a real push animation, arms for waving, and `MultiMesh` people far from the car if the body count costs frame time.

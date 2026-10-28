@@ -1,10 +1,12 @@
 class_name Person
 extends RigidBody3D
-## A person by or on the road (spectator, fan, streaker, mascot). Moves only when a hazard tells
-## it to: walks, runs or dives toward a target. Lives on collision layer 2 like the sheep; the
-## scene's `impact_scale` 0 means a hit never damages the car, and a hit knocks the person away and
-## frees them from the car. Hazards time the moves so the car does not reach them.
+## A person by or on the road (spectator, fan, streaker, mascot). Moves only when told to: walks,
+## runs, dives or flees toward a target, or hops on the spot to cheer. Lives on collision layer 2
+## like the sheep; the scene's `impact_scale` 0 means a hit never damages the car, and a hit knocks
+## the person away and frees them from the car. Hazards time the moves so the car does not reach them.
 
+## Upward speed in m/s of each cheering hop.
+const CHEER_HOP := 1.5
 ## Upward speed in m/s at the start of a dive.
 const DIVE_UP := 2.5
 ## A target closer than this in m counts as reached.
@@ -22,6 +24,7 @@ var hit := false
 var _target := Vector3.ZERO
 var _speed := 0.0
 var _moving := false
+var _cheer_time := 0.0
 
 
 func _ready() -> void:
@@ -42,8 +45,26 @@ func dive_to(target: Vector3, speed: float) -> void:
 	linear_velocity.y = DIVE_UP
 
 
-func _physics_process(_delta: float) -> void:
-	if hit or not _moving:
+## Hops on the spot for `time` seconds.
+func cheer(time: float) -> void:
+	_cheer_time = time
+	sleeping = false
+
+
+## Runs `run` m along `direction` (flattened) at `speed`.
+func flee(direction: Vector3, run: float, speed: float) -> void:
+	direction.y = 0.0
+	walk_to(global_position + direction.normalized() * run, speed)
+
+
+func _physics_process(delta: float) -> void:
+	if hit:
+		return
+	if _cheer_time > 0.0:
+		_cheer_time -= delta
+		if not _moving and absf(linear_velocity.y) < 0.05:
+			linear_velocity.y = CHEER_HOP
+	if not _moving:
 		return
 	var to := _target - global_position
 	to.y = 0.0
