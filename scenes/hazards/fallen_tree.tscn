@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/fallen_tree.gd" id="1_tree"]
+
+[node name="FallenTree" type="StaticBody3D" groups=["solid"]]
+script = ExtResource("1_tree")

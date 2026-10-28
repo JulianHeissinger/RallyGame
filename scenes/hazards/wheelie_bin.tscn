@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/knockable.gd" id="1_knock"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bin"]
+size = Vector3(0.6, 1, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_green"]
+albedo_color = Color(0.1, 0.45, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bin"]
+material = SubResource("StandardMaterial3D_green")
+size = Vector3(0.6, 0.95, 0.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lid"]
+albedo_color = Color(0.05, 0.25, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lid"]
+material = SubResource("StandardMaterial3D_lid")
+size = Vector3(0.66, 0.05, 0.76)
+
+[node name="WheelieBin" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 3
+mass = 15.0
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_knock")
+metadata/impact_scale = 0.02
+metadata/impact_once = true
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_bin")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.475, 0)
+mesh = SubResource("BoxMesh_bin")
+
+[node name="Lid" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.975, 0)
+mesh = SubResource("BoxMesh_lid")

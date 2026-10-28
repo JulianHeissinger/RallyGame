@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/knockable.gd" id="1_knock"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trolley"]
+size = Vector3(0.55, 0.9, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_metal"]
+albedo_color = Color(0.75, 0.77, 0.8, 1)
+metallic = 0.6
+roughness = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_basket"]
+material = SubResource("StandardMaterial3D_metal")
+size = Vector3(0.55, 0.5, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_handle"]
+albedo_color = Color(0.8, 0.1, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_handle"]
+material = SubResource("StandardMaterial3D_handle")
+size = Vector3(0.6, 0.06, 0.06)
+
+[node name="ShoppingTrolley" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 3
+mass = 20.0
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_knock")
+metadata/impact_scale = 0.02
+metadata/impact_once = true
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("BoxShape3D_trolley")
+
+[node name="Basket" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+mesh = SubResource("BoxMesh_basket")
+
+[node name="Handle" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0.45)
+mesh = SubResource("BoxMesh_handle")
