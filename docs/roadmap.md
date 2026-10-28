@@ -68,3 +68,7 @@ A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards), so R a
 ## Immobilized car keeps driving
 
 `CarDamage.immobilize` only emits `immobilized(cause)`; the car still accepts input and drives. Task 8.6 (game-over screen) cuts the engine and stops the car when the signal fires, so game-over behaviour lives in one place.
+
+## Obstacle hazard tuning
+
+Task 6.6 (committed 2026-10-28 as `a237c73`) was verified only with headless runs, not driven in `scenes/stage.tscn`. The explosive barrel strength (`blast_impulse` 7000 N·s, `blast_speed` 10 m/s in `explosive_barrel.gd`) and the difficulty-2 gate on the fallen tree and the barrel are first guesses. To do when driving the stage: tune them if the barrel feels too strong or the tree shows up too early. The next slice task is 6.7; plan it before implementing.
