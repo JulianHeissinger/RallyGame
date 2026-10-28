@@ -71,4 +71,8 @@ A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards), so R a
 
 ## Obstacle hazard tuning
 
-Task 6.6 (committed 2026-10-28 as `a237c73`) was verified only with headless runs, not driven in `scenes/stage.tscn`. The explosive barrel strength (`blast_impulse` 7000 N·s, `blast_speed` 10 m/s in `explosive_barrel.gd`) and the difficulty-2 gate on the fallen tree and the barrel are first guesses. To do when driving the stage: tune them if the barrel feels too strong or the tree shows up too early. The next slice task is 6.7; plan it before implementing.
+Task 6.6 (committed 2026-10-28 as `a237c73`) was verified only with headless runs, not driven in `scenes/stage.tscn`. The explosive barrel strength (`blast_impulse` 7000 N·s, `blast_speed` 10 m/s in `explosive_barrel.gd`) and the difficulty-2 gate on the fallen tree and the barrel are first guesses. To do when driving the stage: tune them if the barrel feels too strong or the tree shows up too early.
+
+## Area and triggered hazard tuning
+
+Task 6.7 was verified only with headless runs, not driven in `scenes/stage.tscn`. First guesses to tune while driving: fire damage per second (`fire_patch.tres`, `burning_car.tres`), strike radius and blast strength (`meteorite.tscn`, `lightning.tscn`), rockfall rock size and `impact_scale` (a pass through the rocks costs about 200 condition points in total), and the difficulty-2 gate on landmine, sinkhole, strikes, rockfall and falling tree. Strikes land where the car would be at its speed when triggered, so braking or accelerating dodges them; that is intended.

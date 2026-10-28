@@ -156,6 +156,11 @@ func _init() -> void:
 		preload("res://data/hazards/crowd_surge.tres"),
 		preload("res://data/hazards/streaker.tres"),
 		preload("res://data/hazards/mascot.tres"),
+		preload("res://data/hazards/rockfall.tres"),
+		preload("res://data/hazards/falling_tree.tres"),
+		preload("res://data/hazards/cheese_wheel.tres"),
+		preload("res://data/hazards/runaway_wheel.tres"),
+		preload("res://data/hazards/tumbleweed.tres"),
 	]
 	surfaces = [
 		SurfaceSectionDef.create("gravel", "grass", 1.0, Vector2(300.0, 700.0)),
