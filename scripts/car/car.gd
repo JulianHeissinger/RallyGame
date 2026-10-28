@@ -33,6 +33,7 @@ var _last_angular_velocity := Vector3.ZERO
 var _rollover_timer := 0.0
 
 @onready var damage: CarDamage = $Damage
+@onready var items: ItemManager = $Items
 
 
 func _ready() -> void:
@@ -41,6 +42,9 @@ func _ready() -> void:
 	center_of_mass_mode = CENTER_OF_MASS_MODE_CUSTOM
 	center_of_mass = Vector3(0.0, stats.get_stat("center_of_mass_y"), 0.0)
 	drivetrain.gearbox.mode = Settings.gearbox_mode
+	items.setup(self, stats, damage)
+	drivetrain.gearbox.gear_shifted.connect(
+		func(from: int, to: int) -> void: items.on_event("gear_shift", {"from": from, "to": to}))
 	for child in get_children():
 		if child is Wheel:
 			wheels.append(child)

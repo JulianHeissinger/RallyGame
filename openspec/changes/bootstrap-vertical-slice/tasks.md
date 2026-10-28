@@ -59,7 +59,7 @@
 
 ## 7. Items
 
-- [ ] 7.1 Create `ItemDef`, `StatModifier`, `ItemEffect` base, and `ItemManager` (passive stacks, 4 mount slots with replace, cooldowns, condition evaluation, event fan-out); verify with `tests/test_items.gd` (stacking, mount replace, cooldown blocks activation, condition toggles on break/repair)
+- [x] 7.1 Create `ItemDef`, `StatModifier`, `ItemEffect` base, and `ItemManager` (passive stacks, 4 mount slots with replace, cooldowns, condition evaluation, event fan-out); verify with `tests/test_items.gd` (stacking, mount replace, cooldown blocks activation, condition toggles on break/repair)
 - [ ] 7.2 Add prototype passive items as `.tres` (grip, power, lethal impact speed) and Drift King with broken-brake condition; verify stat changes in tests and boost fill doubling with a broken brake
 - [ ] 7.3 Add active items: nitro (button), flame exhaust (gear shift trigger), bullbar (collision trigger, reduced front damage, knock-away); verify in stage that nitro respects cooldown, exhaust fires on shifts, bullbar knocks a sheep away with less front damage
 - [ ] 7.4 Add cursed Gearbox of Chaos (power bonus, random gear on shift); verify it is marked cursed in offers and shifts land in random gears
