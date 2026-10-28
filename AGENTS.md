@@ -27,6 +27,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - One-off scripts that load or edit hazard scenes must `load("res://scenes/stage.tscn")` first: `StageParams` preloads the hazard defs, whose scenes use scripts that reference `StageParams` again, and loading a hazard scene first breaks that cycle (scripts go missing from saved scenes).
 - Autoloads (e.g. `Settings`) are not registered yet when a `-s` script compiles. A one-off script that touches the car must not use the `Car` type statically; `await process_frame` in `_init` before loading the scene.
 - A `-s` script that hits a script error never calls `quit()` and hangs at full CPU. Start each one-off script with a watchdog: `create_timer(90.0).timeout.connect(func(): print("WATCHDOG timeout"); quit(1))`. Hazard `class_name` types (`Person`, `Sheep`, ...) depend on `Car` too, so check with `has_method` instead of `is`.
+- Drift events in such scripts: a handbrake turn from 20 m/s (`steer_left` plus `handbrake`) on the test scene gives `drift_end` after about 0.95 s. A throttle exit with countersteer kept the drift going for more than 2 s, so to check an effect on `drift_end`, emit `car.drift_ended.emit(duration)` directly.
 - For runs longer than about 10 m, steer the car along the road each tick, or it leaves the road on curves and spoils distances: aim at `path.curve.sample_baked(path.progress_at(car.global_position) + 10.0)` in car space and press `steer_right`/`steer_left` with strength `clampf(aim.x / 3.0, -1.0, 1.0)`.
 
 ## Handling tuning
