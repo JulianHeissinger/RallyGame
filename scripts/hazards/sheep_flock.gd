@@ -3,11 +3,12 @@ extends Node3D
 ## A flock waiting beside the road. When the car is `lead_time` seconds away along the road at its
 ## current speed, every sheep crosses to the mirrored spot on the other side, each after its own
 ## delay, so many are on the road when the car arrives. Layout and timing come from the placement's RNG.
+## Other animals (cows, chickens, moose, kangaroos, a marching band) are flocks with another
+## `animal_scene` that uses the `Sheep` script.
 
 signal hazard_defeated(hazard: Node)
 
-const SHEEP_SCENE := preload("res://scenes/hazards/sheep.tscn")
-
+@export var animal_scene: PackedScene = preload("res://scenes/hazards/sheep.tscn")
 @export var count_range := Vector2i(40, 100)
 ## Cluster size in m along the road and outward from the nearest sheep. Sheep stand on distinct
 ## cells of a `cell` m grid, so they never spawn inside each other.
@@ -24,6 +25,10 @@ const SHEEP_SCENE := preload("res://scenes/hazards/sheep.tscn")
 @export var walk_speed := Vector2(2.0, 3.0)
 ## Sheep spawn this far above the road and settle onto the ground.
 @export var spawn_height := 0.6
+## Random offset in m along and across the road added to each target, so the flock scatters.
+@export var scatter := 0.0
+## Each animal walks to the road centreline and stands there instead of crossing.
+@export var stop_on_road := false
 
 var _car: Car
 var _path: RoadPath
@@ -56,9 +61,11 @@ func setup(_def: HazardDef, car: Car, path: RoadPath, rng: RandomNumberGenerator
 		var half := path.widths[clampi(path.distances.bsearch(along), 0, path.widths.size() - 1)] / 2.0
 		var out := half + Sheep.OFF_ROAD_MARGIN + side_gap + (row + rng.randf_range(0.2, 0.8)) * cell
 		var start := road.origin + road.basis.x * side * out + Vector3.UP * spawn_height
-		var sheep: Sheep = SHEEP_SCENE.instantiate()
+		var sheep: Sheep = animal_scene.instantiate()
 		sheep.path = path
-		sheep.target = road.origin - road.basis.x * side * out
+		sheep.target = road.origin if stop_on_road else road.origin - road.basis.x * side * out
+		if scatter > 0.0:
+			sheep.target += road.basis.x * rng.randf_range(-scatter, scatter) + road.basis.z * rng.randf_range(-scatter, scatter)
 		sheep.start_delay = rng.randf() * max_delay
 		sheep.walk_speed = rng.randf_range(walk_speed.x, walk_speed.y)
 		sheep.transform = to_local * Transform3D(Basis.looking_at(-road.basis.x * side), start)

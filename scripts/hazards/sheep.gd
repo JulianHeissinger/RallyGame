@@ -15,6 +15,9 @@ const OFF_ROAD_MARGIN := 1.0
 const KNOCK_SIDE := 0.6
 const KNOCK_UP := 0.3
 
+## Upward speed in m/s of each hop while walking (kangaroo); 0 walks.
+@export var hop_speed := 0.0
+
 var target := Vector3.ZERO
 var walk_speed := 2.0
 var start_delay := 0.0
@@ -24,6 +27,7 @@ var _walking := false
 var _timer := 0.0
 var _hit := false
 var _knocked_off := false
+var _hop_timer := 0.0
 
 
 func _ready() -> void:
@@ -53,7 +57,14 @@ func _physics_process(delta: float) -> void:
 		linear_velocity = Vector3(0.0, linear_velocity.y, 0.0)
 		return
 	var step := to.normalized() * walk_speed
-	linear_velocity = Vector3(step.x, linear_velocity.y, step.z)
+	var up := linear_velocity.y
+	if hop_speed > 0.0:
+		_hop_timer -= delta
+		if _hop_timer <= 0.0:
+			up = hop_speed
+			# Next hop once this one has landed: flight time plus a short pause.
+			_hop_timer = 2.0 * hop_speed / (ProjectSettings.get_setting("physics/3d/default_gravity") as float) + 0.1
+	linear_velocity = Vector3(step.x, up, step.z)
 
 
 func _off_road() -> bool:
