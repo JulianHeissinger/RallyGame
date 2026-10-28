@@ -8,7 +8,7 @@ const GRIP := {
 	"tarmac": 1.2,
 	"gravel": 1.0,
 	"grass": 0.8,
-	"snow": 0.6,
+	"snow": 0.75,
 	"ice": 0.4,
 }
 ## Placeholder colours for road and terrain meshes.

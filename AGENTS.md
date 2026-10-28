@@ -33,6 +33,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 
 - Target feel: a mix of art of rally and DiRT, always in a light drift that stays controllable. Plain realistic grip felt floaty and not fun from the iso camera. If the feel is off, try in this order: more direct keyboard steering, the steering yaw assist (`yaw_assist_*` stats), more grip. Values and history are in `docs/roadmap.md` under "Handling tuning on a real track".
 - Workflow: measure the current car first with a one-off headless script (step steer, steering tap, lift-off, 100-0 braking), show a small table of variants with one recommendation, apply only after approval (stats via a `ResourceSaver` script), and let the user drive `scenes/stage.tscn`. Commit after the user says it feels right. If two rounds do not fix a complaint, stop and ask what the car should feel like instead of tweaking further.
+- Surface grip factors (`Surface.GRIP`) are a const and cannot be changed in memory. To measure a surface variant, scale the loaded `prototype.tres` `tire_friction` by the surface factor and run on the gravel test scene (gravel is 1.0).
 - In zsh, a variable holding several script arguments needs `${=var}` to split into words.
 
 ## Watch-outs

@@ -30,11 +30,23 @@ Task 3.8a fixed the structural handling issues in the flat test scene. Task 3.8 
 First pass, values now in `prototype.tres` and code:
 
 - **Tire curve:** `tire_lat_b` 10 → 16, `tire_lat_c` 1.3 → 1.6. The old curve peaked at about 15° slip and stayed flat past it, so full keyboard lock overslipped the front and the yaw oscillated.
-- **Grip:** `tire_friction` 1.0 → 1.5 (about 1.3 g cornering on gravel). Surface grip: grass 0.8, snow 0.6, ice 0.4.
+- **Grip:** `tire_friction` 1.0 → 1.5 (about 1.3 g cornering on gravel). Surface grip: grass 0.8, snow 0.75, ice 0.4.
 - **Steering:** `min_steer_angle_deg` 14 → 8, `steer_reduction_speed` 25 → 22. Keyboard ramp in `InputSource`: toward lock 5/1.5 → 6/4 per second, back to centre 6/3 → 6/5.5 (standstill/at speed).
 - **Lift-off:** `engine_brake_torque` 60 → 20, `center_of_mass_y` −0.35 → −0.5.
 - **Brakes:** `brake_torque` 700 → 1100, `brake_bias_front` 0.7 → 0.65 (100–0 km/h in 36 m without locking). More torque locks the wheels.
 - **Steering yaw assist** (spec changed to allow it): `yaw_assist_lateral_g` 1.7, `yaw_assist_gain` 6, `yaw_assist_rate` 70, `yaw_assist_max_slip_deg` 12, `yaw_assist_max_accel` 3, `yaw_assist_min_speed` 5. Keep `yaw_assist_lateral_g` a little above the grip: about 0.2–0.4 g more gives a light drift, much more spins the car. After the grip raise to 1.5 the drift is lighter; 1.9 brings back about 6° of body slip at 60 km/h.
+
+- **Snow grip** 0.6 → 0.75 (2026-10-28, not yet driven). At 0.6 full keyboard lock at 60 km/h spun the car (47° body slip): the yaw assist (`yaw_assist_lateral_g` 1.9) asks for more lateral grip than snow has. Measured with full lock and throttle 0.4 at 60 km/h, and 100–0 braking:
+
+  | Snow grip | Full lock at 60 km/h | 100–0 braking |
+  |---|---|---|
+  | 1.0 (gravel) | 1.34 g, 1° slip | 36 m |
+  | 0.6 (old) | spins, 47° slip | 63 m |
+  | 0.7 | unstable, 9° slip | 48 m |
+  | 0.75 (chosen) | 0.91 g, 4° slip | 45 m |
+  | 0.8 | 0.93 g, 6° slip | 36 m, brakes like gravel |
+
+  Committed before driving it; check the feel on a snow section. Low-grip surfaces may need a yaw assist target scaled by surface grip; ice (0.4) likely spins the same way.
 
 Still open for 3.8:
 
@@ -71,12 +83,14 @@ A 4 km stage takes 1–3 s to build (terrain, about 2000 props, hazards, spectat
 
 ## Obstacle hazard tuning
 
-Task 6.6 (committed 2026-10-28 as `a237c73`) was verified only with headless runs, not driven in `scenes/stage.tscn`. The explosive barrel strength (`blast_impulse` 7000 N·s, `blast_speed` 10 m/s in `explosive_barrel.gd`) and the difficulty-2 gate on the fallen tree and the barrel are first guesses. To do when driving the stage: tune them if the barrel feels too strong or the tree shows up too early.
+Task 6.6 (committed 2026-10-28 as `a237c73`) was verified with headless runs; the user drove the stage on 2026-10-28 after task 6.10 and found it works well. The explosive barrel strength (`blast_impulse` 7000 N·s, `blast_speed` 10 m/s in `explosive_barrel.gd`) and the difficulty-2 gate on the fallen tree and the barrel are first guesses. Optional: tune them if the barrel feels too strong or the tree shows up too early.
 
 ## Area and triggered hazard tuning
 
-Task 6.7 was verified only with headless runs, not driven in `scenes/stage.tscn`. First guesses to tune while driving: fire damage per second (`fire_patch.tres`, `burning_car.tres`), strike radius and blast strength (`meteorite.tscn`, `lightning.tscn`), rockfall rock size and `impact_scale` (a pass through the rocks costs about 200 condition points in total), and the difficulty-2 gate on landmine, sinkhole, strikes, rockfall and falling tree. The same goes for the 6.8 animals: herd sizes, walk speeds, lead times and `impact_scale` per animal scene (cow 0.3, moose 1 and `solid`). Task 6.9 force areas: wind gust 10 m/s² (moves an uncorrected car about 2.4 m per gust), steam geyser 25 m/s² up (launches at about 8 m/s), dust devil 12 m/s² up and 8 rad/s² yaw, helicopter downwash 2 m/s² down and 12 m/s² outward (only about 0.7 m sideways for a car passing 4 m off centre; tires resist most of it). Task 6.10 road followers are kinematic, so they never yield: a rear-end hit on the tractor at about 15 m/s costs about 190 condition points and a head-on with the wrong-way tourist about 600 (not lethal, they are not `solid`). Strikes land where the car would be at its speed when triggered, so braking or accelerating dodges them; that is intended.
+Tasks 6.7–6.10 and 5.9 were verified with headless runs; the user drove the stage on 2026-10-28 and found it works well. The values below are first guesses, optional to tune: fire damage per second (`fire_patch.tres`, `burning_car.tres`), strike radius and blast strength (`meteorite.tscn`, `lightning.tscn`), rockfall rock size and `impact_scale` (a pass through the rocks costs about 200 condition points in total), and the difficulty-2 gate on landmine, sinkhole, strikes, rockfall and falling tree. The same goes for the 6.8 animals: herd sizes, walk speeds, lead times and `impact_scale` per animal scene (cow 0.3, moose 1 and `solid`). Task 6.9 force areas: wind gust 10 m/s² (moves an uncorrected car about 2.4 m per gust), steam geyser 25 m/s² up (launches at about 8 m/s), dust devil 12 m/s² up and 8 rad/s² yaw, helicopter downwash 2 m/s² down and 12 m/s² outward (only about 0.7 m sideways for a car passing 4 m off centre; tires resist most of it). Task 6.10 road followers are kinematic, so they never yield: a rear-end hit on the tractor at about 15 m/s costs about 190 condition points and a head-on with the wrong-way tourist about 600 (not lethal, they are not `solid`). Strikes land where the car would be at its speed when triggered, so braking or accelerating dodges them; that is intended.
 
 ## Roadside spectators
 
 Task 5.9 was added during section 6 and done after 6.9. A 4 km stage has about 250 spectators as `Person` rigid bodies; with them the stage build takes about 2.6 s. Only people within 40 m of the car along the road are checked each tick. Rollover pushers stand beside the car for 1 s and walk off; the reset itself is still instant. To do when it matters: a real push animation, arms for waving, and `MultiMesh` people far from the car if the body count costs frame time.
+
+`SpectatorPlacer`, `SpectatorCrowd` and the `CrowdSurge` hazard call underscore-private helpers of other scripts (`PropScatter._nearest`, `PropScatter._buckets`, `SurfacePatch._outside_sign`). Make them public (drop the underscore, update callers) if more scripts need them.
