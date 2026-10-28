@@ -108,7 +108,7 @@ func _print_sections() -> void:
 
 ## One scene per placement, on the road at its distance and lateral offset. Hazards with a `setup`
 ## method get their def, the car, the road and their own seeded RNG; their `hazard_defeated` is
-## forwarded.
+## forwarded, and their `car_fell` (sinkhole) becomes a respawn penalty.
 func _build_hazards() -> Node3D:
 	var root := Node3D.new()
 	root.name = "Hazards"
@@ -120,6 +120,8 @@ func _build_hazards() -> Node3D:
 			hazard.setup(placement.def, _car, path, SeedStreams.rng(stage_seed, "hazard_%d" % i))
 		if hazard.has_signal("hazard_defeated"):
 			hazard.hazard_defeated.connect(hazard_defeated.emit)
+		if hazard.has_signal("car_fell"):
+			hazard.car_fell.connect(func() -> void: car_respawned.emit(_params.respawn_penalty))
 		root.add_child(hazard)
 		var sign_node := _build_sign(placement)
 		sign_node.name = "Sign%d" % i

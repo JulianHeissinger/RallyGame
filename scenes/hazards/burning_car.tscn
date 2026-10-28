@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/fire_patch.gd" id="1_fire"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/crashed_car.tscn" id="2_car"]
+
+[node name="BurningCar" type="Node3D"]
+script = ExtResource("1_fire")
+radius = 3.5
+flame_count = 12
+
+[node name="CrashedCar" parent="." instance=ExtResource("2_car")]

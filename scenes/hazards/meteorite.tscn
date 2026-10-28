@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/strike.gd" id="1_strike"]
+[ext_resource type="Resource" path="res://data/hazards/pothole.tres" id="2_pothole"]
+[ext_resource type="Resource" path="res://data/hazards/fire_patch.tres" id="3_fire"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+transparency = 1
+albedo_color = Color(0.9, 0.1, 0.05, 0.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_marker"]
+material = SubResource("StandardMaterial3D_marker")
+top_radius = 1.0
+bottom_radius = 1.0
+height = 0.01
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_color = Color(0.3, 0.15, 0.08, 1)
+emission_enabled = true
+emission = Color(1, 0.4, 0.05, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rock"]
+material = SubResource("StandardMaterial3D_rock")
+radius = 0.8
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flash"]
+transparency = 1
+albedo_color = Color(1, 0.6, 0.1, 0.6)
+emission_enabled = true
+emission = Color(1, 0.5, 0.05, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_flash"]
+material = SubResource("StandardMaterial3D_flash")
+radius = 4.0
+height = 8.0
+
+[node name="Meteorite" type="Node3D"]
+script = ExtResource("1_strike")
+lead_time = 2.5
+aftermath = Array[Resource]([ExtResource("2_pothole"), ExtResource("3_fire")])
+
+[node name="Marker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_marker")
+
+[node name="Falling" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_rock")
+
+[node name="Flash" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_flash")
