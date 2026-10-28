@@ -42,6 +42,7 @@ func _ready() -> void:
 	center_of_mass_mode = CENTER_OF_MASS_MODE_CUSTOM
 	center_of_mass = Vector3(0.0, stats.get_stat("center_of_mass_y"), 0.0)
 	drivetrain.gearbox.mode = Settings.gearbox_mode
+	damage.stats = stats
 	items.setup(self, stats, damage)
 	drivetrain.gearbox.gear_shifted.connect(
 		func(from: int, to: int) -> void: items.on_event("gear_shift", {"from": from, "to": to}))
@@ -51,6 +52,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Items can change the mass during a stage.
+	mass = stats.get_stat("mass")
 	input.update(delta, linear_velocity.length())
 	damage.update_wear(stats, delta, linear_velocity.length())
 	_apply_damage()
@@ -84,7 +87,7 @@ func _apply_patches(wheel: Wheel) -> void:
 	for patch in patches:
 		if patch.contains(wheel.contact_point()):
 			wheel.patch_grip *= patch.grip
-			wheel.patch_drag += patch.drag
+			wheel.patch_drag += patch.drag * stats.get_stat("patch_drag_scale")
 
 
 ## Steering yaw assist: while steering, pulls the yaw rate toward a target set by the input, so

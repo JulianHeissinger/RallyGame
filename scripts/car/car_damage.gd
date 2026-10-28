@@ -24,6 +24,8 @@ const CENTER_HALF_WIDTH := 0.28
 const CENTER_END_SHARE := 0.75
 
 var condition: Dictionary = {}
+## Car stats, set by the car. Scales damage by the `<group>_damage_taken` stats; null in tests.
+var stats: StatBlock
 var is_immobilized := false
 
 
@@ -32,8 +34,11 @@ func _init() -> void:
 		condition[part] = 100.0
 
 
-## Impact or hazard damage. Emits `part_damaged`, and `part_broken` when the part reaches 0.
+## Impact, hazard or malfunction damage, scaled by the part group's `<group>_damage_taken` stat.
+## Emits `part_damaged`, and `part_broken` when the part reaches 0.
 func apply_damage(part: String, amount: float) -> void:
+	if stats:
+		amount *= stats.get_stat(part.get_slice("_", 0) + "_damage_taken")
 	if condition[part] <= 0.0 or amount <= 0.0:
 		return
 	var applied := minf(amount, condition[part])

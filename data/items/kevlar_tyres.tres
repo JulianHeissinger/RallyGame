@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_eet70"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_rlp6l"]
+
+[sub_resource type="Resource" id="Resource_y8iyf"]
+script = ExtResource("1_eet70")
+stat = "tire_damage_taken"
+multiplier = 0.7
+
+[resource]
+script = ExtResource("2_rlp6l")
+id = "kevlar_tyres"
+name = "Kevlar Tyres"
+description = "Tires take 30% less damage."
+modifiers = Array[ExtResource("1_eet70")]([SubResource("Resource_y8iyf")])

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_k7ay0"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_5wsuo"]
+
+[sub_resource type="Resource" id="Resource_mssfw"]
+script = ExtResource("1_k7ay0")
+stat = "mass"
+multiplier = 0.93
+
+[sub_resource type="Resource" id="Resource_ggesq"]
+script = ExtResource("1_k7ay0")
+stat = "impact_damage"
+multiplier = 1.1
+
+[resource]
+script = ExtResource("2_5wsuo")
+id = "lightweight_panels"
+name = "Lightweight Panels"
+description = "-7% mass, but impacts deal 10% more damage."
+modifiers = Array[ExtResource("1_k7ay0")]([SubResource("Resource_mssfw"), SubResource("Resource_ggesq")])

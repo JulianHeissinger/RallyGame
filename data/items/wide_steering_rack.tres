@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_nta0f"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_r27ti"]
+
+[sub_resource type="Resource" id="Resource_2k7qt"]
+script = ExtResource("1_nta0f")
+stat = "max_steer_angle_deg"
+additive = 5.0
+
+[sub_resource type="Resource" id="Resource_x6bhh"]
+script = ExtResource("1_nta0f")
+stat = "min_steer_angle_deg"
+additive = 2.0
+
+[resource]
+script = ExtResource("2_r27ti")
+id = "wide_steering_rack"
+name = "Wide Steering Rack"
+description = "More steering lock at every speed."
+modifiers = Array[ExtResource("1_nta0f")]([SubResource("Resource_2k7qt"), SubResource("Resource_x6bhh")])

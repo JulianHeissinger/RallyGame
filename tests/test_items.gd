@@ -141,3 +141,55 @@ func test_condition_toggles_on_break_and_repair() -> void:
 	assert_almost_eq(stats.get_stat("tire_friction"), 1.0, 0.0001, "off again after repair")
 	_free_nodes()
 	damage.free()
+
+
+func test_data_items_change_their_stats() -> void:
+	var base: Dictionary = load("res://data/cars/prototype.tres").stats
+	# id -> {stat: expected effective value with one copy}
+	var expected := {
+		"rally_tyres": {"tire_friction": base["tire_friction"] * 1.1},
+		"turbo_kit": {"max_torque": base["max_torque"] * 1.12},
+		"roll_cage": {"lethal_impact_speed": base["lethal_impact_speed"] + 3.0},
+		"glass_cannon": {"max_torque": base["max_torque"] * 1.3, "impact_damage": base["impact_damage"] * 1.5},
+		"rally_brakes": {"brake_torque": base["brake_torque"] * 1.15},
+		"short_gearbox": {"final_drive": base["final_drive"] * 1.08},
+		"stiff_springs": {"spring_stiffness": base["spring_stiffness"] * 1.15, "damper": base["damper"] * 1.15},
+		"lightweight_panels": {"mass": base["mass"] * 0.93, "impact_damage": base["impact_damage"] * 1.1},
+		"mechanics_tape": {"wear_rate": base["wear_rate"] * 0.75},
+		"wide_steering_rack": {"max_steer_angle_deg": base["max_steer_angle_deg"] + 5.0,
+			"min_steer_angle_deg": base["min_steer_angle_deg"] + 2.0},
+		"cold_air_intake": {"max_torque": base["max_torque"] * 1.05},
+		"sport_exhaust": {"max_torque": base["max_torque"] * 1.06, "redline_rpm": base["redline_rpm"] + 250.0},
+		"chip_tune": {"redline_rpm": base["redline_rpm"] + 500.0, "shift_up_rpm": base["shift_up_rpm"] + 500.0},
+		"lightweight_flywheel": {"shift_time": base["shift_time"] * 0.7,
+			"engine_brake_torque": base["engine_brake_torque"] * 1.3},
+		"armoured_sump": {"engine_damage_taken": 0.7},
+		"kevlar_tyres": {"tire_damage_taken": 0.7},
+		"forged_internals": {"engine_damage_taken": 0.75,
+			"engine_damaged_power": base["engine_damaged_power"] + 0.15},
+		"mud_flaps": {"patch_drag_scale": 0.5},
+		"ice_studs": {"grip_snow": 1.25, "grip_ice": 1.25},
+	}
+	for id: String in expected:
+		var stats := StatBlock.new(base)
+		var manager := _manager(stats)
+		var def: ItemDef = load("res://data/items/%s.tres" % id)
+		assert_eq(def.id, id, "id matches file name")
+		manager.add_item(def)
+		for stat: String in expected[id]:
+			assert_almost_eq(stats.get_stat(stat), expected[id][stat], 0.0001, "%s %s" % [id, stat])
+		_free_nodes()
+
+
+func test_damage_taken_scales_part_damage() -> void:
+	var stats := StatBlock.new(load("res://data/cars/prototype.tres").stats)
+	var damage := CarDamage.new()
+	damage.stats = stats
+	var manager := _manager(stats, damage)
+	manager.add_item(load("res://data/items/kevlar_tyres.tres"))
+	damage.apply_damage("tire_fl", 10.0)
+	damage.apply_damage("brake_fl", 10.0)
+	assert_almost_eq(damage.condition["tire_fl"], 93.0, 0.0001, "Kevlar Tyres take 30% less tire damage")
+	assert_almost_eq(damage.condition["brake_fl"], 90.0, 0.0001, "other groups unchanged")
+	_free_nodes()
+	damage.free()

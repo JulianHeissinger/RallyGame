@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_h3aji"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_tafec"]
+
+[sub_resource type="Resource" id="Resource_p604j"]
+script = ExtResource("1_h3aji")
+stat = "grip_snow"
+multiplier = 1.25
+
+[sub_resource type="Resource" id="Resource_p7mey"]
+script = ExtResource("1_h3aji")
+stat = "grip_ice"
+multiplier = 1.25
+
+[resource]
+script = ExtResource("2_tafec")
+id = "ice_studs"
+name = "Ice Studs"
+description = "+25% grip on snow and ice."
+modifiers = Array[ExtResource("1_h3aji")]([SubResource("Resource_p604j"), SubResource("Resource_p7mey")])

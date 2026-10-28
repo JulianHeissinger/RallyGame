@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_w5prd"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_1jfn4"]
+
+[sub_resource type="Resource" id="Resource_57owp"]
+script = ExtResource("1_w5prd")
+stat = "max_torque"
+multiplier = 1.3
+
+[sub_resource type="Resource" id="Resource_dxvna"]
+script = ExtResource("1_w5prd")
+stat = "impact_damage"
+multiplier = 1.5
+
+[resource]
+script = ExtResource("2_1jfn4")
+id = "glass_cannon"
+name = "Glass Cannon"
+description = "+30% engine power. Drawback: impacts deal 50% more damage."
+cursed = true
+modifiers = Array[ExtResource("1_w5prd")]([SubResource("Resource_57owp"), SubResource("Resource_dxvna")])
