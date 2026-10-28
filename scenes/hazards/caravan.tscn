@@ -1,0 +1,54 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/road_follower.gd" id="1_follower"]
+
+[sub_resource type="BoxShape3D" id="Shape_car"]
+size = Vector3(1.8, 1.4, 4.2)
+
+[sub_resource type="StandardMaterial3D" id="Mat_car"]
+albedo_color = Color(0.75, 0.75, 0.78, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_car"]
+material = SubResource("Mat_car")
+size = Vector3(1.8, 1.4, 4.2)
+
+[sub_resource type="BoxShape3D" id="Shape_van"]
+size = Vector3(2.2, 2.4, 5)
+
+[sub_resource type="StandardMaterial3D" id="Mat_van"]
+albedo_color = Color(0.95, 0.93, 0.85, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_van"]
+material = SubResource("Mat_van")
+size = Vector3(2.2, 2.4, 5)
+
+[node name="Caravan" type="Node3D"]
+script = ExtResource("1_follower")
+speed = 12.0
+lateral = 1.0
+sway = 0.8
+lead_time = 8.0
+
+[node name="Body" type="AnimatableBody3D" parent="."]
+collision_layer = 2
+collision_mask = 3
+
+[node name="Collision" type="CollisionShape3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("Shape_car")
+
+[node name="Mesh" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+mesh = SubResource("Mesh_car")
+
+[node name="Trailer" type="AnimatableBody3D" parent="."]
+collision_layer = 2
+collision_mask = 3
+
+[node name="Collision" type="CollisionShape3D" parent="Trailer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+shape = SubResource("Shape_van")
+
+[node name="Mesh" type="MeshInstance3D" parent="Trailer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+mesh = SubResource("Mesh_van")
