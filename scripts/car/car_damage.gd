@@ -49,7 +49,8 @@ func apply_damage(part: String, amount: float) -> void:
 
 
 ## Collision at `local_point` (car space, front is -z) with `impact_speed` along the contact
-## normal. `scale` multiplies the damage (soft bodies like sheep hurt less). A hit on a `solid` body
+## normal. `scale` multiplies the damage (soft bodies like sheep hurt less); front-end hits also
+## scale by `front_impact_damage_taken` (bullbar). A hit on a `solid` body
 ## at or above `lethal_impact_speed` immobilizes the car.
 func apply_impact(stats: StatBlock, local_point: Vector3, impact_speed: float, is_solid: bool,
 		scale: float = 1.0) -> void:
@@ -58,6 +59,8 @@ func apply_impact(stats: StatBlock, local_point: Vector3, impact_speed: float, i
 		apply_damage("chassis", amount)
 	else:
 		var end := "f" if local_point.z < 0.0 else "r"
+		if end == "f":
+			amount *= stats.get_stat("front_impact_damage_taken")
 		var corners: Array[String] = [end + ("l" if local_point.x < 0.0 else "r")]
 		var corner_amount := amount
 		if absf(local_point.x) < CENTER_HALF_WIDTH:

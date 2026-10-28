@@ -21,6 +21,7 @@ stats = {
 "final_drive": 5.2,
 "flat_tire_drag": 0.1,
 "flat_tire_grip": 0.4,
+"front_impact_damage_taken": 1.0,
 "gear_count": 5.0,
 "gear_ratio_1": 2.75,
 "gear_ratio_2": 2.1,

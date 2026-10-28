@@ -94,6 +94,8 @@ func _physics_process(delta: float) -> void:
 	# Items can change the mass during a stage.
 	mass = stats.get_stat("mass")
 	input.update(delta, linear_velocity.length())
+	if input.activate_pressed:
+		items.activate_button()
 	damage.update_wear(stats, delta, linear_velocity.length())
 	_apply_damage()
 	_update_rollover(delta)

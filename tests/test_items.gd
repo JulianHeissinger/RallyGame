@@ -5,8 +5,9 @@ class CountingEffect extends ItemEffect:
 	var activations := 0
 	var events: Array[String] = []
 
-	func on_activate(_car: Node) -> void:
+	func on_activate(_car: Node, _data: Variant) -> bool:
 		activations += 1
+		return true
 
 	func on_event(_car: Node, event: String, _data: Variant) -> void:
 		events.append(event)
@@ -318,4 +319,41 @@ func test_overboost_doubles_engine_damage() -> void:
 	assert_almost_eq(car.stats.get_stat("max_torque"), car.stats.base["max_torque"] * 1.35, 0.0001, "power bonus")
 	car.damage.apply_damage("engine", 10.0)
 	assert_almost_eq(car.damage.condition["engine"], 80.0, 0.0001, "double engine damage")
+	_free_nodes()
+
+
+class RefusingEffect extends ItemEffect:
+	var refuse := true
+
+	func on_activate(_car: Node, _data: Variant) -> bool:
+		return not refuse
+
+
+func test_failed_activation_starts_no_cooldown() -> void:
+	var manager := _manager()
+	var def := _active("jacks", ItemDef.Mount.TRUNK, ItemDef.Activation.BUTTON, 6.0)
+	def.effect = RefusingEffect.new()
+	manager.add_item(def)
+	manager.activate_button()
+	assert_almost_eq(manager.cooldowns[ItemDef.Mount.TRUNK], 0.0, 0.0001, "refused: no cooldown")
+	def.effect.refuse = false
+	manager.activate_button()
+	assert_almost_eq(manager.cooldowns[ItemDef.Mount.TRUNK], 6.0, 0.0001, "fired: cooldown starts")
+	_free_nodes()
+
+
+func test_bullbar_halves_front_impact_damage() -> void:
+	var car := _fake_car()
+	car.damage.apply_impact(car.stats, Vector3(0.8, 0.0, -1.9), 13.0, false)
+	var bare: float = 100.0 - car.damage.condition["tire_fr"]
+	var rear_bare: float = 100.0 - car.damage.condition["tire_rr"]
+	var armoured := _fake_car()
+	armoured.items.add_item(load("res://data/items/bullbar.tres"))
+	armoured.damage.apply_impact(armoured.stats, Vector3(0.8, 0.0, -1.9), 13.0, false)
+	assert_true(bare > 0.0, "bare front hit damages the tire")
+	assert_almost_eq(100.0 - armoured.damage.condition["tire_fr"], bare * 0.5, 0.0001, "bullbar halves front damage")
+	armoured.damage.apply_impact(armoured.stats, Vector3(0.8, 0.0, 1.9), 13.0, false)
+	car.damage.apply_impact(car.stats, Vector3(0.8, 0.0, 1.9), 13.0, false)
+	assert_almost_eq(armoured.damage.condition["tire_rr"], car.damage.condition["tire_rr"], 0.0001, "rear hits unchanged")
+	assert_almost_eq(rear_bare, 0.0, 0.0001, "front hit left the rear alone")
 	_free_nodes()

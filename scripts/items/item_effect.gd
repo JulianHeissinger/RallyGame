@@ -4,9 +4,10 @@ extends Resource
 ## reuse existing effects and modifiers are pure `.tres` data.
 
 
-## Called when a mounted item fires, by button or by its trigger event.
-func on_activate(_car: Node) -> void:
-	pass
+## Called when a mounted item fires, by button (`data` null) or by its trigger event (the event's
+## data). Returns false when it could not fire (e.g. airborne); then no cooldown starts.
+func on_activate(_car: Node, _data: Variant) -> bool:
+	return true
 
 
 ## Called for every car or stage event while the item's condition is met, once per owned copy.

@@ -81,7 +81,7 @@ func activate_button() -> void:
 	for slot: int in mounts:
 		var def: ItemDef = mounts[slot]
 		if def.activation == ItemDef.Activation.BUTTON:
-			_fire(slot)
+			_fire(slot, null)
 
 
 ## Passes `event` to the effects of items whose condition is met, once per owned copy, and fires
@@ -94,16 +94,16 @@ func on_event(event: String, data: Variant = null) -> void:
 	for slot: int in mounts:
 		var def: ItemDef = mounts[slot]
 		if def.activation == ItemDef.Activation.TRIGGER and def.trigger_event == event:
-			_fire(slot)
+			_fire(slot, data)
 
 
-func _fire(slot: int) -> void:
+## Fires a ready item; the cooldown starts only if its effect fired.
+func _fire(slot: int, data: Variant) -> void:
 	var def: ItemDef = mounts[slot]
 	if cooldowns[slot] > 0.0 or not _active.has(def.id):
 		return
-	cooldowns[slot] = def.cooldown
-	if def.effect:
-		def.effect.on_activate(_car)
+	if def.effect == null or def.effect.on_activate(_car, data):
+		cooldowns[slot] = def.cooldown
 
 
 func _all_items() -> Array[ItemDef]:

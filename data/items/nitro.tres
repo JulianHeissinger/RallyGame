@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/nitro_effect.gd" id="1_crr0w"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_46h77"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_wlbxn"]
+
+[sub_resource type="Resource" id="Resource_e2cci"]
+script = ExtResource("1_crr0w")
+
+[resource]
+script = ExtResource("3_wlbxn")
+id = "nitro"
+name = "Nitro"
+description = "Press to spend boost for a 1.5 s push. Refills the boost meter slowly."
+kind = 1
+mount = 3
+activation = 1
+cooldown = 3.0
+effect = SubResource("Resource_e2cci")

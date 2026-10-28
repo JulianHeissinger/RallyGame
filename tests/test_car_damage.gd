@@ -110,6 +110,7 @@ func _impact_stats() -> StatBlock:
 		"impact_damage": 4.0,
 		"impact_chassis_share": 0.3,
 		"lethal_impact_speed": 18.0,
+		"front_impact_damage_taken": 1.0,
 	})
 
 
