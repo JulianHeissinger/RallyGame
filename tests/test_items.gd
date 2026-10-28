@@ -12,6 +12,14 @@ class CountingEffect extends ItemEffect:
 		events.append(event)
 
 
+## Stand-in for `Car` with the parts item effects use.
+class FakeCar extends Node:
+	var stats: StatBlock
+	var damage: CarDamage
+	var items: ItemManager
+	var drivetrain := Drivetrain.new()
+
+
 ## Nodes made by a test, freed by `_free_nodes()` at its end.
 var _nodes: Array[Node] = []
 
@@ -131,11 +139,11 @@ func test_condition_toggles_on_break_and_repair() -> void:
 	manager.add_item(def)
 	manager.on_event("drift")
 	assert_almost_eq(stats.get_stat("tire_friction"), 1.0, 0.0001, "off with intact brakes")
-	assert_eq(def.effect.events.size(), 0, "no events while off")
+	assert_eq(def.effect.events.count("drift"), 0, "no events while off")
 	damage.apply_damage("brake_rl", 100.0)
 	manager.on_event("drift")
 	assert_almost_eq(stats.get_stat("tire_friction"), 2.0, 0.0001, "on once a brake breaks")
-	assert_eq(def.effect.events.size(), 1, "events while on")
+	assert_eq(def.effect.events.count("drift"), 1, "events while on")
 	damage.condition["brake_rl"] = 100.0
 	manager.update_conditions()
 	assert_almost_eq(stats.get_stat("tire_friction"), 1.0, 0.0001, "off again after repair")
@@ -220,4 +228,94 @@ func test_boost_meter_caps_and_refuses_overspend() -> void:
 	assert_true(manager.spend_boost(0.6), "spend with enough boost")
 	assert_false(manager.spend_boost(0.6), "spend refused without enough boost")
 	assert_almost_eq(manager.boost, 0.4, 0.0001, "refused spend takes nothing")
+	_free_nodes()
+
+
+func _fake_car() -> FakeCar:
+	var car := FakeCar.new()
+	car.stats = StatBlock.new(load("res://data/cars/prototype.tres").stats)
+	car.damage = CarDamage.new()
+	car.damage.stats = car.stats
+	car.items = ItemManager.new()
+	car.items.setup(car, car.stats, car.damage)
+	_nodes.append_array([car, car.damage, car.items])
+	return car
+
+
+func test_drift_king_fills_boost_and_doubles_with_broken_brake() -> void:
+	var car := _fake_car()
+	car.items.add_item(load("res://data/items/drift_king.tres"))
+	car.items.on_event("drift", {"delta": 1.0, "slip_deg": 20.0})
+	assert_almost_eq(car.items.boost, 0.15, 0.0001, "one second of drift")
+	car.items.on_event("jump")
+	assert_almost_eq(car.items.boost, 0.15, 0.0001, "other events do not fill")
+	car.damage.apply_damage("brake_fr", 100.0)
+	car.items.on_event("drift", {"delta": 1.0, "slip_deg": 20.0})
+	assert_almost_eq(car.items.boost, 0.45, 0.0001, "twice as fast with a broken brake")
+	car.items.add_item(load("res://data/items/drift_king.tres"))
+	car.items.on_event("drift", {"delta": 1.0, "slip_deg": 20.0})
+	assert_almost_eq(car.items.boost, 1.0, 0.0001, "two copies fill twice, capped at 1")
+	_free_nodes()
+
+
+func test_gearbox_of_chaos_lands_in_another_gear_and_holds() -> void:
+	var car := _fake_car()
+	car.items.add_item(load("res://data/items/gearbox_of_chaos.tres"))
+	assert_almost_eq(car.stats.get_stat("max_torque"), car.stats.base["max_torque"] * 1.25, 0.0001, "power bonus")
+	var gearbox := car.drivetrain.gearbox
+	for i in 20:
+		gearbox.gear = 2
+		gearbox.gear_shifted.emit(1, 2)
+		car.items.on_event("gear_shift", {"from": 1, "to": 2})
+		assert_true(gearbox.gear != 2 and gearbox.gear >= 1 and gearbox.gear <= 5, "random other forward gear, got %d" % gearbox.gear)
+	car.items.on_event("gear_shift", {"from": 1, "to": Gearbox.NEUTRAL})
+	assert_true(gearbox.gear >= 1, "shifts into neutral are left alone")
+	# Automatic mode wants 2nd at this speed; the forced 1st holds for 1.5 s.
+	gearbox.force_gear(1, 1.5)
+	var input := InputSource.new()
+	var speed := 30.0
+	var spin := speed / car.stats.get_stat("wheel_radius")
+	for i in 168:
+		gearbox.update(input, spin, speed, car.stats, 1.0 / 120.0)
+	assert_eq(gearbox.gear, 1, "held for 1.4 s")
+	for i in 120:
+		gearbox.update(input, spin, speed, car.stats, 1.0 / 120.0)
+	assert_true(gearbox.gear > 1, "shifts again after the hold")
+	_free_nodes()
+
+
+func test_underdog_adds_power_per_broken_part() -> void:
+	var car := _fake_car()
+	var base: float = car.stats.base["max_torque"]
+	car.items.add_item(load("res://data/items/underdog.tres"))
+	assert_almost_eq(car.stats.get_stat("max_torque"), base, 0.0001, "no broken parts")
+	car.damage.apply_damage("tire_fl", 100.0)
+	car.damage.apply_damage("brake_rr", 100.0)
+	assert_almost_eq(car.stats.get_stat("max_torque"), base * 1.1, 0.0001, "two broken parts")
+	car.damage.repair("brake_rr", 50.0)
+	assert_almost_eq(car.stats.get_stat("max_torque"), base * 1.05, 0.0001, "repair removes the bonus")
+	_free_nodes()
+
+
+func test_lucky_dice_repairs_and_prevents_immobilization() -> void:
+	var car := _fake_car()
+	var dice: ItemDef = load("res://data/items/lucky_dice.tres").duplicate(true)
+	dice.effect.chance = 1.0
+	car.items.add_item(dice)
+	car.damage.apply_damage("engine", 100.0)
+	assert_almost_eq(car.damage.condition["engine"], 30.0, 0.0001, "broken engine repaired to 30")
+	assert_false(car.damage.is_immobilized, "repaired before the immobilize check")
+	dice.effect.chance = 0.0
+	car.damage.apply_damage("engine", 100.0)
+	assert_true(car.damage.is_immobilized, "no repair on a failed roll")
+	_free_nodes()
+
+
+func test_overboost_doubles_engine_damage() -> void:
+	var car := _fake_car()
+	car.items.add_item(load("res://data/items/overboost.tres"))
+	assert_true(load("res://data/items/overboost.tres").cursed, "marked cursed")
+	assert_almost_eq(car.stats.get_stat("max_torque"), car.stats.base["max_torque"] * 1.35, 0.0001, "power bonus")
+	car.damage.apply_damage("engine", 10.0)
+	assert_almost_eq(car.damage.condition["engine"], 80.0, 0.0001, "double engine damage")
 	_free_nodes()

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_qurc4"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_sy3as"]
+
+[sub_resource type="Resource" id="Resource_sllvr"]
+script = ExtResource("1_qurc4")
+stat = "max_torque"
+multiplier = 1.35
+
+[sub_resource type="Resource" id="Resource_8nbqr"]
+script = ExtResource("1_qurc4")
+stat = "engine_damage_taken"
+multiplier = 2.0
+
+[resource]
+script = ExtResource("2_sy3as")
+id = "overboost"
+name = "Overboost"
+description = "+35% engine power. Drawback: the engine takes double damage."
+cursed = true
+modifiers = Array[ExtResource("1_qurc4")]([SubResource("Resource_sllvr"), SubResource("Resource_8nbqr")])

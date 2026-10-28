@@ -9,6 +9,17 @@ func on_activate(_car: Node) -> void:
 	pass
 
 
-## Called for every car or stage event while the item's condition is met.
+## Called for every car or stage event while the item's condition is met, once per owned copy.
 func on_event(_car: Node, _event: String, _data: Variant) -> void:
 	pass
+
+
+## Called every physics tick while the item's condition is met, once per owned copy.
+func on_physics(_car: Node, _delta: float) -> void:
+	pass
+
+
+## Modifiers that depend on the car's state, added to the item's own. Re-read whenever a part
+## breaks or is repaired; they stack per copy like the item's own modifiers.
+func dynamic_modifiers(_car: Node) -> Array[StatModifier]:
+	return []

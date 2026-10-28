@@ -85,9 +85,6 @@ func _ready() -> void:
 	collided.connect(func(body: Object, speed: float, point: Vector3) -> void:
 		items.on_event("collision", {"body": body, "speed": speed, "point": point}))
 	rolled_over.connect(func(penalty: float) -> void: items.on_event("rolled_over", {"penalty": penalty}))
-	damage.part_damaged.connect(func(part: String, amount: float) -> void:
-		items.on_event("part_damaged", {"part": part, "amount": amount}))
-	damage.part_broken.connect(func(part: String) -> void: items.on_event("part_broken", {"part": part}))
 	for child in get_children():
 		if child is Wheel:
 			wheels.append(child)

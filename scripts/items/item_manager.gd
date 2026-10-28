@@ -23,14 +23,23 @@ func setup(car: Node, stats: StatBlock, damage: CarDamage) -> void:
 	_car = car
 	_stats = stats
 	_damage = damage
-	_damage.part_broken.connect(func(_part: String) -> void: update_conditions())
-	_damage.part_repaired.connect(func(_part: String) -> void: update_conditions())
+	# Recompute first, so effects see the new conditions; dynamic modifiers depend on parts too.
+	_damage.part_broken.connect(func(part: String) -> void:
+		_recompute()
+		on_event("part_broken", {"part": part}))
+	_damage.part_repaired.connect(func(_part: String) -> void: _recompute())
+	_damage.part_damaged.connect(func(part: String, amount: float) -> void:
+		on_event("part_damaged", {"part": part, "amount": amount}))
 	_recompute()
 
 
 func _physics_process(delta: float) -> void:
 	for slot: int in cooldowns:
 		cooldowns[slot] = maxf(cooldowns[slot] - delta, 0.0)
+	for def in _all_items():
+		if def.effect and _active.has(def.id):
+			for i in _count(def):
+				def.effect.on_physics(_car, delta)
 
 
 ## Passive items add a stack; active items replace whatever is in their mount slot.
@@ -46,8 +55,8 @@ func add_item(def: ItemDef) -> void:
 	_recompute()
 
 
-## Re-checks broken-part conditions and recomputes stats when one flips. Runs on `part_broken`
-## and `part_repaired`.
+## Re-checks broken-part conditions and recomputes stats when one flips. For condition changes
+## outside `part_broken` and `part_repaired`, which recompute anyway.
 func update_conditions() -> void:
 	for def in _all_items():
 		if _condition_met(def) != _active.has(def.id):
@@ -75,12 +84,13 @@ func activate_button() -> void:
 			_fire(slot)
 
 
-## Passes `event` to the effects of items whose condition is met, and fires ready TRIGGER items
-## listening for it.
+## Passes `event` to the effects of items whose condition is met, once per owned copy, and fires
+## ready TRIGGER items listening for it.
 func on_event(event: String, data: Variant = null) -> void:
 	for def in _all_items():
 		if def.effect and _active.has(def.id):
-			def.effect.on_event(_car, event, data)
+			for i in _count(def):
+				def.effect.on_event(_car, event, data)
 	for slot: int in mounts:
 		var def: ItemDef = mounts[slot]
 		if def.activation == ItemDef.Activation.TRIGGER and def.trigger_event == event:
@@ -105,6 +115,11 @@ func _all_items() -> Array[ItemDef]:
 	return items
 
 
+## Owned copies: the passive stack size, or 1 for a mounted item.
+func _count(def: ItemDef) -> int:
+	return passives[def.id]["count"] if passives.has(def.id) else 1
+
+
 func _condition_met(def: ItemDef) -> bool:
 	if def.condition_broken.is_empty():
 		return true
@@ -115,7 +130,7 @@ func _condition_met(def: ItemDef) -> bool:
 	return false
 
 
-## Rebuilds the additive and multiplicative item modifiers from scratch.
+## Rebuilds the additive and multiplicative item modifiers, static and from effects, from scratch.
 func _recompute() -> void:
 	_active.clear()
 	_stats.additive.clear()
@@ -124,8 +139,11 @@ func _recompute() -> void:
 		if not _condition_met(def):
 			continue
 		_active[def.id] = true
-		var count: int = passives[def.id]["count"] if passives.has(def.id) else 1
-		for modifier in def.modifiers:
+		var count := _count(def)
+		var modifiers := def.modifiers.duplicate()
+		if def.effect:
+			modifiers.append_array(def.effect.dynamic_modifiers(_car))
+		for modifier: StatModifier in modifiers:
 			_stats.additive[modifier.stat] = _stats.additive.get(modifier.stat, 0.0) + modifier.additive * count
 			_stats.multiplicative[modifier.stat] = _stats.multiplicative.get(modifier.stat, 1.0) * pow(modifier.multiplier, count)
 	_stats.mark_dirty()

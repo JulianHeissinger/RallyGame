@@ -19,6 +19,8 @@ var gear := 1
 
 var _target_gear := 1
 var _shift_timer := 0.0
+## Seconds automatic mode keeps a forced gear before choosing again.
+var _hold := 0.0
 
 
 func is_shifting() -> bool:
@@ -54,6 +56,9 @@ func update(input: InputSource, mean_spin: float, speed: float, stats: StatBlock
 		next = _choose_manual(input, mean_spin, speed, stats)
 	elif is_shifting():
 		return
+	elif _hold > 0.0:
+		_hold -= delta
+		return
 	else:
 		next = _choose_automatic(input, speed, stats)
 	if next == _target_gear:
@@ -61,6 +66,15 @@ func update(input: InputSource, mean_spin: float, speed: float, stats: StatBlock
 	_target_gear = next
 	# Shifting back to the engaged gear mid-shift cancels the shift.
 	_shift_timer = 0.0 if next == gear else stats.get_stat("shift_time")
+
+
+## Engages `g` at once, without a shift or `gear_shifted`, and keeps automatic mode from
+## choosing another gear for `hold` seconds (Gearbox of Chaos).
+func force_gear(g: int, hold: float) -> void:
+	gear = g
+	_target_gear = g
+	_shift_timer = 0.0
+	_hold = hold
 
 
 ## Manual presses act on the target gear, so quick repeated presses chain.
