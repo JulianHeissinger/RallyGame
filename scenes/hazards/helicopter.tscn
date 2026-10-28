@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/force_area.gd" id="1_force"]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.15, 0.25, 0.6, 1)
+
+[sub_resource type="BoxMesh" id="BodyMesh"]
+material = SubResource("Paint")
+size = Vector3(1.6, 1.6, 4)
+
+[sub_resource type="BoxMesh" id="TailMesh"]
+material = SubResource("Paint")
+size = Vector3(0.3, 0.4, 4)
+
+[sub_resource type="StandardMaterial3D" id="Rotor"]
+albedo_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="RotorMesh"]
+material = SubResource("Rotor")
+size = Vector3(10, 0.05, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="Dust"]
+transparency = 1
+albedo_color = Color(0.75, 0.62, 0.42, 0.4)
+
+[sub_resource type="TorusMesh" id="DustMesh"]
+material = SubResource("Dust")
+inner_radius = 4.5
+outer_radius = 6.0
+
+[node name="Helicopter" type="Node3D"]
+script = ExtResource("1_force")
+radius = 6.0
+push = Vector3(0, -2, 0)
+outward = 12.0
+spin_visual = 20.0
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0)
+mesh = SubResource("BodyMesh")
+
+[node name="Tail" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15.3, 3.8)
+mesh = SubResource("TailMesh")
+
+[node name="Spin" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0)
+
+[node name="Blade0" type="MeshInstance3D" parent="Spin"]
+mesh = SubResource("RotorMesh")
+
+[node name="Blade1" type="MeshInstance3D" parent="Spin"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0, 0, 0)
+mesh = SubResource("RotorMesh")
+
+[node name="DustRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.05, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("DustMesh")
