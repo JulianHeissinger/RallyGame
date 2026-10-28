@@ -6,6 +6,7 @@ extends Node
 signal part_damaged(part: String, amount: float)
 signal part_broken(part: String)
 signal immobilized(cause: String)
+signal part_repaired(part: String)
 
 const PARTS: Array[String] = [
 	"tire_fl", "tire_fr", "tire_rl", "tire_rr",
@@ -86,6 +87,15 @@ func update_wear(stats: StatBlock, delta: float, speed: float) -> void:
 			continue
 		_set_condition(part, c - rate * (1.0 + (100.0 - c) / acceleration) * delta)
 		_check_broken(part)
+
+
+## Raises `part` to `value` (at most 100). Does not undo immobilization.
+func repair(part: String, value: float) -> void:
+	value = minf(value, 100.0)
+	if value <= condition[part]:
+		return
+	_set_condition(part, value)
+	part_repaired.emit(part)
 
 
 ## Ends the run for this car. Emits `immobilized` once. Lethal impacts call it directly; part

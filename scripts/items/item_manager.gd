@@ -9,6 +9,8 @@ var passives: Dictionary = {}
 var mounts: Dictionary = {}
 ## Seconds left per mount slot.
 var cooldowns: Dictionary = {}
+## Boost meter from 0 to 1 that items fill (drifting) and spend (nitro).
+var boost := 0.0
 
 var _car: Node
 var _stats: StatBlock
@@ -22,6 +24,7 @@ func setup(car: Node, stats: StatBlock, damage: CarDamage) -> void:
 	_stats = stats
 	_damage = damage
 	_damage.part_broken.connect(func(_part: String) -> void: update_conditions())
+	_damage.part_repaired.connect(func(_part: String) -> void: update_conditions())
 	_recompute()
 
 
@@ -43,13 +46,25 @@ func add_item(def: ItemDef) -> void:
 	_recompute()
 
 
-## Re-checks broken-part conditions and recomputes stats when one flips. Runs on `part_broken`;
-## call it after a repair.
+## Re-checks broken-part conditions and recomputes stats when one flips. Runs on `part_broken`
+## and `part_repaired`.
 func update_conditions() -> void:
 	for def in _all_items():
 		if _condition_met(def) != _active.has(def.id):
 			_recompute()
 			return
+
+
+func fill_boost(amount: float) -> void:
+	boost = minf(boost + amount, 1.0)
+
+
+## Spends `amount` of boost. Returns false and spends nothing when there is not enough.
+func spend_boost(amount: float) -> bool:
+	if boost < amount:
+		return false
+	boost -= amount
+	return true
 
 
 ## Fires every ready BUTTON item.

@@ -193,3 +193,31 @@ func test_damage_taken_scales_part_damage() -> void:
 	assert_almost_eq(damage.condition["brake_fl"], 90.0, 0.0001, "other groups unchanged")
 	_free_nodes()
 	damage.free()
+
+
+func test_repair_raises_condition_and_flips_condition() -> void:
+	var stats := StatBlock.new({"tire_friction": 1.0})
+	var damage := CarDamage.new()
+	var manager := _manager(stats, damage)
+	manager.add_item(_passive("drift_king", "tire_friction", 2.0, "brake"))
+	damage.apply_damage("brake_fl", 100.0)
+	assert_almost_eq(stats.get_stat("tire_friction"), 2.0, 0.0001, "on with a broken brake")
+	damage.repair("brake_fl", 150.0)
+	assert_almost_eq(damage.condition["brake_fl"], 100.0, 0.0001, "repair caps at 100")
+	assert_almost_eq(stats.get_stat("tire_friction"), 1.0, 0.0001, "repair turns the condition off")
+	damage.apply_damage("tire_fl", 50.0)
+	damage.repair("tire_fl", 30.0)
+	assert_almost_eq(damage.condition["tire_fl"], 50.0, 0.0001, "repair never lowers a condition")
+	_free_nodes()
+	damage.free()
+
+
+func test_boost_meter_caps_and_refuses_overspend() -> void:
+	var manager := _manager()
+	manager.fill_boost(0.7)
+	manager.fill_boost(0.7)
+	assert_almost_eq(manager.boost, 1.0, 0.0001, "fill caps at 1")
+	assert_true(manager.spend_boost(0.6), "spend with enough boost")
+	assert_false(manager.spend_boost(0.6), "spend refused without enough boost")
+	assert_almost_eq(manager.boost, 0.4, 0.0001, "refused spend takes nothing")
+	_free_nodes()

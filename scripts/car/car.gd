@@ -5,11 +5,31 @@ extends RigidBody3D
 
 ## Emitted after spectators put the car back on its wheels; `penalty` is in seconds.
 signal rolled_over(penalty: float)
+## Emitted every physics tick while the car drifts; `slip_deg` is the body slip angle.
+signal drifted(delta: float, slip_deg: float)
+## Emitted when a drift ends; `duration` is in seconds.
+signal drift_ended(duration: float)
+## Emitted once all four wheels have been off the ground for `JUMP_MIN_AIR_TIME`.
+signal jumped
+## Emitted on the first wheel contact after a jump; `air_time` counts from takeoff.
+signal landed(air_time: float)
+## Emitted for each impact; `point` is in car space.
+signal collided(body: Object, speed: float, point: Vector3)
 
 ## The car counts as rolled over while its up axis is below this against world up (~73° tilt).
 const ROLLOVER_UP_DOT := 0.3
 ## Height in m the car is lifted on a rollover reset, so the wheels drop onto the ground.
 const ROLLOVER_LIFT := 1.0
+## A drift starts after `DRIFT_START_TIME` s with body slip of at least `DRIFT_START_SLIP_DEG` at
+## `DRIFT_MIN_SPEED` m/s or more and two wheels grounded. It ends below `DRIFT_END_SLIP_DEG`, below
+## `DRIFT_MIN_SPEED`, or after `DRIFT_MAX_AIR_TIME` s with fewer than two wheels grounded.
+const DRIFT_START_SLIP_DEG := 12.0
+const DRIFT_END_SLIP_DEG := 6.0
+const DRIFT_MIN_SPEED := 8.0
+const DRIFT_START_TIME := 0.2
+const DRIFT_MAX_AIR_TIME := 0.3
+## Seconds with all wheels off the ground before the car counts as jumping.
+const JUMP_MIN_AIR_TIME := 0.15
 
 @export var car_stats: CarStats
 
@@ -31,6 +51,17 @@ var _impacted_once: Dictionary = {}
 var _last_velocity := Vector3.ZERO
 var _last_angular_velocity := Vector3.ZERO
 var _rollover_timer := 0.0
+## Seconds the drift start conditions have held, while not drifting.
+var _drift_build := 0.0
+var _drifting := false
+var _drift_time := 0.0
+## Seconds with fewer than two wheels grounded during a drift.
+var _drift_air := 0.0
+## Seconds with no wheel grounded.
+var _air_time := 0.0
+var _jumping := false
+## True from `place` until a wheel touches ground, so the drop after a reset is no jump.
+var _placed := false
 
 @onready var damage: CarDamage = $Damage
 @onready var items: ItemManager = $Items
@@ -46,6 +77,17 @@ func _ready() -> void:
 	items.setup(self, stats, damage)
 	drivetrain.gearbox.gear_shifted.connect(
 		func(from: int, to: int) -> void: items.on_event("gear_shift", {"from": from, "to": to}))
+	drifted.connect(func(delta: float, slip_deg: float) -> void:
+		items.on_event("drift", {"delta": delta, "slip_deg": slip_deg}))
+	drift_ended.connect(func(duration: float) -> void: items.on_event("drift_end", {"duration": duration}))
+	jumped.connect(func() -> void: items.on_event("jump"))
+	landed.connect(func(air_time: float) -> void: items.on_event("landing", {"air_time": air_time}))
+	collided.connect(func(body: Object, speed: float, point: Vector3) -> void:
+		items.on_event("collision", {"body": body, "speed": speed, "point": point}))
+	rolled_over.connect(func(penalty: float) -> void: items.on_event("rolled_over", {"penalty": penalty}))
+	damage.part_damaged.connect(func(part: String, amount: float) -> void:
+		items.on_event("part_damaged", {"part": part, "amount": amount}))
+	damage.part_broken.connect(func(part: String) -> void: items.on_event("part_broken", {"part": part}))
 	for child in get_children():
 		if child is Wheel:
 			wheels.append(child)
@@ -76,6 +118,52 @@ func _physics_process(delta: float) -> void:
 		wheel.update_tire(self, stats, delta)
 		wheel.update_visual(stats, delta)
 	_apply_yaw_assist()
+	_update_air(delta)
+	_update_drift(delta)
+
+
+## Emits `jumped` once the car has been fully airborne for `JUMP_MIN_AIR_TIME`, then `landed`.
+## A car on its side or roof, or dropping after `place`, is not jumping.
+func _update_air(delta: float) -> void:
+	if global_basis.y.dot(Vector3.UP) < ROLLOVER_UP_DOT:
+		_jumping = false
+		_air_time = 0.0
+		return
+	if wheels.any(func(w: Wheel) -> bool: return w.is_grounded):
+		_placed = false
+		if _jumping:
+			landed.emit(_air_time)
+		_jumping = false
+		_air_time = 0.0
+		return
+	_air_time += delta
+	if not _jumping and not _placed and _air_time >= JUMP_MIN_AIR_TIME:
+		_jumping = true
+		jumped.emit()
+
+
+## Emits `drifted` every tick while drifting and `drift_ended` when the drift ends.
+func _update_drift(delta: float) -> void:
+	var speed := linear_velocity.length()
+	var slip := rad_to_deg(absf(atan2(linear_velocity.dot(global_basis.x), linear_velocity.dot(-global_basis.z)))) \
+			if speed > 0.1 else 0.0
+	var grounded := wheels.filter(func(w: Wheel) -> bool: return w.is_grounded).size() >= 2
+	if not _drifting:
+		var starting := slip >= DRIFT_START_SLIP_DEG and speed >= DRIFT_MIN_SPEED and grounded
+		_drift_build = _drift_build + delta if starting else 0.0
+		if _drift_build < DRIFT_START_TIME:
+			return
+		_drifting = true
+		_drift_time = 0.0
+		_drift_air = 0.0
+	_drift_air = 0.0 if grounded else _drift_air + delta
+	if slip < DRIFT_END_SLIP_DEG or speed < DRIFT_MIN_SPEED or _drift_air >= DRIFT_MAX_AIR_TIME:
+		_drifting = false
+		_drift_build = 0.0
+		drift_ended.emit(_drift_time)
+		return
+	_drift_time += delta
+	drifted.emit(delta, slip)
 
 
 ## Combines the patches under a grounded wheel: grip factors multiply, drags add up.
@@ -144,6 +232,7 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 			_impacted_once[collider.get_instance_id()] = true
 		damage.apply_impact(stats, to_local(impact[0]), impact[1], collider.is_in_group("solid"),
 			collider.get_meta("impact_scale", 1.0))
+		collided.emit(collider, impact[1], to_local(impact[0]))
 	_touching = touching
 	_last_velocity = state.linear_velocity
 	_last_angular_velocity = state.angular_velocity
@@ -189,5 +278,8 @@ func place(target: Transform3D) -> void:
 	angular_velocity = Vector3.ZERO
 	_last_velocity = Vector3.ZERO
 	_last_angular_velocity = Vector3.ZERO
+	_jumping = false
+	_placed = true
+	_air_time = 0.0
 	for wheel in wheels:
 		wheel.spin = 0.0
