@@ -76,12 +76,16 @@ func spend_boost(amount: float) -> bool:
 	return true
 
 
-## Fires every ready BUTTON item.
-func activate_button() -> void:
-	for slot: int in mounts:
-		var def: ItemDef = mounts[slot]
-		if def.activation == ItemDef.Activation.BUTTON:
-			_fire(slot, null)
+## Fires the BUTTON item in mount slot `slot` if it is ready.
+func activate_mount(slot: int) -> void:
+	var def: ItemDef = mounts.get(slot)
+	if def and def.activation == ItemDef.Activation.BUTTON:
+		_fire(slot, null)
+
+
+## True while the item's broken-part condition is met (always for items without one).
+func is_active(def: ItemDef) -> bool:
+	return _active.has(def.id)
 
 
 ## Passes `event` to the effects of items whose condition is met, once per owned copy, and fires

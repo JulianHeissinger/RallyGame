@@ -108,6 +108,7 @@ func _setup_upgrades() -> void:
 	add_child(_meter)
 	_pick.name = "UpgradePick"
 	add_child(_pick)
+	_hud.meter = _meter
 	_meter.filled.connect(_queue_pick)
 	hazard_defeated.connect(func(_hazard: Node) -> void: _meter.add_hazard_bonus())
 	_pick.picked.connect(_on_picked)

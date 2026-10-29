@@ -28,11 +28,15 @@ Active items SHALL occupy one of four mount points (roof, front bumper, rear/exh
 - **THEN** the new item replaces the old one
 
 ### Requirement: Trigger and button activation
-An active item SHALL activate either automatically on a game event (e.g. drift, jump, gear shift, ram, part broken) or when the player presses the activate button, and SHALL respect its cooldown in both cases.
+An active item SHALL activate either automatically on a game event (e.g. drift, jump, gear shift, ram, part broken) or when the player presses its mount point's activate button, and SHALL respect its cooldown in both cases. Each mount point's button SHALL fire only the item on that mount point.
 
 #### Scenario: Button item on cooldown
 - **WHEN** the player presses activate while the button item is on cooldown
 - **THEN** nothing happens
+
+#### Scenario: Two button items
+- **WHEN** button items are mounted on the roof and in the trunk and the player presses the trunk button
+- **THEN** only the trunk item activates
 
 #### Scenario: Trigger item fires
 - **WHEN** the car lands a jump and a mounted item triggers on jumps
@@ -60,7 +64,7 @@ The prototype SHALL include at least: three passive stat items (grip, power, let
 - **THEN** the sheep is knocked away and front parts take less damage than without the bullbar
 
 ### Requirement: Mid-stage upgrade pick
-Distance driven SHALL fill an upgrade meter, and defeating hazards SHALL add a small bonus. When full, the game SHALL slow time and offer three random items. The player SHALL pick one with the driving controls; if no pick is made within a few seconds, the first offer is taken.
+Distance driven SHALL fill an upgrade meter, and defeating hazards SHALL add a small bonus. When full, the game SHALL slow time and offer three random items. The player SHALL pick one with the driving controls (steering moves, handbrake confirms); if no pick is made within a few seconds, the first offer is taken.
 
 #### Scenario: Meter fills
 - **WHEN** the upgrade meter fills during a stage

@@ -57,7 +57,7 @@ tests/    run_tests.gd + test_*.gd
 - Handling effects: car-wide effects (engine power) go through `StatBlock` damage multipliers. Per-wheel effects (tire grip and rolling drag, brake loss, suspension sag and stiffness) are factors on each `Wheel`, set by the car from the matching parts each tick, because `StatBlock` holds only car-wide stats.
 
 ### Input
-InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `shift_up`, `shift_down`, `activate_item`, `pause`, `ui_*`. Both keyboard and joypad events are bound to each action.
+InputMap actions: `steer_left/right`, `throttle`, `brake`, `handbrake`, `shift_up`, `shift_down`, `item_roof`/`item_front`/`item_rear`/`item_trunk` (keys 1–4, d-pad up/left/right/down), `pause`, `ui_*`. Both keyboard and joypad events are bound to each action.
 
 An `InputSource` object exposes `steer/throttle/brake/handbrake` as floats and `shift_up/shift_down` as just-pressed flags. The car reads only from its assigned source. The single-player source uses the `Input` singleton with keyboard and device 0. A per-device source for couch co-op can be added later without touching the car. Keyboard steering ramps at a rate that drops with speed.
 

@@ -42,6 +42,11 @@ func add_progress(distance: float) -> void:
 	_add(distance / _params.upgrade_distance)
 
 
+## Road distance in m still needed to fill the meter, without hazard bonuses.
+func distance_left() -> float:
+	return (1.0 - value) * _params.upgrade_distance
+
+
 func add_hazard_bonus() -> void:
 	_add(_params.upgrade_hazard_bonus * _stats.get_stat("hazard_bonus_scale"))
 

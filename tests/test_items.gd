@@ -96,7 +96,7 @@ func test_mount_replaces_old_item() -> void:
 	manager.add_item(new)
 	assert_eq(manager.mounts[ItemDef.Mount.FRONT_BUMPER], new, "new item in the slot")
 	assert_eq(manager.mounts[ItemDef.Mount.ROOF], roof, "other slot untouched")
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.FRONT_BUMPER)
 	assert_eq(old.effect.activations, 0, "replaced item no longer fires")
 	assert_eq(new.effect.activations, 1, "new item fires")
 	_free_nodes()
@@ -106,12 +106,33 @@ func test_cooldown_blocks_activation() -> void:
 	var manager := _manager()
 	var nitro := _active("nitro", ItemDef.Mount.TRUNK, ItemDef.Activation.BUTTON, 5.0)
 	manager.add_item(nitro)
-	manager.activate_button()
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.TRUNK)
+	manager.activate_mount(ItemDef.Mount.TRUNK)
 	assert_eq(nitro.effect.activations, 1, "second press on cooldown does nothing")
 	manager._physics_process(5.0)
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.TRUNK)
 	assert_eq(nitro.effect.activations, 2, "fires again after the cooldown")
+	_free_nodes()
+
+
+func test_each_mount_button_fires_only_its_slot() -> void:
+	var manager := _manager()
+	var roof := _active("horn", ItemDef.Mount.ROOF, ItemDef.Activation.BUTTON, 4.0)
+	var trunk := _active("nitro", ItemDef.Mount.TRUNK, ItemDef.Activation.BUTTON, 2.0)
+	manager.add_item(roof)
+	manager.add_item(trunk)
+	manager.activate_mount(ItemDef.Mount.TRUNK)
+	assert_eq(trunk.effect.activations, 1, "trunk button fires the trunk item")
+	assert_eq(roof.effect.activations, 0, "roof item untouched")
+	assert_almost_eq(manager.cooldowns[ItemDef.Mount.ROOF], 0.0, 0.0001, "roof cooldown untouched")
+	manager.activate_mount(ItemDef.Mount.ROOF)
+	assert_eq(roof.effect.activations, 1, "roof button fires the roof item")
+	manager.activate_mount(ItemDef.Mount.FRONT_BUMPER)
+	manager._physics_process(2.0)
+	manager.activate_mount(ItemDef.Mount.TRUNK)
+	manager.activate_mount(ItemDef.Mount.ROOF)
+	assert_eq(trunk.effect.activations, 2, "trunk ready again after its own cooldown")
+	assert_eq(roof.effect.activations, 1, "roof still on its longer cooldown")
 	_free_nodes()
 
 
@@ -125,7 +146,7 @@ func test_trigger_fires_on_event_and_respects_cooldown() -> void:
 	manager.on_event("gear_shift")
 	manager.on_event("gear_shift")
 	assert_eq(exhaust.effect.activations, 1, "trigger on cooldown does nothing")
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.REAR)
 	assert_eq(exhaust.effect.activations, 1, "button does not fire trigger items")
 	assert_eq(exhaust.effect.events, ["jump", "gear_shift", "gear_shift"], "effect receives every event")
 	_free_nodes()
@@ -335,10 +356,10 @@ func test_failed_activation_starts_no_cooldown() -> void:
 	var def := _active("jacks", ItemDef.Mount.TRUNK, ItemDef.Activation.BUTTON, 6.0)
 	def.effect = RefusingEffect.new()
 	manager.add_item(def)
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.TRUNK)
 	assert_almost_eq(manager.cooldowns[ItemDef.Mount.TRUNK], 0.0, 0.0001, "refused: no cooldown")
 	def.effect.refuse = false
-	manager.activate_button()
+	manager.activate_mount(ItemDef.Mount.TRUNK)
 	assert_almost_eq(manager.cooldowns[ItemDef.Mount.TRUNK], 6.0, 0.0001, "fired: cooldown starts")
 	_free_nodes()
 
@@ -383,4 +404,29 @@ func test_roll_hoop_cancels_the_rollover_penalty() -> void:
 	data = {"penalty": 5.0}
 	car.items.on_event("rolled_over", data)
 	assert_almost_eq(data["penalty"], 5.0, 0.0001, "full penalty during cooldown")
+	_free_nodes()
+
+
+func test_hud_lists_items_counts_cooldowns_and_inactive() -> void:
+	var manager := _manager()
+	var tyres := _passive("tyres", "tire_friction", 1.1)
+	tyres.name = "Rally Tyres"
+	manager.add_item(tyres)
+	manager.add_item(tyres)
+	var king := _passive("king", "tire_friction", 1.0, "brake")
+	king.name = "Drift King"
+	manager.add_item(king)
+	var nitro := _active("nitro", ItemDef.Mount.TRUNK, ItemDef.Activation.BUTTON, 3.0)
+	nitro.name = "Nitro"
+	manager.add_item(nitro)
+	var exhaust := _active("exhaust", ItemDef.Mount.REAR, ItemDef.Activation.TRIGGER, 0.5)
+	exhaust.name = "Flame Exhaust"
+	manager.add_item(exhaust)
+	manager.activate_mount(ItemDef.Mount.TRUNK)
+	var text := Hud.items_text(manager, null)
+	assert_true(text.contains("Rally Tyres ×2"), "passive count")
+	assert_true(text.contains("[4] Trunk: Nitro  3.0 s"), "button key and cooldown")
+	assert_true(text.contains("auto Rear: Flame Exhaust  ready"), "trigger item")
+	assert_true(text.contains("Roof: –"), "empty slot")
+	assert_true(text.contains("[color=#808080]Drift King (needs broken brake)[/color]"), "inactive item greyed")
 	_free_nodes()

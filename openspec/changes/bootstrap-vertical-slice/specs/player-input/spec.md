@@ -7,7 +7,7 @@ Defines the player controls on controller and keyboard, both treated as first-cl
 ## ADDED Requirements
 
 ### Requirement: Driving actions
-The game SHALL provide these actions on both controller and keyboard: steer left/right, throttle, brake/reverse, handbrake, shift up, shift down, activate mounted item, pause, and menu confirm/back.
+The game SHALL provide these actions on both controller and keyboard: steer left/right, throttle, brake/reverse, handbrake, shift up, shift down, one activate button per mount point (roof, front bumper, rear, trunk), pause, and menu confirm/back.
 
 #### Scenario: Controller driving
 - **WHEN** a controller is connected and the player uses the left stick, triggers and buttons

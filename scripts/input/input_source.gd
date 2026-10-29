@@ -5,6 +5,8 @@ extends RefCounted
 
 const DEVICE := 0
 const STICK_DEADZONE := 0.1
+## Item button actions in `ItemDef.Mount` order: roof, front bumper, rear, trunk.
+const ITEM_ACTIONS: Array[String] = ["item_roof", "item_front", "item_rear", "item_trunk"]
 
 ## Steering rate toward lock, in full-range units per second, at standstill and at `steer_fast_speed`.
 var steer_rate_slow := 6.0
@@ -21,7 +23,8 @@ var brake := 0.0
 var handbrake := 0.0
 var shift_up_pressed := false
 var shift_down_pressed := false
-var activate_pressed := false
+## Just pressed per item button, indexed like `ITEM_ACTIONS`.
+var item_pressed: Array[bool] = [false, false, false, false]
 ## While true (upgrade pick open) every input reads as released and steering centres at once.
 var blocked := false
 
@@ -35,7 +38,7 @@ func update(delta: float, speed: float) -> void:
 		handbrake = 0.0
 		shift_up_pressed = false
 		shift_down_pressed = false
-		activate_pressed = false
+		item_pressed.fill(false)
 		return
 	var stick := Input.get_joy_axis(DEVICE, JOY_AXIS_LEFT_X)
 	if absf(stick) > STICK_DEADZONE:
@@ -47,7 +50,8 @@ func update(delta: float, speed: float) -> void:
 	handbrake = Input.get_action_strength("handbrake")
 	shift_up_pressed = Input.is_action_just_pressed("shift_up")
 	shift_down_pressed = Input.is_action_just_pressed("shift_down")
-	activate_pressed = Input.is_action_just_pressed("activate_item")
+	for i in ITEM_ACTIONS.size():
+		item_pressed[i] = Input.is_action_just_pressed(ITEM_ACTIONS[i])
 
 
 ## Moves `current` toward `target` at a speed-dependent rate. Moving away from center uses the

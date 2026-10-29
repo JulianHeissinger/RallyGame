@@ -1,7 +1,7 @@
 class_name UpgradePick
 extends CanvasLayer
-## Upgrade pick overlay: one card per offered item. Steering moves the highlight, `activate_item`
-## or `throttle` takes it, and when the real-time timer runs out the highlighted card is taken
+## Upgrade pick overlay: one card per offered item. Steering moves the highlight, `handbrake`
+## (Space) takes it, and when the real-time timer runs out the highlighted card is taken
 ## (the first one unless the player moved). Slow motion does not stretch the timer.
 
 signal picked(def: ItemDef)
@@ -76,7 +76,7 @@ func _process(_delta: float) -> void:
 	elif Input.is_action_just_pressed("steer_right"):
 		_selected = mini(_selected + 1, _offers.size() - 1)
 		_highlight()
-	if left <= 0 or Input.is_action_just_pressed("activate_item") or Input.is_action_just_pressed("throttle"):
+	if left <= 0 or Input.is_action_just_pressed("handbrake"):
 		_take()
 
 

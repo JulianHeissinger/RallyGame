@@ -43,7 +43,7 @@ Crossing the finish line SHALL award prize money that is higher for a faster fin
 - **THEN** the 120 s finish awards more prize money
 
 ### Requirement: In-stage HUD
-During a stage the HUD SHALL show the timer, speed, gear, engine RPM with a shift light, the condition of each part, mounted active items with cooldowns, and the upgrade meter. The HUD SHALL stay minimal and SHALL NOT use arcade-style banners.
+During a stage the HUD SHALL show the timer, speed, gear, engine RPM with a shift light, the condition of each part, owned items (passive items with their count, mounted active items with their button and cooldown), and the upgrade meter with the distance to the next pick. The HUD SHALL stay minimal and SHALL NOT use arcade-style banners.
 
 #### Scenario: Part breaks
 - **WHEN** a tire breaks
