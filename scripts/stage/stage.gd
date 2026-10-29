@@ -99,6 +99,7 @@ func _ready() -> void:
 	_camera.road = path
 	_camera.target = _car
 	_hud.car = _car
+	_hud.timer = timer
 	malfunction.connect(_hud.show_malfunction)
 	hazard_defeated.connect(func(hazard: Node) -> void: _car.items.on_event("hazard_defeated", {"hazard": hazard}))
 	_debug_overlay.car = _car

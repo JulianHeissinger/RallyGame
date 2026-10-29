@@ -1,8 +1,9 @@
 class_name Hud
 extends CanvasLayer
-## In-stage HUD: gear, engine RPM and speed of the target car, the upgrade meter, owned items
-## with mount buttons and cooldowns, plus short notices such as malfunctions, and a white screen
-## flash (paparazzi, fireworks).
+## In-stage HUD: stage timer with penalties, gear, engine RPM with a shift light and speed of the
+## target car, its part conditions (`PartsDisplay`), the upgrade meter, owned items with mount
+## buttons and cooldowns, plus short notices such as malfunctions, and a white screen flash
+## (paparazzi, fireworks).
 
 ## Seconds a notice stays on screen.
 const NOTICE_TIME := 3.0
@@ -11,9 +12,12 @@ const FLASH_TIME := 1.5
 const CORNERS := {"fl": "front-left", "fr": "front-right", "rl": "rear-left", "rr": "rear-right"}
 ## Item rows whose broken-part condition is not met are drawn in this colour.
 const INACTIVE_COLOR := "#808080"
+const SHIFT_LIGHT_ON := Color(1.0, 0.2, 0.15)
+const SHIFT_LIGHT_OFF := Color(0.2, 0.2, 0.22, 0.6)
 
 var car: Car
 var meter: UpgradeMeter
+var timer: StageTimer
 
 var _notice_timer := 0.0
 
@@ -22,6 +26,9 @@ var _notice_timer := 0.0
 @onready var _flash: ColorRect = $Flash
 @onready var _upgrade_bar: ProgressBar = $UpgradeBar
 @onready var _items: RichTextLabel = $Items
+@onready var _timer: Label = $Timer
+@onready var _shift_light: ColorRect = $ShiftLight
+@onready var _parts: PartsDisplay = $Parts
 
 
 func _ready() -> void:
@@ -56,8 +63,15 @@ func _process(delta: float) -> void:
 		_notice_timer -= delta
 		_notice.visible = _notice_timer > 0.0
 	_flash.modulate.a = maxf(_flash.modulate.a - delta / FLASH_TIME, 0.0)
+	_timer.visible = timer != null
+	if timer:
+		_timer.text = time_text(timer.total())
+		if timer.penalties > 0.0:
+			_timer.text += "\n+%.1f s penalty" % timer.penalties
 	if car == null:
 		return
+	_parts.damage = car.damage
+	_shift_light.color = SHIFT_LIGHT_ON if shift_light_on(car.drivetrain.rpm, car.stats) else SHIFT_LIGHT_OFF
 	var gearbox := car.drivetrain.gearbox
 	var gear := "R" if gearbox.gear == Gearbox.REVERSE \
 		else "N" if gearbox.gear == Gearbox.NEUTRAL else str(gearbox.gear)
@@ -67,6 +81,17 @@ func _process(delta: float) -> void:
 	_upgrade_bar.visible = meter != null
 	if meter:
 		_upgrade_bar.value = meter.value
+
+
+## Stage time as m:ss.cc, e.g. 65.0 -> "1:05.00".
+static func time_text(seconds: float) -> String:
+	var minutes := floori(seconds / 60.0)
+	return "%d:%05.2f" % [minutes, seconds - minutes * 60.0]
+
+
+## The shift light is on from the car's `shift_up_rpm`, just below the redline.
+static func shift_light_on(rpm: float, stats: StatBlock) -> bool:
+	return rpm >= stats.get_stat("shift_up_rpm")
 
 
 ## Next-pick distance, one row per mount slot (button key or "auto", item, cooldown) and one row
