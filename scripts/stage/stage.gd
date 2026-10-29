@@ -2,7 +2,8 @@ extends Node3D
 ## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
 ## returns it to the road when it falls out of the world. Seed and difficulty come from `RunState`.
 ## Lifecycle: start picks, then a countdown with the car frozen on the start once it has settled,
-## then the timer runs until the finish line; rollover and respawn penalties add to it.
+## then the timer runs until the finish line; rollover and respawn penalties add to it. The finish
+## awards prize money into `RunState` and opens the finish screen.
 ## `reroll_stage` starts a new run with a new seed and reloads; `cycle_difficulty` (dev key) does
 ## the same with the next difficulty 1-2-3.
 
@@ -23,6 +24,7 @@ const START_DISTANCE := 5.0
 ## so another road part passing near the finish trigger does not finish the stage.
 const FINISH_PROGRESS_TOLERANCE := 5.0
 const MAX_DEV_DIFFICULTY := 3
+const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 ## The car freezes for the countdown once it has dropped onto its wheels: at least this long after
 ## spawn, all wheels grounded, and vertical speed below `SETTLE_SPEED` m/s. Horizontal speed is not
 ## checked; on a sloped start the car already rolls by then.
@@ -60,6 +62,7 @@ var _upgrade_rng: RandomNumberGenerator
 var _pending_picks := 0
 var _meter := UpgradeMeter.new()
 var _pick := UpgradePick.new()
+var _finish_screen: FinishScreen = preload("res://scenes/ui/finish_screen.tscn").instantiate()
 
 @onready var _car: Car = $Car
 @onready var _camera: IsoCameraRig = $IsoCameraRig
@@ -107,6 +110,10 @@ func _ready() -> void:
 	car_respawned.connect(timer.add_penalty)
 	_car.input.blocked = true
 	_setup_upgrades()
+	add_child(_finish_screen)
+	_finish_screen.retry_pressed.connect(_restart.bind(stage_seed))
+	_finish_screen.new_stage_pressed.connect(_restart.bind(0))
+	_finish_screen.menu_pressed.connect(func() -> void: get_tree().change_scene_to_file(MAIN_MENU_SCENE))
 	if not _pick.visible:
 		_start_countdown()
 
@@ -135,6 +142,8 @@ func _setup_upgrades() -> void:
 
 
 func _queue_pick() -> void:
+	if state == State.FINISHED:
+		return
 	if _pick.visible:
 		_pending_picks += 1
 		return
@@ -207,8 +216,7 @@ func _update_malfunctions() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reroll_stage"):
-		RunState.reset(0, difficulty)
-		get_tree().reload_current_scene()
+		_restart(0)
 	elif event.is_action_pressed("cycle_difficulty"):
 		RunState.reset(0, difficulty % MAX_DEV_DIFFICULTY + 1)
 		get_tree().reload_current_scene()
@@ -288,3 +296,21 @@ func _on_finish_area_body_entered(body: Node3D) -> void:
 	state = State.FINISHED
 	timer.stop()
 	car_finished.emit()
+	_close_pick()
+	_car.input.blocked = true
+	var prize := PrizeMoney.award(finish_distance - START_DISTANCE, timer.total(), _params)
+	RunState.prize_money += prize
+	_finish_screen.open(timer, prize)
+
+
+## Starts the stage again with `new_seed` (0 = random) and the same difficulty.
+func _restart(new_seed: int) -> void:
+	RunState.reset(new_seed, difficulty)
+	get_tree().reload_current_scene()
+
+
+## Drops an open upgrade pick and any queued ones, leaving slow motion.
+func _close_pick() -> void:
+	_pick.visible = false
+	_pending_picks = 0
+	Engine.time_scale = 1.0

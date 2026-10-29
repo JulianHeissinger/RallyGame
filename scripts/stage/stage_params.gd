@@ -67,6 +67,12 @@ extends Resource
 ## Seconds from the end of the start picks until the timer starts and the car can move.
 @export var countdown_time := 3.0
 
+@export_group("Prize money")
+## Prize at par time; faster pays up to twice this, slower down to a quarter.
+@export var prize_base := 1000
+## Average speed in m/s that sets the par time over the road from start to finish.
+@export var prize_reference_speed := 20.0
+
 @export_group("Upgrades")
 ## Road distance in m that fills the upgrade meter once.
 @export var upgrade_distance := 800.0
