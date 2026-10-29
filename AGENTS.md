@@ -13,7 +13,7 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 
 ## Godot 4.7 headless
 
-- Project check: `godot --headless --path . --import`. `--quit` hangs with "no main scene defined" until a main scene exists (task 8.2).
+- Project check: `godot --headless --path . --import`. The main scene is `scenes/main_menu.tscn`; open `scenes/stage.tscn` directly (F6) to test drive without the menu.
 - Tests: `godot --headless --path . -s tests/run_tests.gd`. After adding a new `class_name` script, run `--import` once first, or the global class cache does not know the class.
 - Editing the InputMap: generate it with a one-off script (outside the repo) that uses `ProjectSettings.set_setting` and `ProjectSettings.save()`, not by hand. Set key events to `device = -1` (the default is 16) to match editor output. `save()` drops settings equal to their defaults (e.g. `renderer/rendering_method="forward_plus"`); that is expected.
 - New scripts and test files get their `.uid` only on the next `--import`; run it again before committing.
@@ -44,4 +44,3 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - Collision layer 2 holds animals (sheep, and the 6.8 animals) and movable obstacles (`Knockable` props, the crashed car). Wheel rays scan only layer 1, so the car cannot stand on them; their mask (3) still hits the ground, each other and the car body.
 - Bodies can tune the impact damage they deal to the car with metadata: `impact_scale` (multiplier, default 1) and `impact_once` (only the first impact counts). `solid` group membership makes a hit at `lethal_impact_speed` lethal.
 - `Car` resets a rollover onto the nearest road point when its `road` is set (the stage sets it), otherwise in place (lifted 1 m, upright, same heading). Rollover and kill-plane respawn emit penalties that nothing adds to a timer until task 8.3.
-- `project.godot` has an uncommitted `run/main_scene="res://scenes/stage.tscn"` set by the user for test driving. Leave it uncommitted; task 8.2 sets the real main scene.

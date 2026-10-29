@@ -71,7 +71,7 @@
 ## 8. Game flow and UI
 
 - [x] 8.1 Implement `RunState` autoload (seed, difficulty, prize money, owned items, reset); verify with a test that reset clears items and money
-- [ ] 8.2 Build main menu (Start Stage, seed field, gearbox setting, Quit) with controller and keyboard navigation, set as main scene; verify empty seed starts a random stage, seed 42 reproduces the same stage, and the gearbox setting persists after restart
+- [x] 8.2 Build main menu (Start Stage, seed field, gearbox setting, Quit) with controller and keyboard navigation, set as main scene; verify empty seed starts a random stage, seed 42 reproduces the same stage, and the gearbox setting persists after restart
 - [ ] 8.3 Implement stage lifecycle: generation before control, countdown with car frozen, timer, penalties added from rollover and respawn; verify timer starts at 0 after countdown and a penalty increases it
 - [ ] 8.4 Build minimal HUD (timer, speed, gear, RPM with shift light, part conditions; items and upgrade meter are in 7.8); verify a broken tire shows as broken
 - [ ] 8.5 Implement prize money formula and finish screen (time, penalties, money, retry same seed, new seed, main menu); verify with a test that a faster time awards more money and in-game that retry regenerates the same seed
