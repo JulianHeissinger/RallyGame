@@ -2,6 +2,19 @@
 
 Technical work deferred past the vertical slice (`openspec/changes/bootstrap-vertical-slice`), plus slice tasks moved to a later point. Each entry says what triggers it.
 
+## Next changes
+
+Order agreed on 2026-10-29 for the OpenSpec changes after the slice; each builds on the one before. The first three make the full game loop. Open design points (shop offers, meta currency, unlock conditions) live in `docs/syspec/open-questions.md` and need settling in `/opsx:explore` first.
+
+1. `campaign-run-loop`: several stages in a row; `RunState` carries damage, items and money; difficulty rises per stage; a placeholder service screen between stages; stage length toward 3-4 min.
+2. `service-park`: repair budget (~30 service minutes) and a shop paid with prize money and scrap (new currency from the road and defeated threats).
+3. `countries`: `CountryDef` data (surfaces, weather, props, threat pool, boss); start with two (e.g. Wales, Finland), random per run, 3 stages each; weather arrives here.
+4. `boss-stages`: one boss per country, the final country and the run-won screen.
+5. `co-driver-pace-notes`: generated from the finished road.
+6. `meta-progression`: save data, meta currency, unlocks of cars, items and threats, permanent upgrades, the 2 extra mount points.
+7. `presentation`: PS1 shader, liveries, audio, Blender asset pipeline.
+8. Later or optional: rival cars and drones, junctions with route choice, endless mode, the Area 51 ending, chase cam.
+
 ## Multiple cars
 
 Car tuning is data-driven: every value lives in a `CarStats` resource (`data/cars/*.tres`), and `Car`, `Wheel`, `Drivetrain` and `Gearbox` hold no shared state. A new car is a new `.tres` plus an inherited scene of `scenes/car.tscn` for its geometry.
@@ -99,6 +112,14 @@ Task 5.9 was added during section 6 and done after 6.9. A 4 km stage has about 2
 ## Road edge lip
 
 Where the terrain meets the road bevel, it often lies a little lower than the bevel's outer edge (on about 9% of the edge more than 2 cm, at most about 18 cm), which leaves a small lip. Walkers set only horizontal velocity, so animals stopped dead there, and a box even wedges its front under the bevel's thin edge. `Mantle` (`scripts/hazards/mantle.gd`, used by `Sheep` and `Person`) hops a grounded walker onto a ledge ahead that rises more than 3 cm within 0.1 m and is at most 0.3 m high. This roughly halved to quartered the animals stuck at the edge (2026-10-29, 10 spots per flock); some still stall with their front already at the lip, where the rise ahead is under 3 cm. Options if it still bothers: a stall fallback that hops on any rise of 1 cm or more, or a buried skirt below the bevel in `RoadBuilder._faces` so the terrain never meets a vertical edge.
+
+## HUD readability
+
+Task 8.4 (2026-10-29). The stage timer label has a black outline; the older white labels (items list, gear/rpm/speed, notice) do not and are hard to read on snow. Fix: the same `font_outline_color` and `outline_size` overrides in `scenes/ui/hud.tscn`. The `PartsDisplay` schematic is about 136 × 176 px at the 1280×720 base resolution; scale it up if it reads too small while driving.
+
+## Prize money tuning
+
+Task 8.5 (2026-10-29). `prize_base` 1000 and `prize_reference_speed` 20 m/s (`StageParams` "Prize money") are first guesses; tune them once real stage times are known. On seed 42 (3978 m) the par time is 199 s. Retry resets `RunState`, money included, as `design.md` says; money only matters once a multi-stage run exists.
 
 ## Road layout seed failures
 

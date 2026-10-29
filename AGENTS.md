@@ -29,6 +29,8 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - A `-s` script that hits a script error never calls `quit()` and hangs at full CPU. Start each one-off script with a watchdog: `create_timer(90.0).timeout.connect(func(): print("WATCHDOG timeout"); quit(1))`. Hazard `class_name` types (`Person`, `Sheep`, ...) depend on `Car` too, so check with `has_method` instead of `is`.
 - Drift events in such scripts: a handbrake turn from 20 m/s (`steer_left` plus `handbrake`) on the test scene gives `drift_end` after about 0.95 s. A throttle exit with countersteer kept the drift going for more than 2 s, so to check an effect on `drift_end`, emit `car.drift_ended.emit(duration)` directly.
 - For runs longer than about 10 m, steer the car along the road each tick, or it leaves the road on curves and spoils distances: aim at `path.curve.sample_baked(path.progress_at(car.global_position) + 10.0)` in car space and press `steer_right`/`steer_left` with strength `clampf(aim.x / 3.0, -1.0, 1.0)`.
+- UI checks: run a one-off script without `--headless` (`godot --path . --resolution 1280x720 -s <script>`, opens a window for a few seconds), then save `root.get_viewport().get_texture().get_image()` with `save_png` into the scratchpad and look at it. Use `--resolution 2560x1440` to check scaling.
+- One-off scripts that call `Settings.set_gearbox_mode` overwrite the user's real `user://settings.cfg`; back it up first and restore it at the end.
 
 ## Handling tuning
 
@@ -44,3 +46,4 @@ Project facts and working agreements for coding agents. The spec lives in `opens
 - Collision layer 2 holds animals (sheep, and the 6.8 animals) and movable obstacles (`Knockable` props, the crashed car). Wheel rays scan only layer 1, so the car cannot stand on them; their mask (3) still hits the ground, each other and the car body.
 - Bodies can tune the impact damage they deal to the car with metadata: `impact_scale` (multiplier, default 1) and `impact_once` (only the first impact counts). `solid` group membership makes a hit at `lethal_impact_speed` lethal.
 - `Car` resets a rollover onto the nearest road point when its `road` is set (the stage sets it), otherwise in place (lifted 1 m, upright, same heading). Rollover and kill-plane respawn penalties add to the stage's `timer` (`StageTimer`).
+- Space is both `handbrake` and the default `ui_accept`. A menu that opens while the player drives (finish, game over, pause) must keep its buttons disabled for a moment, as `FinishScreen` does with `INPUT_DELAY`, or a held handbrake presses the focused button.
