@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_c5kol"]
+
+[node name="Ford" type="Node3D" unique_id=34204861]
+script = ExtResource("1_c5kol")
+size = Vector2(0, 8)
+grip = 0.8
+drag = 0.3
+color = Color(0.2, 0.35, 0.5, 0.85)
+glossy = true
+edge_post_color = Color(0.95, 0.95, 0.95, 1)
+engine_damage = 20.0
+engine_damage_speed = 13.88888888888889

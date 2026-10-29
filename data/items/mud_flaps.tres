@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_lfaba"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_qudlg"]
+
+[sub_resource type="Resource" id="Resource_6v1ue"]
+script = ExtResource("1_lfaba")
+stat = "patch_drag_scale"
+multiplier = 0.5
+
+[resource]
+script = ExtResource("2_qudlg")
+id = "mud_flaps"
+name = "Mud Flaps"
+description = "Half drag from mud, water and tar."
+modifiers = Array[ExtResource("1_lfaba")]([SubResource("Resource_6v1ue")])

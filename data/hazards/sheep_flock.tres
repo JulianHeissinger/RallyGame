@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/sheep_flock.tscn" id="1_k6axa"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_vchrb"]
+
+[resource]
+script = ExtResource("2_vchrb")
+name = "sheep_flock"
+scene = ExtResource("1_k6axa")
+sign_text = "SHEEP"
+surfaces = PackedStringArray()
+on_road = false

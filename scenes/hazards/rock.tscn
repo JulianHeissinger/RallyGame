@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_2etga"]
+radius = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_effex"]
+albedo_color = Color(0.45, 0.45, 0.45, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rnmhl"]
+material = SubResource("StandardMaterial3D_effex")
+radius = 1.0
+height = 2.0
+
+[node name="Rock" type="StaticBody3D" unique_id=2020514892 groups=["solid"]]
+
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1859633115]
+shape = SubResource("SphereShape3D_2etga")
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=1423839227]
+mesh = SubResource("SphereMesh_rnmhl")

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_jb3fk"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_gbpmi"]
+
+[sub_resource type="Resource" id="Resource_43uf2"]
+script = ExtResource("1_jb3fk")
+stat = "max_torque"
+multiplier = 1.06
+
+[sub_resource type="Resource" id="Resource_lbrhr"]
+script = ExtResource("1_jb3fk")
+stat = "redline_rpm"
+additive = 250.0
+
+[resource]
+script = ExtResource("2_gbpmi")
+id = "sport_exhaust"
+name = "Sport Exhaust"
+description = "Engine part: +6% engine power, +250 rpm redline."
+modifiers = Array[ExtResource("1_jb3fk")]([SubResource("Resource_43uf2"), SubResource("Resource_lbrhr")])

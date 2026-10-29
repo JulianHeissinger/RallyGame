@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_alwtf"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_jvdjv"]
+
+[sub_resource type="Resource" id="Resource_3e0n4"]
+script = ExtResource("1_alwtf")
+stat = "max_torque"
+multiplier = 1.05
+
+[resource]
+script = ExtResource("2_jvdjv")
+id = "cold_air_intake"
+name = "Cold Air Intake"
+description = "Engine part: +5% engine power."
+modifiers = Array[ExtResource("1_alwtf")]([SubResource("Resource_3e0n4")])

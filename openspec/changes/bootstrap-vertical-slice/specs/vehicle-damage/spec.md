@@ -7,18 +7,18 @@ Defines how the car takes damage through individual breakable parts instead of a
 ## ADDED Requirements
 
 ### Requirement: Breakable parts with wear
-The car SHALL have these parts, each with a condition from 100% (intact) to 0% (broken): four tires, four brakes, engine, suspension, and chassis. The car SHALL NOT have a single health value.
+The car SHALL have these parts, each with a condition from 100% (intact) to 0% (broken): four tires, four brakes, four suspension corners, engine, and chassis. The car SHALL NOT have a single health value.
 
 #### Scenario: Fresh car
 - **WHEN** a stage starts with a new car
 - **THEN** every part is at 100%
 
-### Requirement: Fast degradation once damaged
-A damaged part SHALL keep losing condition over time while driving, with the rate rising as condition drops, so parts break fairly quickly after first damage.
+### Requirement: Accelerating degradation once damaged
+A damaged part SHALL keep losing condition over time while driving, with the rate rising as condition drops, so heavily damaged parts break within a stage while lightly damaged parts last several stages.
 
 #### Scenario: Damaged tire degrades
 - **WHEN** a tire is hit down to 70% and the car keeps driving
-- **THEN** the tire's condition keeps falling and reaches 0% within a short driving time
+- **THEN** the tire's condition keeps falling and reaches 0% within about one stage of driving
 
 #### Scenario: Intact part does not degrade
 - **WHEN** a part is at 100% and nothing damages it

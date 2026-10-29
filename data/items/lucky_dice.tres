@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/lucky_repair_effect.gd" id="1_pb0ik"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_p4orv"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_qnhxx"]
+
+[sub_resource type="Resource" id="Resource_m38ub"]
+script = ExtResource("1_pb0ik")
+
+[resource]
+script = ExtResource("3_qnhxx")
+id = "lucky_dice"
+name = "Lucky Dice"
+description = "25% chance that a breaking part repairs itself to 30."
+effect = SubResource("Resource_m38ub")

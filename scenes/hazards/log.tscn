@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/wheel_hazard.gd" id="1_7vuvx"]
+[ext_resource type="Script" path="res://scripts/hazards/road_bumps.gd" id="2_rt1bq"]
+
+[node name="Log" type="Node3D" unique_id=1151771878]
+script = ExtResource("1_7vuvx")
+radius = 0.5
+size = Vector2(0, 0.5)
+continuous = false
+
+[node name="Bumps" type="StaticBody3D" parent="." unique_id=1858762548]
+script = ExtResource("2_rt1bq")
+height = 0.25
+round = true
+color = Color(0.4, 0.27, 0.15, 1)

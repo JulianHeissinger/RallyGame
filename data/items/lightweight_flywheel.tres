@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_afr25"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_wn8px"]
+
+[sub_resource type="Resource" id="Resource_8hne8"]
+script = ExtResource("1_afr25")
+stat = "shift_time"
+multiplier = 0.7
+
+[sub_resource type="Resource" id="Resource_ukinb"]
+script = ExtResource("1_afr25")
+stat = "engine_brake_torque"
+multiplier = 1.3
+
+[resource]
+script = ExtResource("2_wn8px")
+id = "lightweight_flywheel"
+name = "Lightweight Flywheel"
+description = "Engine part: 30% faster shifts, more engine braking."
+modifiers = Array[ExtResource("1_afr25")]([SubResource("Resource_8hne8"), SubResource("Resource_ukinb")])

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/oil.tscn" id="1_aydsf"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_5upr4"]
+
+[resource]
+script = ExtResource("2_5upr4")
+name = "oil"
+scene = ExtResource("1_aydsf")
+sign_text = "OIL"
+surfaces = PackedStringArray()

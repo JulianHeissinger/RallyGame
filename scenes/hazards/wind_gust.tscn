@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/force_area.gd" id="1_force"]
+
+[sub_resource type="StandardMaterial3D" id="Streak"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.6)
+
+[sub_resource type="BoxMesh" id="StreakMesh"]
+material = SubResource("Streak")
+size = Vector3(4, 0.05, 0.05)
+
+[node name="WindGust" type="Node3D"]
+script = ExtResource("1_force")
+size = Vector2(0, 40)
+push = Vector3(10, 0, 0)
+random_side = true
+period = 3.0
+active_time = 1.5
+
+[node name="Active" type="Node3D" parent="."]
+
+[node name="Streak0" type="MeshInstance3D" parent="Active"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.2, -14)
+mesh = SubResource("StreakMesh")
+
+[node name="Streak1" type="MeshInstance3D" parent="Active"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.6, -5)
+mesh = SubResource("StreakMesh")
+
+[node name="Streak2" type="MeshInstance3D" parent="Active"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.8, 4)
+mesh = SubResource("StreakMesh")
+
+[node name="Streak3" type="MeshInstance3D" parent="Active"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.9, 13)
+mesh = SubResource("StreakMesh")

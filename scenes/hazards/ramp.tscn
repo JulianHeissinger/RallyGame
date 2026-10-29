@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ramp"]
+points = PackedVector3Array(-1.5, -0.05, 2.5, 1.5, -0.05, 2.5, -1.5, -0.05, -2.5, 1.5, -0.05, -2.5, -1.5, 1, -2.5, 1.5, 1, -2.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ramp"]
+albedo_color = Color(0.95, 0.75, 0.1, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_ramp"]
+material = SubResource("StandardMaterial3D_ramp")
+left_to_right = 0.0
+size = Vector3(5, 1.05, 3)
+
+[node name="Ramp" type="StaticBody3D"]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_ramp")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0.475, 0)
+mesh = SubResource("PrismMesh_ramp")

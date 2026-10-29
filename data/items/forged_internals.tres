@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_rhek8"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_w03vr"]
+
+[sub_resource type="Resource" id="Resource_8rvm6"]
+script = ExtResource("1_rhek8")
+stat = "engine_damage_taken"
+multiplier = 0.75
+
+[sub_resource type="Resource" id="Resource_wk7v6"]
+script = ExtResource("1_rhek8")
+stat = "engine_damaged_power"
+additive = 0.15
+
+[resource]
+script = ExtResource("2_w03vr")
+id = "forged_internals"
+name = "Forged Internals"
+description = "Engine part: engine takes 25% less damage and keeps more power when damaged."
+modifiers = Array[ExtResource("1_rhek8")]([SubResource("Resource_8rvm6"), SubResource("Resource_wk7v6")])

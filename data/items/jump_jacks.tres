@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/jump_jacks_effect.gd" id="1_n6tm0"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_2snaa"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_7cogy"]
+
+[sub_resource type="Resource" id="Resource_r0n5w"]
+script = ExtResource("1_n6tm0")
+
+[resource]
+script = ExtResource("3_7cogy")
+id = "jump_jacks"
+name = "Jump Jacks"
+description = "Press to hop about 1.5 m into the air."
+kind = 1
+mount = 3
+activation = 1
+cooldown = 6.0
+effect = SubResource("Resource_r0n5w")

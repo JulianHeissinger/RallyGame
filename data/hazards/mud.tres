@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/mud.tscn" id="1_1x43t"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_d78se"]
+
+[resource]
+script = ExtResource("2_d78se")
+name = "mud"
+scene = ExtResource("1_1x43t")
+sign_text = "MUD"
+surfaces = PackedStringArray()

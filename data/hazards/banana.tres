@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/banana.tscn" id="1_7pufp"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_dohr4"]
+
+[resource]
+script = ExtResource("2_dohr4")
+name = "banana"
+scene = ExtResource("1_7pufp")
+sign_text = "BANANA"
+surfaces = PackedStringArray()

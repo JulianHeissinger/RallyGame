@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/prop_cluster.gd" id="1_cluster"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/cone.tscn" id="2_prop"]
+
+[node name="Cones" type="Node3D"]
+script = ExtResource("1_cluster")
+prop = ExtResource("2_prop")
+count_range = Vector2i(4, 8)
+spread_side = 4.0
+spread_along = 2.0
+cell = 0.7

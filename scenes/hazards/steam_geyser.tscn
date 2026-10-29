@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/force_area.gd" id="1_force"]
+
+[sub_resource type="StandardMaterial3D" id="Vent"]
+albedo_color = Color(0.25, 0.22, 0.2, 1)
+
+[sub_resource type="TorusMesh" id="VentMesh"]
+material = SubResource("Vent")
+inner_radius = 1.0
+outer_radius = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Steam"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.95, 0.95, 1, 0.55)
+
+[sub_resource type="CylinderMesh" id="SteamMesh"]
+material = SubResource("Steam")
+top_radius = 2.5
+bottom_radius = 1.2
+height = 10.0
+
+[node name="SteamGeyser" type="Node3D"]
+script = ExtResource("1_force")
+radius = 1.5
+push = Vector3(0, 25, 0)
+period = 4.0
+active_time = 0.5
+
+[node name="Vent" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.3, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("VentMesh")
+
+[node name="Active" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+mesh = SubResource("SteamMesh")

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/log.tscn" id="1_wx8sl"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_7sjs5"]
+
+[resource]
+script = ExtResource("2_7sjs5")
+name = "log"
+scene = ExtResource("1_wx8sl")
+min_difficulty = 2
+sign_text = "LOG"
+surfaces = PackedStringArray()
+on_road = false
+damage = {
+"suspension": 15.0
+}

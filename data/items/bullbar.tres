@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/bullbar_effect.gd" id="1_ntw2f"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_eeetc"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_1h3ng"]
+
+[sub_resource type="Resource" id="Resource_kp1do"]
+script = ExtResource("1_ntw2f")
+
+[sub_resource type="Resource" id="Resource_wvysa"]
+script = ExtResource("2_eeetc")
+stat = "front_impact_damage_taken"
+multiplier = 0.5
+
+[resource]
+script = ExtResource("3_1h3ng")
+id = "bullbar"
+name = "Bullbar"
+description = "Half damage from front hits, and things you ram fly away."
+kind = 1
+modifiers = Array[ExtResource("2_eeetc")]([SubResource("Resource_wvysa")])
+mount = 1
+activation = 2
+trigger_event = "collision"
+effect = SubResource("Resource_kp1do")

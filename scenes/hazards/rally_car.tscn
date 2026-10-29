@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/road_follower.gd" id="1_follower"]
+
+[sub_resource type="BoxShape3D" id="Shape_car"]
+size = Vector3(1.8, 1.2, 4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_car"]
+albedo_color = Color(0.1, 0.35, 0.85, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_car"]
+material = SubResource("Mat_car")
+size = Vector3(1.8, 1.2, 4)
+
+[sub_resource type="BoxShape3D" id="Shape_wing"]
+size = Vector3(1.7, 0.08, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wing"]
+albedo_color = Color(0.95, 0.85, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_wing"]
+material = SubResource("Mat_wing")
+size = Vector3(1.7, 0.08, 0.4)
+
+[node name="RallyCar" type="Node3D"]
+script = ExtResource("1_follower")
+pace = 0.75
+lateral = 0.0
+defeat_on_overtake = true
+dust = true
+lead_time = 6.0
+
+[node name="Body" type="AnimatableBody3D" parent="."]
+collision_layer = 2
+collision_mask = 3
+
+[node name="Collision" type="CollisionShape3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("Shape_car")
+
+[node name="Mesh" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("Mesh_car")
+
+[node name="Wing" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 1.8)
+mesh = SubResource("Mesh_wing")

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_ydj2i"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_awkwy"]
+
+[sub_resource type="Resource" id="Resource_y8npy"]
+script = ExtResource("1_ydj2i")
+stat = "lethal_impact_speed"
+additive = 3.0
+
+[resource]
+script = ExtResource("2_awkwy")
+id = "roll_cage"
+name = "Roll Cage"
+description = "Survives solid hits 3 m/s faster."
+modifiers = Array[ExtResource("1_ydj2i")]([SubResource("Resource_y8npy")])

@@ -1,0 +1,42 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/knockable.gd" id="1_knock"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_toilet"]
+size = Vector3(1.1, 2.3, 1.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blue"]
+albedo_color = Color(0.15, 0.35, 0.8, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cabin"]
+material = SubResource("StandardMaterial3D_blue")
+size = Vector3(1.1, 2.2, 1.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roof"]
+albedo_color = Color(0.95, 0.95, 0.95, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof"]
+material = SubResource("StandardMaterial3D_roof")
+size = Vector3(1.2, 0.1, 1.2)
+
+[node name="PortableToilet" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 3
+mass = 80.0
+contact_monitor = true
+max_contacts_reported = 4
+script = ExtResource("1_knock")
+metadata/impact_scale = 0.05
+metadata/impact_once = true
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+shape = SubResource("BoxShape3D_toilet")
+
+[node name="Cabin" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("BoxMesh_cabin")
+
+[node name="Roof" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, 0)
+mesh = SubResource("BoxMesh_roof")

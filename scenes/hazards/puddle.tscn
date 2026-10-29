@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_n1mom"]
+
+[node name="Puddle" type="Node3D" unique_id=924280943]
+script = ExtResource("1_n1mom")
+grip = 0.7
+drag = 0.08
+color = Color(0.25, 0.4, 0.6, 0.85)
+glossy = true

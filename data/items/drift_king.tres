@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/drift_king_effect.gd" id="1_me0gy"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_gi6rr"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_tvqaq"]
+
+[sub_resource type="Resource" id="Resource_bxw26"]
+script = ExtResource("1_me0gy")
+
+[resource]
+script = ExtResource("3_tvqaq")
+id = "drift_king"
+name = "Drift King"
+description = "Drifting fills the boost meter, twice as fast with a broken brake."
+effect = SubResource("Resource_bxw26")

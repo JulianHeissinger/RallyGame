@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/force_area.gd" id="1_force"]
+
+[sub_resource type="StandardMaterial3D" id="Dust"]
+transparency = 1
+albedo_color = Color(0.75, 0.62, 0.42, 0.5)
+
+[sub_resource type="CylinderMesh" id="DustMesh"]
+material = SubResource("Dust")
+top_radius = 2.5
+bottom_radius = 0.6
+height = 8.0
+radial_segments = 6
+
+[node name="DustDevil" type="Node3D"]
+script = ExtResource("1_force")
+push = Vector3(0, 12, 0)
+spin = 8.0
+radius = 3.0
+wander = 3.0
+
+[node name="Spin" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+mesh = SubResource("DustMesh")

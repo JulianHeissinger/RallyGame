@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/surface_patch.gd" id="1_ppdn5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ppdn5"]
+albedo_color = Color(0.22, 0.15, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ysmvd"]
+material = SubResource("StandardMaterial3D_ppdn5")
+size = Vector3(0.35, 0.01, 5)
+
+[node name="Mud" type="Node3D" unique_id=1039335471]
+script = ExtResource("1_ppdn5")
+radius = 3.0
+grip = 0.8
+drag = 0.25
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="Rut0" type="MeshInstance3D" parent="." unique_id=1016718539]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 0.025, 0)
+mesh = SubResource("BoxMesh_ysmvd")
+
+[node name="Rut1" type="MeshInstance3D" parent="." unique_id=1685665719]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.025, 0)
+mesh = SubResource("BoxMesh_ysmvd")

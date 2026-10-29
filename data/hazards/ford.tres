@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/ford.tscn" id="1_d8rrw"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_e1iac"]
+
+[resource]
+script = ExtResource("2_e1iac")
+name = "ford"
+scene = ExtResource("1_d8rrw")
+min_difficulty = 2
+sign_text = "WATER"
+surfaces = PackedStringArray()
+on_road = false

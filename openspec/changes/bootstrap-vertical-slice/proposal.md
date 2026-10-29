@@ -7,8 +7,8 @@ The repo is empty apart from the design notes in `docs/` (`docs/questions.md`, `
 ## What Changes
 
 - Create a Godot 4 project (GDScript, static typing) at the repo root with a clear folder layout.
-- Add a semi-sim raycast car: slip-based tire model, weight transfer, handbrake, gearbox, playable with controller and keyboard.
-- Add part-based damage: per-part wear (tires x4, brakes x4, engine, suspension, chassis), effects on handling, and immobilization (lethal impact speed or critical parts destroyed).
+- Add a semi-sim raycast car: slip-based tire model, weight transfer, handbrake, gearbox with RPM, rev limiter and automatic or manual shifting, playable with controller and keyboard.
+- Add part-based damage: per-part wear (tires x4, brakes x4, suspension x4, engine, chassis), effects on handling, and immobilization (lethal impact speed or critical parts destroyed).
 - Add an isometric follow camera (art of rally style), built as a swappable rig.
 - Add a seeded procedural stage: road spline with curves, hairpins and crests, terrain around it, scattered props, start and finish.
 - Add a basic hazard system: data-driven hazards placed along the stage by seed and difficulty (e.g. rock, pothole, sheep flock, random malfunction).
@@ -16,7 +16,7 @@ The repo is empty apart from the design notes in `docs/` (`docs/questions.md`, `
 - Add a basic game flow: main menu (start with optional seed, quit), stage run with timer, rollover recovery with time penalty, finish screen with time and prize money, crash/game-over screen.
 - Use placeholder primitives for all visuals (no Blender models yet).
 
-Out of scope: service park and shop, countries/biomes, bosses, rival cars, drones, meta progression, pace notes, PS1 shader and liveries, chase cam, couch co-op, endless mode, save data.
+Out of scope: service park and shop, countries/biomes, bosses, rival cars, drones, meta progression, pace notes, PS1 shader and liveries, chase cam, couch co-op, endless mode, save data (only a settings file for the gearbox mode).
 
 ## Capabilities
 
@@ -37,4 +37,4 @@ Out of scope: service park and shop, countries/biomes, bosses, rival cars, drone
 
 - New Godot 4.7 project files at repo root (`project.godot`, scenes, scripts, input map).
 - No third-party addons or dependencies. Tests run as headless GDScript scripts via `godot --headless`.
-- `docs/` (questions and syspec) stays as the design reference; it is not modified by this change.
+- `docs/` (questions and syspec) stays as the design reference. This change only records decisions made during it (manual gearbox option).

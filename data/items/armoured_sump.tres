@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_nu28x"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_prc01"]
+
+[sub_resource type="Resource" id="Resource_ix6pt"]
+script = ExtResource("1_nu28x")
+stat = "engine_damage_taken"
+multiplier = 0.7
+
+[resource]
+script = ExtResource("2_prc01")
+id = "armoured_sump"
+name = "Armoured Sump"
+description = "Engine takes 30% less damage."
+modifiers = Array[ExtResource("1_nu28x")]([SubResource("Resource_ix6pt")])

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="1_dpokg"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="2_i7m8w"]
+
+[sub_resource type="Resource" id="Resource_rlyxp"]
+script = ExtResource("1_dpokg")
+stat = "wear_rate"
+multiplier = 0.75
+
+[resource]
+script = ExtResource("2_i7m8w")
+id = "mechanics_tape"
+name = "Mechanic's Tape"
+description = "Damaged parts wear 25% slower."
+modifiers = Array[ExtResource("1_dpokg")]([SubResource("Resource_rlyxp")])

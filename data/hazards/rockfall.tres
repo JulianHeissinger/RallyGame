@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HazardDef" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/hazards/rockfall.tscn" id="1_scene"]
+[ext_resource type="Script" path="res://scripts/hazards/hazard_def.gd" id="2_def"]
+
+[resource]
+script = ExtResource("2_def")
+name = "rockfall"
+scene = ExtResource("1_scene")
+min_difficulty = 2
+sign_text = "ROCKFALL"
+surfaces = PackedStringArray()
+on_road = false

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/sheep_flock.gd" id="1_flock"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/bandsman.tscn" id="2_animal"]
+
+[node name="MarchingBand" type="Node3D"]
+script = ExtResource("1_flock")
+animal_scene = ExtResource("2_animal")
+count_range = Vector2i(16, 16)
+spread_along = 2.4
+spread_side = 9.6
+cell = 1.2
+walk_speed = Vector2(1.2, 1.2)
+max_delay = 0.0
+lead_time = 8.0
+spawn_height = 1.1

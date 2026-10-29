@@ -7,7 +7,6 @@ Decisions not made yet. When one is answered, record it in `docs/questions.md` a
 - Trigger for the Area 51 alternative ending (hidden junction route, alien artifact item, other).
 - Stages per country and exact stage length.
 - Mid-stage pick: confirm slow motion after playtesting (fallback: full pause).
-- Manual gearbox option.
 - Pace notes: generation rules, how much they help, co-driver perks.
 - Rival cars: AI behavior for rammable rivals vs. pursuers.
 

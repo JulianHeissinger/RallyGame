@@ -8,7 +8,8 @@ Semi-sim. Goal: feel better than art of rally.
 - Real rally techniques emerge from the physics: lift-off oversteer, Scandinavian flick, handbrake turns, left-foot braking.
 - Physics basis: per-wheel suspension, slip-based tire model (slip angle and slip ratio, load-sensitive, combined slip), weight transfer, per-wheel spin.
 - Surfaces have different grip: gravel, tarmac, snow, ice, mud, grass, sand/fesh-fesh, water. Countries mix surfaces (see [world.md](world.md)).
-- Drivetrain: AWD with a torque curve. The prototype uses an automatic gearbox. A manual gearbox option is a later decision.
+- Drivetrain: AWD with a torque curve. Engine RPM follows driven-wheel spin (wheelspin shows as RPM flare), with an automatic clutch at launch, engine braking and a rev limiter.
+- Gearbox: R, N and forward gears with a shift time. Automatic or manual shifting, chosen in a player setting.
 - All handling values are data, so items, damage and different cars can change them at runtime.
 
 ## Input

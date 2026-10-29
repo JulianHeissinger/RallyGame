@@ -46,16 +46,61 @@ Each wheel SHALL use the grip of the surface it touches, so that off-road ground
 - **WHEN** two wheels leave the road onto off-road terrain
 - **THEN** those wheels have less grip than the wheels still on the road
 
-### Requirement: Drivetrain and gears
-The car SHALL be all-wheel drive with an engine torque curve and an automatic gearbox that shifts up and down by engine speed, and reverse SHALL engage when braking at near standstill.
+### Requirement: Engine and RPM
+The car SHALL be all-wheel drive with an engine torque curve. While a gear is engaged, engine RPM SHALL follow the average spin of the driven wheels times the gear ratio and final drive, and SHALL NOT drop below idle RPM. An automatic clutch SHALL slip at low speed so the car can pull away and the engine never stalls. Releasing the throttle in gear SHALL produce engine braking.
+
+#### Scenario: Wheelspin raises RPM
+- **WHEN** the driver applies full throttle on a low-grip surface and the driven wheels spin faster than the car moves
+- **THEN** engine RPM rises above the RPM that matches the car's road speed
+
+#### Scenario: Engine braking
+- **WHEN** the driver lifts off the throttle in gear at speed without braking
+- **THEN** the car slows down faster than when coasting in neutral
+
+#### Scenario: Launch without stall
+- **WHEN** the car is at standstill in 1st gear and the driver applies throttle
+- **THEN** the car pulls away and the engine does not stall
+
+### Requirement: Rev limiter
+When engine RPM reaches the redline, drive torque SHALL be cut until RPM falls a small margin below the redline, and then restored.
+
+#### Scenario: Limiter bounce
+- **WHEN** the driver holds full throttle in one gear until the redline
+- **THEN** RPM oscillates just below the redline and the car does not exceed that gear's top speed
+
+### Requirement: Gearbox
+The gearbox SHALL have reverse, neutral and forward gears with ratios defined as car data. Each shift SHALL take a shift time (car data) during which no drive torque reaches the wheels. Each completed shift SHALL emit a gear-shift event.
+
+#### Scenario: Torque cut during shift
+- **WHEN** a shift starts
+- **THEN** no drive torque reaches the wheels until the shift time has passed and the new gear is engaged
+
+### Requirement: Gearbox modes
+The gearbox SHALL support an automatic mode and a manual mode, selected by a player setting. In automatic mode the gearbox SHALL shift up and down by engine RPM, and reverse SHALL engage when braking at near standstill. In manual mode the player SHALL shift with shift up and shift down; shifting down from 1st SHALL select neutral and then reverse, reverse SHALL only engage at near standstill, and brake SHALL NOT engage reverse.
 
 #### Scenario: Accelerate from standstill
-- **WHEN** the driver holds full throttle from standstill on a flat road
+- **WHEN** the gearbox is automatic and the driver holds full throttle from standstill on a flat road
 - **THEN** the car accelerates, shifts up through gears, and reaches a top speed it does not exceed
 
 #### Scenario: Reverse
-- **WHEN** the car is near standstill and the driver holds brake
+- **WHEN** the gearbox is automatic, the car is near standstill and the driver holds brake
 - **THEN** the car drives backwards
+
+#### Scenario: Manual shift up
+- **WHEN** the gearbox is manual, the car is in 2nd gear and the driver presses shift up
+- **THEN** the gearbox engages 3rd gear after the shift time
+
+#### Scenario: Manual reverse
+- **WHEN** the gearbox is manual, the car is near standstill in 1st gear and the driver presses shift down twice
+- **THEN** the gearbox selects neutral, then reverse, and throttle drives the car backwards
+
+#### Scenario: Reverse refused while moving
+- **WHEN** the gearbox is manual, the car is in neutral at speed and the driver presses shift down
+- **THEN** the gearbox stays in neutral
+
+#### Scenario: Over-rev downshift refused
+- **WHEN** the gearbox is manual and a downshift would put engine RPM above the redline
+- **THEN** the gearbox stays in the current gear
 
 ### Requirement: Handbrake
 A handbrake input SHALL lock the rear wheels while held, reducing rear grip so the car can rotate into tight corners.
@@ -65,11 +110,15 @@ A handbrake input SHALL lock the rear wheels while held, reducing rear grip so t
 - **THEN** the rear slides out and the car rotates faster than with steering alone
 
 ### Requirement: Realistic rotation speed
-The car's rotation when thrown into a slide SHALL be limited by its physical properties (mass, inertia, grip) with no artificial yaw boost or forced drift angle.
+The car's rotation when thrown into a slide SHALL come from its physical properties (mass, inertia, grip) and never snap to a forced drift angle. While the driver steers, a steering yaw assist MAY add a limited yaw torque toward a yaw rate set by the steering input, so the car holds a light, controllable drift and countersteer catches it. Without steering input the assist SHALL be off.
 
 #### Scenario: No arcade spin assist
 - **WHEN** the car slides with no driver input
 - **THEN** its rotation slows down only through tire forces and does not snap to a preset drift angle
+
+#### Scenario: Assist follows steering
+- **WHEN** the driver steers into a corner and then countersteers
+- **THEN** the assist first adds rotation toward the corner and then works against the slide
 
 ### Requirement: Tunable car parameters
 Car handling parameters (mass, power, grip, suspension, steering) SHALL be data that can be changed without code changes, so items and damage can modify them at runtime.

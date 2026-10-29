@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/hazards/wheel_hazard.gd" id="1_cobkj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cobkj"]
+albedo_color = Color(0.05, 0.04, 0.03, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_iyt7g"]
+material = SubResource("StandardMaterial3D_cobkj")
+height = 0.02
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uemk5"]
+albedo_color = Color(0.35, 0.33, 0.3, 1)
+
+[sub_resource type="TorusMesh" id="TorusMesh_iyt7g"]
+material = SubResource("StandardMaterial3D_uemk5")
+outer_radius = 0.65
+
+[node name="Pothole" type="Node3D" unique_id=325072028]
+script = ExtResource("1_cobkj")
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=1210632961]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_iyt7g")
+
+[node name="Rim" type="MeshInstance3D" parent="." unique_id=1254464668]
+transform = Transform3D(1, 0, 0, 0, 0.4, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("TorusMesh_iyt7g")

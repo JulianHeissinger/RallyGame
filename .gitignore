@@ -1,2 +1,4 @@
 .claude/
 .agents/
+.godot/
+.DS_Store
