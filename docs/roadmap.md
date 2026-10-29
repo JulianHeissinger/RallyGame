@@ -95,6 +95,10 @@ Task 5.9 was added during section 6 and done after 6.9. A 4 km stage has about 2
 
 `SpectatorPlacer`, `SpectatorCrowd` and the `CrowdSurge` hazard call underscore-private helpers of other scripts (`PropScatter._nearest`, `PropScatter._buckets`, `SurfacePatch._outside_sign`). Make them public (drop the underscore, update callers) if more scripts need them.
 
+## Road edge lip
+
+Where the terrain meets the road bevel, it often lies a little lower than the bevel's outer edge (on about 9% of the edge more than 2 cm, at most about 18 cm), which leaves a small lip. Walkers set only horizontal velocity, so animals stopped dead there, and a box even wedges its front under the bevel's thin edge. `Mantle` (`scripts/hazards/mantle.gd`, used by `Sheep` and `Person`) hops a grounded walker onto a ledge ahead that rises more than 3 cm within 0.1 m and is at most 0.3 m high. This roughly halved to quartered the animals stuck at the edge (2026-10-29, 10 spots per flock); some still stall with their front already at the lip, where the rise ahead is under 3 cm. Options if it still bothers: a stall fallback that hops on any rise of 1 cm or more, or a buried skirt below the bevel in `RoadBuilder._faces` so the terrain never meets a vertical edge.
+
 ## Items
 
 Tasks 7.1–7.6 are done (7.6 on 2026-10-29). The 7.6 items, as built:

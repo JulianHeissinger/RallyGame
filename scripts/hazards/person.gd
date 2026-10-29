@@ -25,9 +25,11 @@ var _target := Vector3.ZERO
 var _speed := 0.0
 var _moving := false
 var _cheer_time := 0.0
+var _mantle: Mantle
 
 
 func _ready() -> void:
+	_mantle = Mantle.new(self)
 	$Body.material_override = HazardVisuals.material(color)
 	$Head.material_override = HazardVisuals.material(head_color)
 	body_entered.connect(_on_body_entered)
@@ -73,7 +75,7 @@ func _physics_process(delta: float) -> void:
 		linear_velocity = Vector3(0.0, linear_velocity.y, 0.0)
 		return
 	var step := to.normalized() * _speed
-	linear_velocity = Vector3(step.x, linear_velocity.y, step.z)
+	linear_velocity = Vector3(step.x, _mantle.up_speed(step), step.z)
 
 
 func _on_body_entered(body: Node) -> void:

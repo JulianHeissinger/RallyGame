@@ -28,9 +28,11 @@ var _timer := 0.0
 var _hit := false
 var _knocked_off := false
 var _hop_timer := 0.0
+var _mantle: Mantle
 
 
 func _ready() -> void:
+	_mantle = Mantle.new(self)
 	body_entered.connect(_on_body_entered)
 
 
@@ -67,7 +69,7 @@ func _physics_process(delta: float) -> void:
 		linear_velocity = Vector3(0.0, linear_velocity.y, 0.0)
 		return
 	var step := to.normalized() * walk_speed
-	var up := linear_velocity.y
+	var up := _mantle.up_speed(step)
 	if hop_speed > 0.0:
 		_hop_timer -= delta
 		if _hop_timer <= 0.0:
