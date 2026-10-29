@@ -16,6 +16,7 @@ Known limits, fine until a car needs them:
 - **Geometry lives in the scene.** Wheelbase, track width and the collision box are node transforms in the car scene, not stats. They affect handling as much as the stats do, so tuning a car means editing both files.
 - **Axle role comes from `steerable`.** `Drivetrain` picks the front axle for torque split and brake bias by the wheel's `steerable` flag. Rear-wheel steering would need a separate axle flag.
 - **Gearbox mode is global.** `Settings.gearbox_mode` is one setting for all cars. Split-screen or per-car modes would need it per player.
+- **Shared item effect state.** Effects keep state on the loaded `.tres` resource (Nitro's burn timer, Roof Spoiler's airborne flag, the RNGs of Gearbox of Chaos and Lucky Dice), so two cars with the same item share it. With one car the only trace is a stage reload during a Nitro burn: picking Nitro again pushes for at most the rest of that 1.5 s burn. For AI or rival cars, duplicate item defs per car (`duplicate(true)` in `ItemManager.add_item`); tests that compare mounted defs by identity then need updating.
 
 ## Countries
 
@@ -115,7 +116,6 @@ Items could not be driven in game before the upgrade pick (task 7.7). On 2026-10
 
 Known limits:
 
-- **Shared effect state.** Effects keep state on the loaded `.tres` resource (Nitro's burn timer, Roof Spoiler's airborne flag, the RNGs of Gearbox of Chaos and Lucky Dice). Two cars with the same item, or a stage reload while the resource stays cached, share that state. Duplicate item defs per car (`duplicate(true)` in `ItemManager.add_item`) when a second car or `RunState` (task 8.1) needs it; tests that compare mounted defs by identity then need updating.
-- **Unseeded rolls.** Gearbox of Chaos and Lucky Dice roll with their own randomized RNG. Move them to the run RNG seeded by the stage seed (task 7.7 or 8.1).
+- **Unseeded rolls.** Gearbox of Chaos and Lucky Dice roll with their own randomized RNG. This only matters for replays, ghosts or a fair daily seed; then move them to an RNG stream of the stage seed.
 - **Wear is harsh.** `wear_rate` 0.1 and `wear_acceleration` 10 take any damaged part from 99 to 0 in about 3 minutes. An item that wears a part "even while intact" therefore kills it within one stage; Overboost became data only (double engine damage) for that reason.
 - **First-guess values.** Boost fill (Drift King 0.15/s, Nitro refill 0.04/s), Nitro (cost 0.25, 1.5 s, 6 m/s²), Flame Exhaust (cooldown 0.5 s, 3 m blast at 6 m/s), Bullbar (front damage ×0.5), Drift Launch (1.5 m/s per drift second, max 5), Jump Jacks (5.4 m/s, about 1.5 m) and all passive multipliers. Tune them after driving.

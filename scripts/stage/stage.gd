@@ -1,8 +1,8 @@
 extends Node3D
 ## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
-## returns it to the road when it falls out of the world. `reroll_stage` reloads the scene, which
-## rolls a new seed when the scene's `stage_seed` is 0; `cycle_difficulty` (dev key) steps the
-## difficulty 1-2-3 and reloads the same way.
+## returns it to the road when it falls out of the world. Seed and difficulty come from `RunState`.
+## `reroll_stage` starts a new run with a new seed and reloads; `cycle_difficulty` (dev key) does
+## the same with the next difficulty 1-2-3.
 
 ## Emitted when the car fell out of the world and was put back on the road; `penalty` is in seconds.
 signal car_respawned(penalty: float)
@@ -22,17 +22,15 @@ const START_DISTANCE := 5.0
 const FINISH_PROGRESS_TOLERANCE := 5.0
 const MAX_DEV_DIFFICULTY := 3
 
-## 0 picks a random seed.
+## 0 takes `RunState.stage_seed`, or rolls a random seed when that is 0 too.
 @export var stage_seed := 0
 ## Empty uses the `StageParams` defaults.
 @export var params: StageParams
-## Gates and scales hazards. `RunState` sets it once it exists (task 8.1).
-@export var difficulty := 1
 ## Upgrade picks offered right after spawn, for testing items until the run loop exists.
 @export var start_picks := 3
 
-## Difficulty chosen with the dev key; survives scene reloads. 0 keeps the exported `difficulty`.
-static var _dev_difficulty := 0
+## Gates and scales hazards; set from `RunState.difficulty`.
+var difficulty := 1
 
 var path: RoadPath
 ## Hazard placements, built into the "Hazards" node.
@@ -59,9 +57,11 @@ var _pick := UpgradePick.new()
 
 func _ready() -> void:
 	if stage_seed == 0:
+		stage_seed = RunState.stage_seed
+	if stage_seed == 0:
 		stage_seed = randi_range(1, 999999)
-	if _dev_difficulty > 0:
-		difficulty = _dev_difficulty
+	RunState.stage_seed = stage_seed
+	difficulty = RunState.difficulty
 	print("Stage seed: %d, difficulty %d" % [stage_seed, difficulty])
 	_params = params if params else StageParams.new()
 	path = RoadPath.build(RoadLayout.generate(stage_seed, _params), stage_seed, _params)
@@ -128,6 +128,7 @@ func _queue_pick() -> void:
 
 func _on_picked(def: ItemDef) -> void:
 	_car.items.add_item(def)
+	RunState.add_item(def)
 	print("Picked: " + def.name)
 	if _pending_picks > 0:
 		_pending_picks -= 1
@@ -151,9 +152,10 @@ func _physics_process(_delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reroll_stage"):
+		RunState.reset(0, difficulty)
 		get_tree().reload_current_scene()
 	elif event.is_action_pressed("cycle_difficulty"):
-		_dev_difficulty = difficulty % MAX_DEV_DIFFICULTY + 1
+		RunState.reset(0, difficulty % MAX_DEV_DIFFICULTY + 1)
 		get_tree().reload_current_scene()
 
 
