@@ -63,6 +63,19 @@ extends Resource
 ## Seconds added when the car falls out of the world and is put back on the road.
 @export var respawn_penalty := 10.0
 
+@export_group("Upgrades")
+## Road distance in m that fills the upgrade meter once.
+@export var upgrade_distance := 800.0
+## Share of the meter each defeated hazard adds, times the car's `hazard_bonus_scale`.
+@export var upgrade_hazard_bonus := 0.05
+## Progress steps longer than this in m per tick (respawn, teleport) do not fill the meter.
+@export var upgrade_max_step := 5.0
+## Seconds of real time to pick before the highlighted offer is taken.
+@export var upgrade_pick_time := 60.0
+## `Engine.time_scale` while a pick is open.
+@export var upgrade_time_scale := 0.02
+@export var upgrade_offer_count := 3
+
 @export_group("Surfaces")
 ## Weighted surface table the road sections are drawn from. Neighbouring sections may repeat a surface.
 @export var surfaces: Array[SurfaceSectionDef] = []

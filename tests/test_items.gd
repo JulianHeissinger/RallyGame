@@ -178,6 +178,7 @@ func test_data_items_change_their_stats() -> void:
 			"engine_damaged_power": base["engine_damaged_power"] + 0.15},
 		"mud_flaps": {"patch_drag_scale": 0.5},
 		"ice_studs": {"grip_snow": 1.25, "grip_ice": 1.25},
+		"hazard_hunter": {"hazard_bonus_scale": 2.0},
 	}
 	for id: String in expected:
 		var stats := StatBlock.new(base)

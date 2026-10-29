@@ -35,6 +35,7 @@ stats = {
 "grip_snow": 1.0,
 "grip_tarmac": 1.0,
 "handbrake_torque": 3000.0,
+"hazard_bonus_scale": 1.0,
 "idle_rpm": 900.0,
 "impact_chassis_share": 0.3,
 "impact_damage": 4.0,

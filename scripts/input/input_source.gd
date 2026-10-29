@@ -22,10 +22,21 @@ var handbrake := 0.0
 var shift_up_pressed := false
 var shift_down_pressed := false
 var activate_pressed := false
+## While true (upgrade pick open) every input reads as released and steering centres at once.
+var blocked := false
 
 
 ## Reads input for one physics tick. `speed` is the car's speed in m/s.
 func update(delta: float, speed: float) -> void:
+	if blocked:
+		steer = 0.0
+		throttle = 0.0
+		brake = 0.0
+		handbrake = 0.0
+		shift_up_pressed = false
+		shift_down_pressed = false
+		activate_pressed = false
+		return
 	var stick := Input.get_joy_axis(DEVICE, JOY_AXIS_LEFT_X)
 	if absf(stick) > STICK_DEADZONE:
 		steer = stick

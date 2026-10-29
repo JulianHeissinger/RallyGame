@@ -28,6 +28,8 @@ const MAX_DEV_DIFFICULTY := 3
 @export var params: StageParams
 ## Gates and scales hazards. `RunState` sets it once it exists (task 8.1).
 @export var difficulty := 1
+## Upgrade picks offered right after spawn, for testing items until the run loop exists.
+@export var start_picks := 3
 
 ## Difficulty chosen with the dev key; survives scene reloads. 0 keeps the exported `difficulty`.
 static var _dev_difficulty := 0
@@ -42,6 +44,12 @@ var finish_distance := 0.0
 var _params: StageParams
 var _finished := false
 var _next_malfunction := 0
+var _item_pool: Array[ItemDef] = []
+var _upgrade_rng: RandomNumberGenerator
+## Picks still to show after the open one; the meter can fill again during a pick.
+var _pending_picks := 0
+var _meter := UpgradeMeter.new()
+var _pick := UpgradePick.new()
 
 @onready var _car: Car = $Car
 @onready var _camera: IsoCameraRig = $IsoCameraRig
@@ -82,6 +90,50 @@ func _ready() -> void:
 	malfunction.connect(_hud.show_malfunction)
 	hazard_defeated.connect(func(hazard: Node) -> void: _car.items.on_event("hazard_defeated", {"hazard": hazard}))
 	_debug_overlay.car = _car
+	_setup_upgrades()
+
+
+func _exit_tree() -> void:
+	# A reload or quit during a pick must not leave the next scene in slow motion.
+	Engine.time_scale = 1.0
+
+
+## Upgrade meter and pick: offers come from the whole item pool through a stream of the stage seed.
+func _setup_upgrades() -> void:
+	_item_pool = ItemPool.load_all()
+	_upgrade_rng = SeedStreams.rng(stage_seed, "upgrades")
+	_meter.name = "UpgradeMeter"
+	_meter.setup(_params, _car.stats)
+	_meter.track(_car, path)
+	add_child(_meter)
+	_pick.name = "UpgradePick"
+	add_child(_pick)
+	_meter.filled.connect(_queue_pick)
+	hazard_defeated.connect(func(_hazard: Node) -> void: _meter.add_hazard_bonus())
+	_pick.picked.connect(_on_picked)
+	for i in start_picks:
+		_queue_pick()
+
+
+func _queue_pick() -> void:
+	if _pick.visible:
+		_pending_picks += 1
+		return
+	_pick.open(ItemPool.offer(_item_pool, _car.items, _upgrade_rng, _params.upgrade_offer_count), _car.items,
+			_params.upgrade_pick_time)
+	_car.input.blocked = true
+	Engine.time_scale = _params.upgrade_time_scale
+
+
+func _on_picked(def: ItemDef) -> void:
+	_car.items.add_item(def)
+	print("Picked: " + def.name)
+	if _pending_picks > 0:
+		_pending_picks -= 1
+		_queue_pick()
+		return
+	_car.input.blocked = false
+	Engine.time_scale = 1.0
 
 
 ## Fires each scheduled malfunction once, when the car's road progress passes its distance.

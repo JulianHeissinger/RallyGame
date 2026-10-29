@@ -109,7 +109,9 @@ Tasks 7.1–7.6 are done (7.6 on 2026-10-29). The 7.6 items, as built:
 - Roll Hoop (roof, `rolled_over`, 30 s): cancels the rollover penalty. `Car` passes the penalty to `items.on_event("rolled_over", data)` in a mutable dictionary before it emits `rolled_over` with the possibly changed value.
 - Grapple Hook (front, button, 15 s): only off the road (more than half the road width from the centreline). Sets the horizontal velocity toward the nearest road point to `min(distance * 1.5, 12)` m/s, plus 3 m/s up. From 12 m off the centreline it lands about 1 m from it.
 
-Items cannot be driven in game until the upgrade pick (task 7.7). On 2026-10-28 the user declined an F3 dev key that would add items, so 7.2–7.6 are checked with tests and headless runs only.
+Task 7.7 adds the upgrade meter and pick (`UpgradeMeter`, `ItemPool`, `UpgradePick`, built by the stage). All its numbers are first guesses in the `StageParams` "Upgrades" group (one fill per 800 m, +5% per defeated hazard, 60 s real-time pick at time scale 0.02, 3 offers), so countries and the finished run loop can change them. The stage's `start_picks` export (3) opens picks right after spawn so items can be tried; drop it or move it after the countdown in task 8.3. The car takes no input during a pick and rolls freely, so on a slope at the start it can roll back a little during the start picks.
+
+Items could not be driven in game before the upgrade pick (task 7.7). On 2026-10-28 the user declined an F3 dev key that would add items, so 7.2–7.6 are checked with tests and headless runs only.
 
 Known limits:
 
