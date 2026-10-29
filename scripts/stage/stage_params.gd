@@ -63,6 +63,10 @@ extends Resource
 ## Seconds added when the car falls out of the world and is put back on the road.
 @export var respawn_penalty := 10.0
 
+@export_group("Lifecycle")
+## Seconds from the end of the start picks until the timer starts and the car can move.
+@export var countdown_time := 3.0
+
 @export_group("Upgrades")
 ## Road distance in m that fills the upgrade meter once.
 @export var upgrade_distance := 800.0

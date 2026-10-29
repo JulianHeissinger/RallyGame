@@ -1,6 +1,8 @@
 extends Node3D
 ## Generated stage: builds road, terrain and props from a seed, puts the car on the start, and
 ## returns it to the road when it falls out of the world. Seed and difficulty come from `RunState`.
+## Lifecycle: start picks, then a countdown with the car frozen on the start once it has settled,
+## then the timer runs until the finish line; rollover and respawn penalties add to it.
 ## `reroll_stage` starts a new run with a new seed and reloads; `cycle_difficulty` (dev key) does
 ## the same with the next difficulty 1-2-3.
 
@@ -21,12 +23,19 @@ const START_DISTANCE := 5.0
 ## so another road part passing near the finish trigger does not finish the stage.
 const FINISH_PROGRESS_TOLERANCE := 5.0
 const MAX_DEV_DIFFICULTY := 3
+## The car freezes for the countdown once it has dropped onto its wheels: at least this long after
+## spawn, all wheels grounded, and vertical speed below `SETTLE_SPEED` m/s. Horizontal speed is not
+## checked; on a sloped start the car already rolls by then.
+const SETTLE_TIME := 0.3
+const SETTLE_SPEED := 0.05
+
+enum State { PICKS, COUNTDOWN, RUNNING, FINISHED }
 
 ## 0 takes `RunState.stage_seed`, or rolls a random seed when that is 0 too.
 @export var stage_seed := 0
 ## Empty uses the `StageParams` defaults.
 @export var params: StageParams
-## Upgrade picks offered right after spawn, for testing items until the run loop exists.
+## Upgrade picks offered before the countdown, for testing items until the run loop exists.
 @export var start_picks := 3
 
 ## Gates and scales hazards; set from `RunState.difficulty`.
@@ -38,9 +47,12 @@ var hazards: Array[HazardPlacer.Placement] = []
 ## Malfunctions by road distance; `_next_malfunction` is the next one to fire.
 var malfunctions: Array[MalfunctionSchedule.Malfunction] = []
 var finish_distance := 0.0
+var state := State.PICKS
+var timer := StageTimer.new()
 
 var _params: StageParams
-var _finished := false
+var _countdown_left := 0.0
+var _settle_time := 0.0
 var _next_malfunction := 0
 var _item_pool: Array[ItemDef] = []
 var _upgrade_rng: RandomNumberGenerator
@@ -90,7 +102,12 @@ func _ready() -> void:
 	malfunction.connect(_hud.show_malfunction)
 	hazard_defeated.connect(func(hazard: Node) -> void: _car.items.on_event("hazard_defeated", {"hazard": hazard}))
 	_debug_overlay.car = _car
+	_car.rolled_over.connect(timer.add_penalty)
+	car_respawned.connect(timer.add_penalty)
+	_car.input.blocked = true
 	_setup_upgrades()
+	if not _pick.visible:
+		_start_countdown()
 
 
 func _exit_tree() -> void:
@@ -134,12 +151,49 @@ func _on_picked(def: ItemDef) -> void:
 		_pending_picks -= 1
 		_queue_pick()
 		return
-	_car.input.blocked = false
 	Engine.time_scale = 1.0
+	if state == State.PICKS:
+		_start_countdown()
+	else:
+		_car.input.blocked = false
+
+
+func _start_countdown() -> void:
+	state = State.COUNTDOWN
+	_countdown_left = _params.countdown_time
+	_hud.show_notice(str(ceili(_countdown_left)))
+
+
+## Freezes the car once it has settled, counts down and starts the timer.
+func _update_countdown(delta: float) -> void:
+	_settle_time += delta
+	if not _car.freeze and _settle_time >= SETTLE_TIME and absf(_car.linear_velocity.y) < SETTLE_SPEED \
+			and _car.wheels.all(func(wheel: Wheel) -> bool: return wheel.is_grounded):
+		_car.freeze = true
+	if state != State.COUNTDOWN:
+		return
+	var shown := ceili(_countdown_left)
+	_countdown_left -= delta
+	if _countdown_left > 0.0:
+		if ceili(_countdown_left) != shown:
+			_hud.show_notice(str(ceili(_countdown_left)))
+		return
+	_car.freeze = false
+	_car.input.blocked = false
+	state = State.RUNNING
+	timer.start()
+	_hud.show_notice("Go")
+
+
+func _physics_process(delta: float) -> void:
+	timer.update(delta)
+	if state == State.PICKS or state == State.COUNTDOWN:
+		_update_countdown(delta)
+	_update_malfunctions()
 
 
 ## Fires each scheduled malfunction once, when the car's road progress passes its distance.
-func _physics_process(_delta: float) -> void:
+func _update_malfunctions() -> void:
 	if _next_malfunction >= malfunctions.size():
 		return
 	var next := malfunctions[_next_malfunction]
@@ -226,9 +280,10 @@ func _on_kill_plane_body_entered(body: Node3D) -> void:
 
 
 func _on_finish_area_body_entered(body: Node3D) -> void:
-	if body != _car or _finished:
+	if body != _car or state == State.FINISHED:
 		return
 	if path.progress_at(_car.global_position) < finish_distance - FINISH_PROGRESS_TOLERANCE:
 		return
-	_finished = true
+	state = State.FINISHED
+	timer.stop()
 	car_finished.emit()
