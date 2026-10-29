@@ -97,19 +97,19 @@ Task 5.9 was added during section 6 and done after 6.9. A 4 km stage has about 2
 
 ## Items
 
-Tasks 7.1–7.5 are done (2026-10-28). Task 7.6 has a proposed plan that is not yet approved:
+Tasks 7.1–7.6 are done (7.6 on 2026-10-29). The 7.6 items, as built:
 
-- Air Horn (roof, button, 10 s): layer-2 bodies within 40 m and 60° ahead leave the road to their nearer side. `Person` gets `flee`, sheep-type animals get a target 4 m beyond the road edge, double walk speed and `start()`. Nothing in range: no cooldown.
-- Spare Wheel (trunk, `part_broken`, 60 s): a broken tire repairs to 60; other parts do not fire.
-- Roof Spoiler (roof, `jump`): while airborne, a torque pulls pitch and roll toward level (gain 8, damping 3, max 6 rad/s²) until the first wheel contact.
-- Roll Hoop (roof, `rolled_over`, 30 s): cancels the rollover penalty. This needs `Car` to call `items.on_event("rolled_over", {"penalty": p})` with a mutable dictionary before it emits `rolled_over`, and emit the possibly changed penalty. Today the items hear the signal only after it is emitted.
-- Grapple Hook (front, button, 15 s): only off the road (more than half the road width from the centreline). It sets the horizontal velocity toward the nearest road point to `min(distance * 1.5, 12)` m/s, plus 3 m/s up.
+- Air Horn (roof, button, 10 s): people and animals on the road within 40 m and 60° ahead leave it to their nearer side, 4 m past the edge. People run at 6 m/s (`Person.flee`); sheep-type animals walk at double speed (`Sheep.flee_to`). Nothing on the road in range: no cooldown. In a headless run it cleared 75 of 97 sheep standing on the road; the rest were outside the cone or range.
+- Spare Wheel (trunk, `part_broken`, 60 s): a broken tire repairs to 60; other parts do not fire it.
+- Roof Spoiler (roof, `jump`): while airborne, a torque pulls pitch and roll toward level (gain 8, damping 3, max 6 rad/s²) until the first wheel touches down. A roll and pitch kick off the test ramp landed at 2° tilt with it and flipped the car without it.
+- Roll Hoop (roof, `rolled_over`, 30 s): cancels the rollover penalty. `Car` passes the penalty to `items.on_event("rolled_over", data)` in a mutable dictionary before it emits `rolled_over` with the possibly changed value.
+- Grapple Hook (front, button, 15 s): only off the road (more than half the road width from the centreline). Sets the horizontal velocity toward the nearest road point to `min(distance * 1.5, 12)` m/s, plus 3 m/s up. From 12 m off the centreline it lands about 1 m from it.
 
 Items cannot be driven in game until the upgrade pick (task 7.7). On 2026-10-28 the user declined an F3 dev key that would add items, so 7.2–7.6 are checked with tests and headless runs only.
 
 Known limits:
 
-- **Shared effect state.** Effects keep state on the loaded `.tres` resource (Nitro's burn timer, the RNGs of Gearbox of Chaos and Lucky Dice). Two cars with the same item, or a stage reload while the resource stays cached, share that state. Duplicate item defs per car (`duplicate(true)` in `ItemManager.add_item`) when a second car or `RunState` (task 8.1) needs it; tests that compare mounted defs by identity then need updating.
+- **Shared effect state.** Effects keep state on the loaded `.tres` resource (Nitro's burn timer, Roof Spoiler's airborne flag, the RNGs of Gearbox of Chaos and Lucky Dice). Two cars with the same item, or a stage reload while the resource stays cached, share that state. Duplicate item defs per car (`duplicate(true)` in `ItemManager.add_item`) when a second car or `RunState` (task 8.1) needs it; tests that compare mounted defs by identity then need updating.
 - **Unseeded rolls.** Gearbox of Chaos and Lucky Dice roll with their own randomized RNG. Move them to the run RNG seeded by the stage seed (task 7.7 or 8.1).
 - **Wear is harsh.** `wear_rate` 0.1 and `wear_acceleration` 10 take any damaged part from 99 to 0 in about 3 minutes. An item that wears a part "even while intact" therefore kills it within one stage; Overboost became data only (double engine damage) for that reason.
 - **First-guess values.** Boost fill (Drift King 0.15/s, Nitro refill 0.04/s), Nitro (cost 0.25, 1.5 s, 6 m/s²), Flame Exhaust (cooldown 0.5 s, 3 m blast at 6 m/s), Bullbar (front damage ×0.5), Drift Launch (1.5 m/s per drift second, max 5), Jump Jacks (5.4 m/s, about 1.5 m) and all passive multipliers. Tune them after driving.

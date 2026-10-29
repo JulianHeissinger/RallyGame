@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/spare_wheel_effect.gd" id="1_8swkn"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_oft7e"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_48yp3"]
+
+[sub_resource type="Resource" id="Resource_5ik88"]
+script = ExtResource("1_8swkn")
+
+[resource]
+script = ExtResource("3_48yp3")
+id = "spare_wheel"
+name = "Spare Wheel"
+description = "When a tire breaks, the spare goes on: the tire is back to 60."
+kind = 1
+mount = 3
+activation = 2
+trigger_event = "part_broken"
+cooldown = 60.0
+effect = SubResource("Resource_5ik88")

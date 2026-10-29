@@ -84,7 +84,6 @@ func _ready() -> void:
 	landed.connect(func(air_time: float) -> void: items.on_event("landing", {"air_time": air_time}))
 	collided.connect(func(body: Object, speed: float, point: Vector3) -> void:
 		items.on_event("collision", {"body": body, "speed": speed, "point": point}))
-	rolled_over.connect(func(penalty: float) -> void: items.on_event("rolled_over", {"penalty": penalty}))
 	for child in get_children():
 		if child is Wheel:
 			wheels.append(child)
@@ -267,7 +266,10 @@ func _update_rollover(delta: float) -> void:
 		if forward.length_squared() < 0.0001:
 			forward = global_basis.y.slide(Vector3.UP)
 		place(Transform3D(Basis.looking_at(forward.normalized()), global_position + Vector3.UP * ROLLOVER_LIFT))
-	rolled_over.emit(stats.get_stat("rollover_penalty"))
+	# Items hear the rollover first and may change the penalty (Roll Hoop).
+	var data := {"penalty": stats.get_stat("rollover_penalty")}
+	items.on_event("rolled_over", data)
+	rolled_over.emit(data["penalty"])
 
 
 ## Moves the car to `target` at rest, with the wheels stopped.

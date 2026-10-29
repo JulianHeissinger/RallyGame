@@ -39,6 +39,16 @@ func start() -> void:
 	sleeping = false
 
 
+## Walks to `point` at once, `speed_scale` times faster (air horn). Ignored after a car hit.
+func flee_to(point: Vector3, speed_scale: float) -> void:
+	if _hit:
+		return
+	target = point
+	walk_speed *= speed_scale
+	start_delay = 0.0
+	start()
+
+
 func _physics_process(delta: float) -> void:
 	if _hit:
 		if not _knocked_off and _off_road():

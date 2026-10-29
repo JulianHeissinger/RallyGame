@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/roll_hoop_effect.gd" id="1_xpbs6"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_vppy7"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_i84wa"]
+
+[sub_resource type="Resource" id="Resource_3kmvb"]
+script = ExtResource("1_xpbs6")
+
+[resource]
+script = ExtResource("3_i84wa")
+id = "roll_hoop"
+name = "Roll Hoop"
+description = "A rollover costs no time penalty."
+kind = 1
+activation = 2
+trigger_event = "rolled_over"
+cooldown = 30.0
+effect = SubResource("Resource_3kmvb")

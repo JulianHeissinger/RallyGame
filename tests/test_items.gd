@@ -357,3 +357,29 @@ func test_bullbar_halves_front_impact_damage() -> void:
 	assert_almost_eq(armoured.damage.condition["tire_rr"], car.damage.condition["tire_rr"], 0.0001, "rear hits unchanged")
 	assert_almost_eq(rear_bare, 0.0, 0.0001, "front hit left the rear alone")
 	_free_nodes()
+
+
+func test_spare_wheel_repairs_a_broken_tire_only() -> void:
+	var car := _fake_car()
+	car.items.add_item(load("res://data/items/spare_wheel.tres"))
+	car.damage.apply_damage("brake_fl", 100.0)
+	assert_almost_eq(car.damage.condition["brake_fl"], 0.0, 0.0001, "other parts stay broken")
+	assert_almost_eq(car.items.cooldowns[ItemDef.Mount.TRUNK], 0.0, 0.0001, "no cooldown on other parts")
+	car.damage.apply_damage("tire_rl", 100.0)
+	assert_almost_eq(car.damage.condition["tire_rl"], 60.0, 0.0001, "broken tire back to 60")
+	assert_almost_eq(car.items.cooldowns[ItemDef.Mount.TRUNK], 60.0, 0.0001, "cooldown starts")
+	car.damage.apply_damage("tire_fr", 100.0)
+	assert_almost_eq(car.damage.condition["tire_fr"], 0.0, 0.0001, "no spare during cooldown")
+	_free_nodes()
+
+
+func test_roll_hoop_cancels_the_rollover_penalty() -> void:
+	var car := _fake_car()
+	car.items.add_item(load("res://data/items/roll_hoop.tres"))
+	var data := {"penalty": 5.0}
+	car.items.on_event("rolled_over", data)
+	assert_almost_eq(data["penalty"], 0.0, 0.0001, "penalty cancelled")
+	data = {"penalty": 5.0}
+	car.items.on_event("rolled_over", data)
+	assert_almost_eq(data["penalty"], 5.0, 0.0001, "full penalty during cooldown")
+	_free_nodes()

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/grapple_hook_effect.gd" id="1_nfqfq"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_52rxg"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_2dri2"]
+
+[sub_resource type="Resource" id="Resource_vl75v"]
+script = ExtResource("1_nfqfq")
+
+[resource]
+script = ExtResource("3_2dri2")
+id = "grapple_hook"
+name = "Grapple Hook"
+description = "Press when off the road to pull the car back toward it."
+kind = 1
+mount = 1
+activation = 1
+cooldown = 15.0
+effect = SubResource("Resource_vl75v")

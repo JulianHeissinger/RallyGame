@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/air_horn_effect.gd" id="1_2ev4t"]
+[ext_resource type="Script" path="res://scripts/items/stat_modifier.gd" id="2_divvf"]
+[ext_resource type="Script" path="res://scripts/items/item_def.gd" id="3_k44pm"]
+
+[sub_resource type="Resource" id="Resource_3tacv"]
+script = ExtResource("1_2ev4t")
+
+[resource]
+script = ExtResource("3_k44pm")
+id = "air_horn"
+name = "Air Horn"
+description = "Press to clear people and animals off the road ahead."
+kind = 1
+activation = 1
+cooldown = 10.0
+effect = SubResource("Resource_3tacv")
